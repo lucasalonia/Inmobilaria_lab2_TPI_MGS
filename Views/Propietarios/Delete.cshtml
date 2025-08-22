@@ -1,0 +1,26 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.Propietario
+
+@{
+    ViewData["Title"] = "Eliminar Propietario";
+}
+
+<h3>¿Está seguro que desea eliminar este propietario?</h3>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">DNI</dt>
+        <dd class="col-sm-10">@Model.Persona.Dni</dd>
+
+        <dt class="col-sm-2">Nombre</dt>
+        <dd class="col-sm-10">@Model.Persona.Nombre @Model.Persona.Apellido</dd>
+
+        <dt class="col-sm-2">Estado</dt>
+        <dd class="col-sm-10">@Model.Estado</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

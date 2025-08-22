@@ -1,0 +1,51 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.Propietario
+
+@{
+    ViewData["Title"] = "Create";
+}
+<h2>Nuevo Propietario</h2>
+
+<form asp-action="Create" asp-controller="Propietarios" method="post">
+    
+    <label for="Persona_Dni">DNI</label>
+    <input type="text" class="form-control" id="Persona_Dni" name="Persona.Dni" />
+
+    <label for="Persona_Sexo">Sexo</label>
+    <select id="Persona_Sexo" name="Persona.Sexo" class="form-control">
+        <option value="">-- Seleccione --</option>
+        <option value="M">M</option>
+        <option value="F">F</option>
+        <option value="X">X</option>
+    </select>
+
+    <label for="Persona_Nombre">Nombre</label>
+    <input type="text" class="form-control" id="Persona_Nombre" name="Persona.Nombre" />
+
+    <label for="Persona_Apellido">Apellido</label>
+    <input type="text" class="form-control" id="Persona_Apellido" name="Persona.Apellido" />
+
+    <label for="Persona_FechaNacimiento">Fecha de Nacimiento</label>
+    <input type="date" class="form-control" id="Persona_FechaNacimiento" name="Persona.FechaNacimiento" />
+
+    <label for="Persona_Email">Email</label>
+    <input type="email" class="form-control" id="Persona_Email" name="Persona.Email" />
+
+    <label for="Persona_Telefono">Teléfono</label>
+    <input type="text" class="form-control" id="Persona_Telefono" name="Persona.Telefono" />
+
+    <hr />
+
+    <label for="Estado">Estado</label>
+    <select id="Estado" name="Estado" class="form-control">
+        <option value="ACTIVO">ACTIVO</option>
+    </select>
+
+    <label for="CreadoPor">Creado Por</label>
+    <input type="number" class="form-control" id="CreadoPor" name="CreadoPor" />
+
+    <label for="ModificadoPor">Modificado Por</label>
+    <input type="number" class="form-control" id="ModificadoPor" name="ModificadoPor" />
+
+    <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+    <a href="@Url.Action("Index")" class="btn btn-secondary mt-3">Cancelar</a>
+</form>

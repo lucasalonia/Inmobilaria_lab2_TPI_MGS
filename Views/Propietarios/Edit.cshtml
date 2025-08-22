@@ -1,0 +1,54 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.Propietario
+
+@{
+    ViewData["Title"] = "Editar Propietario";
+}
+<h2>Editar Propietario</h2>
+
+<form asp-action="Edit" asp-controller="Propietarios" method="post">
+    @* Ids ocultos *@
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Persona.Id" />
+
+    <label asp-for="Persona.Dni"></label>
+    <input asp-for="Persona.Dni" class="form-control" />
+
+    <label asp-for="Persona.Sexo"></label>
+    <select asp-for="Persona.Sexo" class="form-control">
+        <option value="">-- Seleccione --</option>
+        <option value="M">M</option>
+        <option value="F">F</option>
+        <option value="X">X</option>
+    </select>
+
+    <label asp-for="Persona.Nombre"></label>
+    <input asp-for="Persona.Nombre" class="form-control" />
+
+    <label asp-for="Persona.Apellido"></label>
+    <input asp-for="Persona.Apellido" class="form-control" />
+
+    <label asp-for="Persona.FechaNacimiento"></label>
+    <input asp-for="Persona.FechaNacimiento" type="date" class="form-control" />
+
+    <label asp-for="Persona.Email"></label>
+    <input asp-for="Persona.Email" class="form-control" />
+
+    <label asp-for="Persona.Telefono"></label>
+    <input asp-for="Persona.Telefono" class="form-control" />
+
+    <hr />
+
+    <label asp-for="Estado"></label>
+    <select asp-for="Estado" class="form-control">
+        <option value="ACTIVO">ACTIVO</option>
+    </select>
+
+    <label asp-for="CreadoPor"></label>
+    <input asp-for="CreadoPor" class="form-control" />
+
+    <label asp-for="ModificadoPor"></label>
+    <input asp-for="ModificadoPor" class="form-control" />
+
+    <button type="submit" class="btn btn-primary mt-3">Modificar</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Cancelar</a>
+</form>
