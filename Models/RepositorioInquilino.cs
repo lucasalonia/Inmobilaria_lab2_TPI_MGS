@@ -55,7 +55,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
                                 Console.WriteLine("El inquilino ya existe pero está inactivo. Se actualizará su estado a activo.");
 
                                 string query = @"UPDATE inquilino 
-                                 SET estado = 'ACTIVO', fecha_modificacion = @FechaModificacion, modificado_por = @ModificadoPor 
+                                 SET estado = 'ACTIVO', fecha_modificacion = @FechaModificacion
                                  WHERE persona_id = (SELECT id FROM persona WHERE dni = @Dni)";
 
                                 using (MySqlCommand command = new MySqlCommand())
@@ -64,7 +64,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
                                     command.CommandText = query;
 
                                     command.Parameters.AddWithValue("@FechaModificacion", DateTime.Now);
-                                    command.Parameters.AddWithValue("@ModificadoPor", 1);
+                                    //PENDINTE: CAMBIAR POR USUARIO LOGUEADO
+                                    // insertInquilinoCmd.Parameters.AddWithValue("@ModificadoPor", 1);
                                     command.Parameters.AddWithValue("@Dni", persona.Dni);
 
                                     int rowsAffected = command.ExecuteNonQuery();
@@ -128,8 +129,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
                             // Si se obtuvo un ID de persona, ya sea existente o una nueva, se crear el inquilino - LS
                             if (personaId > 0)
                             {
-                                string insertInquilinoQuery = @"INSERT INTO inquilino (persona_id, estado, fecha_creacion, fecha_modificacion, creado_por, modificado_por)
-                                        VALUES (@personaId, @Estado, @FechaCreacion, @FechaModificacion, @CreadoPor, @ModificadoPor);
+                                string insertInquilinoQuery = @"INSERT INTO inquilino (persona_id, estado, fecha_creacion, fecha_modificacion)
+                                        VALUES (@personaId, @Estado, @FechaCreacion, @FechaModificacion);
                                         SELECT LAST_INSERT_ID();";
 
                                 using (MySqlCommand insertInquilinoCmd = new MySqlCommand(insertInquilinoQuery, connection))
@@ -138,8 +139,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
                                     insertInquilinoCmd.Parameters.AddWithValue("@Estado", "ACTIVO");
                                     insertInquilinoCmd.Parameters.AddWithValue("@FechaCreacion", DateTime.Now);
                                     insertInquilinoCmd.Parameters.AddWithValue("@FechaModificacion", DateTime.Now);
-                                    insertInquilinoCmd.Parameters.AddWithValue("@CreadoPor", 1);
-                                    insertInquilinoCmd.Parameters.AddWithValue("@ModificadoPor", 1);
+                                    //PENDINTE: CAMBIAR POR USUARIO LOGUEADO
+                                    // insertInquilinoCmd.Parameters.AddWithValue("@CreadoPor", 1);
+                                    // insertInquilinoCmd.Parameters.AddWithValue("@ModificadoPor", 1);
 
                                     int inquilinoId = Convert.ToInt32(insertInquilinoCmd.ExecuteScalar());
                                     if (inquilinoId > 0)
@@ -181,7 +183,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
                     connection.Open();
 
                     string query = @"UPDATE inquilino 
-                                 SET estado = 'INACTIVO', fecha_modificacion = @FechaModificacion, modificado_por = @ModificadoPor 
+                                 SET estado = 'INACTIVO', fecha_modificacion = @FechaModificacion
                                  WHERE persona_id = @idPersona";
 
                     using (MySqlCommand command = new MySqlCommand())
@@ -190,7 +192,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
                         command.CommandText = query;
 
                         command.Parameters.AddWithValue("@FechaModificacion", DateTime.Now);
-                        command.Parameters.AddWithValue("@ModificadoPor", 1);
+                        //PENDINTE: CAMBIAR POR USUARIO LOGUEADO
+                        // insertInquilinoCmd.Parameters.AddWithValue("@ModificadoPor", 1);
                         command.Parameters.AddWithValue("@idPersona", idPersona);
 
                         int rowsAffected = command.ExecuteNonQuery();
@@ -221,7 +224,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
         }
 
 
-    //Modificacion tanto de datos de persona como de inquilino
+        //Modificacion tanto de datos de persona como de inquilino
         public bool Modificar(Persona persona)
         {
             bool resultado = false;
@@ -240,7 +243,6 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
                                             p.email = @Email,
                                             p.fecha_modificacion = @FechaModificacion,
                                             i.fecha_modificacion = @FechaModificacion,
-                                            i.modificado_por = @ModificadoPor
                                         WHERE p.id = @idPersona;";
 
                     using (MySqlCommand command = new MySqlCommand())
@@ -254,7 +256,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
                         command.Parameters.AddWithValue("@Telefono", persona.Telefono);
                         command.Parameters.AddWithValue("@Email", persona.Email);
                         command.Parameters.AddWithValue("@FechaModificacion", DateTime.Now);
-                        command.Parameters.AddWithValue("@ModificadoPor", 1);
+                        //PENDINTE: CAMBIAR POR USUARIO LOGUEADO
+                        // insertInquilinoCmd.Parameters.AddWithValue("@ModificadoPor", 1);
                         command.Parameters.AddWithValue("@idPersona", persona.Id);
 
                         int rowsAffected = command.ExecuteNonQuery();

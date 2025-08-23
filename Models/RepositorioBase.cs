@@ -9,7 +9,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
 
         // Temporalmente usamos conexión local a la base de datos 
         //true para local, false para remota - LS
-        protected RepositorioBase(bool usarLocal = true)
+        protected RepositorioBase(bool usarLocal = false)
         {
 
             configuration = new ConfigurationBuilder()

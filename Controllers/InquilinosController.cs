@@ -17,6 +17,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         }
 
 
+
+        /*PENDIENTE: CONTROLAR INGRESO DE INFORMACION. SI ES CORRECTA O SI EXISTE
+        GENERAR MODALES ACORDES QUE SURGAN SEGUN EL RESULTADO DE LOS METODOS DEL REPO - LS*/ 
+
         // GET: InquilinosController
         [Route("[controller]/Index")]
         public ActionResult Index()
