@@ -1,11 +1,13 @@
 using System.Data;
 using System.Data.SqlClient;
+using Inmobilaria_lab2_TPI_MGS.Models;
 using MySql.Data.MySqlClient;
-namespace Inmobilaria_lab2_TPI_MGS.Models
+
+namespace Inmobilaria_lab2_TPI_MGS.Repository
 {
-    public class RepositorioInquilino : RepositorioBase
+    public class InquilinoRepository : BaseRepository
     {
-        public RepositorioInquilino() : base()
+        public InquilinoRepository() : base()
         {
 
         }

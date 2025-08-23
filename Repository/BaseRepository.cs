@@ -1,7 +1,7 @@
 
-namespace Inmobilaria_lab2_TPI_MGS.Models
+namespace Inmobilaria_lab2_TPI_MGS.Repository
 {
-    public abstract class RepositorioBase
+    public abstract class BaseRepository
     {
         protected readonly IConfiguration configuration;
         protected readonly string connectionString;
@@ -9,7 +9,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
 
         // Temporalmente usamos conexión local a la base de datos 
         //true para local, false para remota - LS
-        protected RepositorioBase(bool usarLocal = true)
+        protected BaseRepository(bool usarLocal = false)
         {
 
             configuration = new ConfigurationBuilder()
@@ -19,6 +19,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
 
             //Esto sera utilizado por los repositorios que hereden de esta clase
             //Se utiliza en "(MySqlConnection connection = new MySqlConnection(connectionString))" la cual establece la conexion con la base de datos - LS
+            
             connectionString = usarLocal ? configuration["ConnectionStrings:MySqlLocal"] : configuration["ConnectionStrings:MySqlRemote"];
         }
     }

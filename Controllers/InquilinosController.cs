@@ -1,4 +1,5 @@
 using Inmobilaria_lab2_TPI_MGS.Models;
+using Inmobilaria_lab2_TPI_MGS.Services;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,13 +10,12 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
 {
     public class InquilinosController : Controller
     {
-        private readonly RepositorioInquilino repositorio;
+        private readonly InquilinoService inquilinoService;
 
-        public InquilinosController()
+        public InquilinosController(InquilinoService inquilinoService)
         {
-            this.repositorio = new RepositorioInquilino();
+            this.inquilinoService = inquilinoService;
         }
-
 
         // GET: InquilinosController
         [Route("[controller]/Index")]
@@ -23,7 +23,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         {
             try
             {
-                var lista = repositorio.ObtenerTodos();
+                var lista = inquilinoService.ObtenerTodos();
                 return View(lista);
             }
             catch (Exception ex)
@@ -56,7 +56,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             try
             {
 
-                repositorio.Alta(persona);
+                inquilinoService.Alta(persona);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -71,7 +71,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         {
             try
             {
-                repositorio.Modificar(persona);
+                inquilinoService.Modificar(persona);
 
                 return RedirectToAction("Index");
             }
@@ -87,7 +87,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             try
             {
                 Console.WriteLine(persona.Id);
-                repositorio.Baja(persona.Id);
+                inquilinoService.Baja(persona.Id);
 
                 return RedirectToAction("Index");
             }
