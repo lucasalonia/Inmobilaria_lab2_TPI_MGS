@@ -6,15 +6,20 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
         protected readonly IConfiguration configuration;
         protected readonly string connectionString;
 
-        protected RepositorioBase()
+
+        // Temporalmente usamos conexión local a la base de datos 
+        //true para local, false para remota - LS
+        protected RepositorioBase(bool usarLocal = true)
         {
-           
+
             configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory()) 
+                .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            connectionString = configuration["ConnectionStrings:MySql"];
+            //Esto sera utilizado por los repositorios que hereden de esta clase
+            //Se utiliza en "(MySqlConnection connection = new MySqlConnection(connectionString))" la cual establece la conexion con la base de datos - LS
+            connectionString = usarLocal ? configuration["ConnectionStrings:MySqlLocal"] : configuration["ConnectionStrings:MySqlRemote"];
         }
     }
 }

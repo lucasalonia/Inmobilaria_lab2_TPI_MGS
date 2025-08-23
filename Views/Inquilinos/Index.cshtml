@@ -1,0 +1,148 @@
+@model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.Persona>
+@{
+	ViewData["Title"] = "Index";
+
+}
+<h1>
+	Lista de Inquilinos
+	<div class="btn-group pull-right">
+		<a class="btn btn-primary" asp-action="Agregar" title="Crear"><i class="fa-solid fa-plus"></i></a>
+	</div>
+</h1>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>@Html.DisplayNameFor(model => model.Id)</th>
+			<th>@Html.DisplayNameFor(model => model.Nombre)</th>
+			<th>@Html.DisplayNameFor(model => model.Apellido)</th>
+			<th>@Html.DisplayNameFor(model => model.Dni)</th>
+			<th>@Html.DisplayNameFor(model => model.Telefono)</th>
+			<th>@Html.DisplayNameFor(model => model.Email)</th>
+			<th>@Html.DisplayNameFor(model => model)</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>@item.Id</td>
+				<td>@item.Nombre</td>
+				<td>@item.Apellido</td>
+				<td>@item.Dni</td>
+				<td>@item.Telefono</td>
+				<td>@item.Email</td>
+				<td>
+					<div class="btn-group" role="group">
+						<a class="btn btn-primary btn-editar" href="javascript:void(0);" data-id="@item.Id"
+							data-nombre="@item.Nombre" data-apellido="@item.Apellido" data-dni="@item.Dni"
+							data-telefono="@item.Telefono" data-email="@item.Email" title="Editar">
+							<i class="fa-solid fa-pen"></i>
+						</a>
+
+						<a class="btn btn-danger btn-eliminar" href="javascript:void(0);" data-id="@item.Id"
+						data-nombre="@item.Nombre" data-apellido="@item.Apellido"
+							title="Eliminar">
+							<i class="fa-solid fa-trash-can"></i>
+						</a>
+						
+						<a class="btn btn-secondary" asp-action="PorPropietario" asp-controller="Inmuebles"
+							asp-route-id="@item.Id" title="Mis Propiedades">
+							<i class="fa-solid fa-building"></i>
+						</a>
+					</div>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+
+<!-- Modal Editar Inquilino -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="formEditar" method="post" asp-action="Editar">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editarModalLabel">Editar Inquilino</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" id="Id" name="Id" />
+					<div class="mb-3">
+						<label for="Nombre" class="form-label">Nombre</label>
+						<input type="text" class="form-control" id="Nombre" name="Nombre" required />
+					</div>
+					<div class="mb-3">
+						<label for="Apellido" class="form-label">Apellido</label>
+						<input type="text" class="form-control" id="Apellido" name="Apellido" required />
+					</div>
+					<div class="mb-3">
+						<label for="Dni" class="form-label">DNI</label>
+						<input type="text" class="form-control" id="Dni" name="Dni" required />
+					</div>
+					<div class="mb-3">
+						<label for="Telefono" class="form-label">Teléfono</label>
+						<input type="text" class="form-control" id="Telefono" name="Telefono" />
+					</div>
+					<div class="mb-3">
+						<label for="Email" class="form-label">Email</label>
+						<input type="email" class="form-control" id="Email" name="Email" />
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+					<button type="submit" class="btn btn-primary">Guardar cambios</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Confirmación Eliminar -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="formEliminar" method="post" asp-action="Eliminar">
+				<div class="modal-header">
+					<h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+				</div>
+				<div class="modal-body">
+					<p id="mensajeEliminar"></p>
+				
+					<input type="hidden" id="EliminarId" name="Id" />
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+					<button type="submit" class="btn btn-danger">Eliminar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+document.querySelectorAll('.btn-editar').forEach(btn=>{
+    btn.addEventListener('click',function(){
+        document.getElementById('Id').value=this.dataset.id;
+        document.getElementById('Nombre').value=this.dataset.nombre;
+        document.getElementById('Apellido').value=this.dataset.apellido;
+        document.getElementById('Dni').value=this.dataset.dni;
+        document.getElementById('Telefono').value=this.dataset.telefono;
+        document.getElementById('Email').value=this.dataset.email;
+        new bootstrap.Modal(document.getElementById('editarModal')).show();
+    });
+});
+document.querySelectorAll('.btn-eliminar').forEach(btn=>{
+    btn.addEventListener('click',function(){
+		
+		const nombre = this.dataset.apellido + ' ' + this.dataset.nombre; 
+		
+        document.getElementById('EliminarId').value=this.dataset.id;
+		
+        new bootstrap.Modal(document.getElementById('eliminarModal')).show();
+		document.getElementById('mensajeEliminar').textContent = 
+            `¿Estás seguro que deseas eliminar al inquilino ${nombre}?`;
+    });
+});
+</script>
