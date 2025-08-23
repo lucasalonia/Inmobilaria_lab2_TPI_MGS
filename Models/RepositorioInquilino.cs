@@ -242,7 +242,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
                                             p.telefono = @Telefono,
                                             p.email = @Email,
                                             p.fecha_modificacion = @FechaModificacion,
-                                            i.fecha_modificacion = @FechaModificacion,
+                                            i.fecha_modificacion = @FechaModificacion
                                         WHERE p.id = @idPersona;";
 
                     using (MySqlCommand command = new MySqlCommand())
