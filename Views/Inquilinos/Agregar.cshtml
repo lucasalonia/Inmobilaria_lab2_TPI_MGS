@@ -1,0 +1,80 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.InquilinoCreateViewModel
+@{
+    ViewData["Title"] = "Crear";
+}
+
+@*PERSONA*@
+<form asp-action="Create" style="max-width: 600px; margin: auto;">
+    <h4> Nuevo Inquilino</h4>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <hr>
+    <h5>Ingrese datos personales</h5>
+
+    <div class="form-group">
+        <label asp-for="Persona.Nombre">Nombre</label>
+        <input asp-for="Persona.Nombre" type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
+    </div>
+
+    <br>
+
+    <div class="form-group">
+        <label asp-for="Persona.Apellido">Apelldio</label>
+        <input asp-for="Persona.Apellido" type="text" class="form-control" id="apellido" placeholder="Ingrese su apellido">
+    </div>
+
+    <br>
+
+    <div class="form-group">
+        <label asp-for="Persona.Dni">DNI</label>
+        <input asp-for="Persona.Dni" type="text" class="form-control" id="dni" placeholder="Ingrese su DNI">
+    </div>
+
+    <br>
+
+
+    <div class="form-group">
+        <label asp-for="Persona.Telefono">Telefono</label>
+        <input asp-for="Persona.Telefono" type="tel" class="form-control" id="telefono" placeholder="Ingrese su telefono">
+    </div>
+    
+    <br>
+
+    <div class="form-group">
+        <label asp-for="Persona.Email" for="email">Email</label>
+        <input asp-for="Persona.Email" type="email" class="form-control" id="email" placeholder="Ingrese su email">
+    </div>
+
+    <br>
+
+    <div class="form-group">
+        <label asp-for="Persona.FechaNacimiento">Fecha de Nacimiento</label>
+        <input asp-for="Persona.FechaNacimiento" type="date" class="form-control" id="fechaNacimiento">
+    </div>
+
+    <br>
+
+    <div class="form-group">
+        <label asp-for="Persona.Sexo">Sexo</label><br>
+        <div class="form-check form-check-inline">
+            <input asp-for="Persona.Sexo"  class="form-check-input" type="radio"  id="sexoMasculino" value="M">
+            <label class="form-check-label" for="sexoMasculino">Masculino</label>
+        </div>
+
+        <br>
+
+        <div class="form-check form-check-inline">
+            <input asp-for="Persona.Sexo" class="form-check-input" type="radio" id="sexoFemenino" value="F">
+            <label class="form-check-label" for="sexoFemenino">Femenino</label>
+        </div>
+
+        <br>
+
+        <div class="form-check form-check-inline">
+            <input asp-for="Persona.Sexo" class="form-check-input" type="radio" id="sexoX" value="X">
+            <label class="form-check-label" for="sexoX">No especifica</label>
+        </div>
+        
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar datos</button>
+</form>
+<button type="submit" class="btn btn-primary">Asignar Propiedad</button>
