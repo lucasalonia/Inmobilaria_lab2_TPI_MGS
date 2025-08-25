@@ -9,8 +9,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
         public string Estado { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaModificacion { get; set; }
-        public DateTime? UltimLogin { get; set; } 
-        public int? CreadoPor { get; set; }
-        public int? ModificadoPor { get; set; }
+        public DateTime? UltimoLogin { get; set; } 
+        public Usuario? CreadoPor { get; set; }
+        public Usuario? ModificadoPor { get; set; }
     }
 }
