@@ -1,4 +1,6 @@
 
+using Microsoft.Extensions.Configuration;
+
 namespace Inmobilaria_lab2_TPI_MGS.Repository
 {
     public abstract class BaseRepository
