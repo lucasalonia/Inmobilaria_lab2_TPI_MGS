@@ -1,7 +1,21 @@
+using Inmobilaria_lab2_TPI_MGS.Repository;
+using Inmobilaria_lab2_TPI_MGS.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Repos
+builder.Services.AddScoped<PropietarioRepository>();
+builder.Services.AddScoped<InquilinoRepository>();
+builder.Services.AddScoped<UsuarioRepository>();
+
+
+// Servicios
+builder.Services.AddScoped<PropietarioService, PropietarioServiceImpl>();
+builder.Services.AddScoped<InquilinoService, InquilinoServiceImpl>();
+builder.Services.AddScoped<UsuarioService, UsuarioServiceImpl>();
 
 var app = builder.Build();
 

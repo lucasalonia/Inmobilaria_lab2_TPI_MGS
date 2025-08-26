@@ -1,5 +1,6 @@
 using Google.Protobuf;
 using Inmobilaria_lab2_TPI_MGS.Models;
+using Inmobilaria_lab2_TPI_MGS.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobilaria_lab2_TPI_MGS.Controllers
@@ -7,17 +8,18 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
 
     public class PropietariosController : Controller
     {
-        private readonly RepositorioPropietario repositorio = new RepositorioPropietario();
-        public PropietariosController()
+        private readonly PropietarioService propietarioService;
+        public PropietariosController(PropietarioService propietarioService)
         {
-            this.repositorio = new RepositorioPropietario();
+            this.propietarioService = propietarioService;
         }
+
         [Route("[controller]/Index")]
         public ActionResult Index()
         {
             try
             {
-                var lista = repositorio.ObtenerTodos();
+                var lista = propietarioService.ObtenerTodos();
                 return View(lista);// Views/Propietarios/Index.cshtml
             }
             catch (Exception ex)
@@ -54,7 +56,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             try
             {
                 // Este Alta inserta PERSONA y luego PROPIETARIO
-                var nuevoId = repositorio.Alta(modelo);
+                var nuevoId = propietarioService.Alta(modelo);
 
                 TempData["Msg"] = $"Propietario creado (ID {nuevoId}).";
                 return RedirectToAction(nameof(Index));
@@ -70,7 +72,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         // GET: Propietarios/Edit/5
         public IActionResult Edit(int id)
         {
-            var propietario = repositorio.ObtenerPorId(id);
+            var propietario = propietarioService.ObtenerPorId(id);
             if (propietario == null)
             {
                 return NotFound();
@@ -93,7 +95,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             {
                 try
                 {
-                    repositorio.Modificar(p);
+                    propietarioService.Modificar(p);
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -109,7 +111,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         // GET: Propietarios/Delete/5
         public IActionResult Delete(int id)
         {
-            var propietario = repositorio.ObtenerPorId(id);
+            var propietario = propietarioService.ObtenerPorId(id);
             if (propietario == null)
             {
                 return NotFound();
@@ -124,7 +126,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         {
             try
             {
-                repositorio.BajaLogica(id, 1); // acá podrías pasar el usuario logueado como modificadoPor
+                propietarioService.BajaLogica(id, 1); // acá podrías pasar el usuario logueado como modificadoPor
                 TempData["Mensaje"] = "Propietario eliminado correctamente.";
             }
             catch (Exception ex)
