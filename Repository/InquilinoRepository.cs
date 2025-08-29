@@ -291,18 +291,22 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
 
 
         //Lista todos los inquilinos activos
-        public IList<Persona> ObtenerTodos()
+        //LO QUE QUEREMOS ES LISTAR INQUILINOS CON LOS DATOS DE LA PERSONA. EN ESTE CASO A DIFERENCIA DE LISTAR INQUILINOS SIN CONTRATO
+        // SE OBTIENE TANTO EL ID DE INQUILINO COMO EL DE PERSONA PARA PODER MODIFICAR SUS DATOS - LS
+        public IList<Inquilino> ObtenerTodos()
         {
-            IList<Persona> personas = new List<Persona>();
+            IList<Inquilino> inquilinos = new List<Inquilino>();
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    string query = @"SELECT p.id, p.dni, p.sexo, p.nombre, p.apellido, p.fecha_nacimiento, p.email, p.telefono, 
-                                    p.fecha_creacion, p.fecha_modificacion 
-                                    FROM persona p 
-                                    JOIN inquilino i ON p.id = i.persona_id 
+                    string query = @"
+                                    SELECT i.id AS InquilinoId, i.estado, i.fecha_creacion AS InqFechaCreacion, i.fecha_modificacion AS InqFechaModificacion,
+                                        p.id AS PersonaId, p.dni, p.sexo, p.nombre, p.apellido, p.fecha_nacimiento, p.email, p.telefono,
+                                        p.fecha_creacion AS PersFechaCreacion, p.fecha_modificacion AS PersFechaModificacion
+                                    FROM inquilino i
+                                    JOIN persona p ON p.id = i.persona_id
                                     WHERE i.estado = 'ACTIVO'";
 
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -310,20 +314,87 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     {
                         while (reader.Read())
                         {
-                            Persona persona = new Persona
+                            Inquilino inquilino = new Inquilino
                             {
-                                Id = reader.GetInt32("id"),
-                                Dni = reader.GetString("dni"),
-                                Sexo = reader.GetString("sexo"),
-                                Nombre = reader.GetString("nombre"),
-                                Apellido = reader.GetString("apellido"),
-                                FechaNacimiento = reader.IsDBNull(reader.GetOrdinal("fecha_nacimiento")) ? null : reader.GetDateTime("fecha_nacimiento"),
-                                Email = reader.GetString("email"),
-                                Telefono = reader.GetString("telefono"),
-                                FechaCreacion = reader.GetDateTime("fecha_creacion"),
-                                FechaModificacion = reader.GetDateTime("fecha_modificacion")
+                                Id = reader.GetInt32("InquilinoId"),
+                                Estado = reader.GetString("estado"),
+                                FechaCreacion = reader.GetDateTime("InqFechaCreacion"),
+                                FechaModificacion = reader.GetDateTime("InqFechaModificacion"),
+                                Persona = new Persona
+                                {
+                                    Id = reader.GetInt32("PersonaId"),
+                                    Dni = reader.GetString("dni"),
+                                    Sexo = reader.GetString("sexo"),
+                                    Nombre = reader.GetString("nombre"),
+                                    Apellido = reader.GetString("apellido"),
+                                    FechaNacimiento = reader.IsDBNull(reader.GetOrdinal("fecha_nacimiento"))
+                                                        ? null
+                                                        : reader.GetDateTime("fecha_nacimiento"),
+                                    Email = reader.GetString("email"),
+                                    Telefono = reader.GetString("telefono"),
+                                    FechaCreacion = reader.GetDateTime("PersFechaCreacion"),
+                                    FechaModificacion = reader.GetDateTime("PersFechaModificacion")
+                                }
                             };
-                            personas.Add(persona);
+                            inquilinos.Add(inquilino);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error al obtener inquilinos: {e.Message}");
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+            return inquilinos;
+        }
+
+
+
+        public IList<Persona> ListarInquilinosSinContrato()
+        {
+            IList<Persona> personas = new List<Persona>();
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    string query = @"
+                                SELECT i.id, i.estado, i.fecha_creacion, i.fecha_modificacion,
+                                p.id, p.dni, p.sexo, p.nombre, p.apellido, p.fecha_nacimiento, p.email, p.telefono,p.fecha_creacion, p.fecha_modificacion
+                                FROM persona p
+                                JOIN inquilino i ON p.id = i.persona_id
+                                LEFT JOIN contrato c 
+                                ON i.id = c.inquilino_id 
+                                WHERE c.id IS NULL AND i.estado='ACTIVO';";
+
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                    {
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                //EN ESTE CASO LA PERSONA SE CONFIGURA CON EL ID DE INQUILINO. NO PASA LO MISMO CON OBTENERTODOS (Ver especificacion en el metodo) - LS
+                                Persona persona = new Persona
+                                {
+                                    Id = reader.GetInt32("id"),
+                                    Dni = reader.GetString("dni"),
+                                    Sexo = reader.GetString("sexo"),
+                                    Nombre = reader.GetString("nombre"),
+                                    Apellido = reader.GetString("apellido"),
+                                    FechaNacimiento = reader.GetDateTime("fecha_nacimiento"),
+                                    Email = reader.GetString("email"),
+                                    Telefono = reader.GetString("telefono"),
+                                    FechaCreacion = reader.GetDateTime("fecha_creacion"),
+                                    FechaModificacion = reader.GetDateTime("fecha_modificacion")
+                                };
+                                personas.Add(persona);
+                            }
                         }
                     }
                 }
@@ -339,6 +410,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             }
             return personas;
         }
-
     }
+
+
 }

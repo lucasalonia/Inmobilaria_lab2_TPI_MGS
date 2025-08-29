@@ -5,36 +5,53 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Configuration;
+using Inmobilaria_lab2_TPI_MGS.Models.ViewModels;
 
 namespace Inmobilaria_lab2_TPI_MGS.Controllers
 {
     public class InquilinosController : Controller
     {
         private readonly InquilinoService inquilinoService;
+        private readonly ContratoService contratoService;
 
-        public InquilinosController(InquilinoService inquilinoService)
+        public InquilinosController(InquilinoService inquilinoService, ContratoService contratoService)
         {
             this.inquilinoService = inquilinoService;
+            this.contratoService = contratoService;
         }
 
 
 
         /*PENDIENTE: CONTROLAR INGRESO DE INFORMACION. SI ES CORRECTA O SI EXISTE
-        GENERAR MODALES ACORDES QUE SURGAN SEGUN EL RESULTADO DE LOS METODOS DEL REPO - LS*/ 
+        GENERAR MODALES ACORDES QUE SURGAN SEGUN EL RESULTADO DE LOS METODOS DEL REPO - LS*/
 
         // GET: InquilinosController
         [Route("[controller]/Index")]
         public ActionResult Index()
         {
-            try
+            var listaInquilinos = inquilinoService.ObtenerTodos();
+            var listaViewModel = new List<InquilinoCreateViewModel>();
+            foreach (var inquilino in listaInquilinos)
             {
-                var lista = inquilinoService.ObtenerTodos();
-                return View(lista);
+                var contrato = contratoService.ObtenerContratoVigente(inquilino.Id);
+                
+                if (contrato == null)
+                {
+                    contrato = new Contrato
+                    {
+                        Estado = "SIN CONTRATO"
+                    };
+                }
+
+                listaViewModel.Add(new InquilinoCreateViewModel
+                {
+                    Persona = inquilino.Persona,
+                    Inquilino = inquilino,
+                    Contrato = contrato
+                });
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
+
+            return View(listaViewModel);
         }
 
         [Route("[controller]/Agregar")]

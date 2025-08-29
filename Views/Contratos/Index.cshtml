@@ -1,0 +1,45 @@
+@model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.Persona>
+@{
+	ViewData["Title"] = "Index";
+
+}
+<h1>
+	Inquilinos Sin Contrato Vigente
+</h1>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>@Html.DisplayNameFor(model => model.Id)</th>
+			<th>@Html.DisplayNameFor(model => model.Nombre)</th>
+			<th>@Html.DisplayNameFor(model => model.Apellido)</th>
+			<th>@Html.DisplayNameFor(model => model.Dni)</th>
+			<th>@Html.DisplayNameFor(model => model.Telefono)</th>
+			<th>@Html.DisplayNameFor(model => model.Email)</th>
+			<th>@Html.DisplayNameFor(model => model.Email)</th>
+			<th>@Html.DisplayNameFor(model => model)</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>@item.Id</td>
+				<td>@item.Nombre</td>
+				<td>@item.Apellido</td>
+				<td>@item.Dni</td>
+				<td>@item.Telefono</td>
+				<td>@item.Email</td>
+				<td>
+					<div class="btn-group" role="group">
+						<a class="btn btn-primary btn-editar" href="javascript:void(0);" data-id="@item.Id"
+							data-nombre="@item.Nombre" data-apellido="@item.Apellido" data-dni="@item.Dni"
+							data-telefono="@item.Telefono" data-email="@item.Email" title="Editar">
+							Crear Nuevo Contrato  <i class="bi bi-file-earmark-plus"></i>
+						</a>
+
+					</div>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
