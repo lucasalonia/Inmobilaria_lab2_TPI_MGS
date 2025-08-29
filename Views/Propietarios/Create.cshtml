@@ -2,42 +2,108 @@
 
 @{
     ViewData["Title"] = "Create";
+    bool personaEncontrada = Model?.Persona != null && Model.Persona.Id > 0;
 }
+
 <h2>Nuevo Propietario</h2>
 
+@if (TempData["Msg"] != null)
+{
+    <div class="alert alert-warning">@TempData["Msg"]</div>
+}
+@Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+<form asp-action="BuscarPorDni" asp-controller="Propietarios" method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" class="form-control" name="dni" placeholder="Buscar por DNI" />
+        <button type="submit" class="btn btn-info">Buscar por DNI</button>
+    </div>
+</form>
+
 <form asp-action="Create" asp-controller="Propietarios" method="post">
-    
+    <input type="hidden" name="Persona.Id" value="@Model?.Persona?.Id" />
+
     <label for="Persona_Dni">DNI</label>
-    <input type="text" class="form-control" id="Persona_Dni" name="Persona.Dni" />
+    <input type="text" class="form-control" id="Persona_Dni" name="Persona.Dni" value="@Model?.Persona?.Dni" readonly="@personaEncontrada" />
 
     <label for="Persona_Sexo">Sexo</label>
-    <select id="Persona_Sexo" name="Persona.Sexo" class="form-control">
-        <option value="">-- Seleccione --</option>
-        <option value="M">M</option>
-        <option value="F">F</option>
-        <option value="X">X</option>
-    </select>
+    @if (personaEncontrada)
+    {
+        <input type="hidden" name="Persona.Sexo" value="@Model.Persona.Sexo" />
+        <select id="Persona_Sexo" class="form-control" disabled>
+            <option>@Model.Persona.Sexo</option>
+        </select>
+    }
+    else
+    {
+        <select id="Persona_Sexo" name="Persona.Sexo" class="form-control">
+            <option value="">-- Seleccione --</option>
+            <option value="M" selected="@(Model?.Persona?.Sexo == "M")">M</option>
+            <option value="F" selected="@(Model?.Persona?.Sexo == "F")">F</option>
+            <option value="X" selected="@(Model?.Persona?.Sexo == "X")">X</option>
+        </select>
+    }
 
     <label for="Persona_Nombre">Nombre</label>
-    <input type="text" class="form-control" id="Persona_Nombre" name="Persona.Nombre" />
+    @if (personaEncontrada)
+    {
+        <input type="hidden" name="Persona.Nombre" value="@Model.Persona.Nombre" />
+        <input type="text" class="form-control" value="@Model.Persona.Nombre" readonly />
+    }
+    else
+    {
+        <input type="text" class="form-control" id="Persona_Nombre" name="Persona.Nombre" value="@Model?.Persona?.Nombre" />
+    }
 
     <label for="Persona_Apellido">Apellido</label>
-    <input type="text" class="form-control" id="Persona_Apellido" name="Persona.Apellido" />
+    @if (personaEncontrada)
+    {
+        <input type="hidden" name="Persona.Apellido" value="@Model.Persona.Apellido" />
+        <input type="text" class="form-control" value="@Model.Persona.Apellido" readonly />
+    }
+    else
+    {
+        <input type="text" class="form-control" id="Persona_Apellido" name="Persona.Apellido" value="@Model?.Persona?.Apellido" />
+    }
 
     <label for="Persona_FechaNacimiento">Fecha de Nacimiento</label>
-    <input type="date" class="form-control" id="Persona_FechaNacimiento" name="Persona.FechaNacimiento" />
+    @if (personaEncontrada)
+    {
+        <input type="hidden" name="Persona.FechaNacimiento" value="@Model.Persona.FechaNacimiento?.ToString("yyyy-MM-dd")" />
+        <input type="date" class="form-control" value="@Model.Persona.FechaNacimiento?.ToString("yyyy-MM-dd")" readonly />
+    }
+    else
+    {
+        <input type="date" class="form-control" id="Persona_FechaNacimiento" name="Persona.FechaNacimiento" value="@(Model?.Persona?.FechaNacimiento?.ToString("yyyy-MM-dd"))" />
+    }
 
     <label for="Persona_Email">Email</label>
-    <input type="email" class="form-control" id="Persona_Email" name="Persona.Email" />
+    @if (personaEncontrada)
+    {
+        <input type="hidden" name="Persona.Email" value="@Model.Persona.Email" />
+        <input type="email" class="form-control" value="@Model.Persona.Email" readonly />
+    }
+    else
+    {
+        <input type="email" class="form-control" id="Persona_Email" name="Persona.Email" value="@Model?.Persona?.Email" />
+    }
 
     <label for="Persona_Telefono">Teléfono</label>
-    <input type="text" class="form-control" id="Persona_Telefono" name="Persona.Telefono" />
+    @if (personaEncontrada)
+    {
+        <input type="hidden" name="Persona.Telefono" value="@Model.Persona.Telefono" />
+        <input type="text" class="form-control" value="@Model.Persona.Telefono" readonly />
+    }
+    else
+    {
+        <input type="text" class="form-control" id="Persona_Telefono" name="Persona.Telefono" value="@Model?.Persona?.Telefono" />
+    }
 
     <hr />
 
     <label for="Estado">Estado</label>
     <select id="Estado" name="Estado" class="form-control">
-        <option value="ACTIVO">ACTIVO</option>
+        <option value="ACTIVO" selected>ACTIVO</option>
     </select>
 
     <label for="CreadoPor">Creado Por</label>

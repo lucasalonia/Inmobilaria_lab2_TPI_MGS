@@ -14,6 +14,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
 
         Propietario ObtenerPorId(int propietarioId);
 
+        Persona? ObtenerPorDni(string dni);
+
         int Alta(Propietario propietario);
     }
 }

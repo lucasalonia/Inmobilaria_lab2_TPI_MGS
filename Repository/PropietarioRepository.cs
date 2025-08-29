@@ -50,9 +50,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                     Sexo = reader.GetString("sexo"),
                                     Nombre = reader.GetString("nombre"),
                                     Apellido = reader.GetString("apellido"),
-                                    FechaNacimiento = reader.IsDBNull(reader.GetOrdinal("fecha_nacimiento")) ? (DateTime?)null : reader.GetDateTime("fecha_nacimiento"),
-                                    Email = reader.GetString("email"),
-                                    Telefono = reader.GetString("telefono"),
+                                    FechaNacimiento = reader.IsDBNull(reader.GetOrdinal("fecha_nacimiento")) ? null : reader.GetDateTime("fecha_nacimiento"),
+                                    Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString("email"),
+                                    Telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? null : reader.GetString("telefono"),
                                     FechaCreacion = reader.GetDateTime("fecha_creacion"),
                                     FechaModificacion = reader.GetDateTime("fecha_modificacion")
                                 }
@@ -68,20 +68,34 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
 
         public int Alta(Propietario p)
         {
-            int res = -1;
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
 
-                // 1. Insertar en persona
+            // 1. Usar el Id de Persona si ya existe (viene del formulario)
+            int personaId = p.Persona.Id;
+
+            // 2. Si no viene Id, buscar por DNI en la base de datos
+            if (personaId == 0)
+            {
+                var checkSql = "SELECT id FROM persona WHERE dni = @dni";
+                using (var checkCmd = new MySqlCommand(checkSql, connection))
+                {
+                    checkCmd.Parameters.AddWithValue("@dni", p.Persona.Dni);
+                    var result = checkCmd.ExecuteScalar();
+                    personaId = result != null ? Convert.ToInt32(result) : 0;
+                }
+            }
+
+            // 3. Insertar persona solo si personaId sigue siendo 0
+            if (personaId == 0)
+            {
                 string sqlPersona = @"
                     INSERT INTO persona 
-                    (dni, sexo, nombre, apellido, fecha_nacimiento, email, telefono, 
-                    fecha_creacion, fecha_modificacion)
-                    VALUES (@dni, @sexo, @nombre, @apellido, @fecha_nacimiento, @email, @telefono, NOW(), NOW());
+                    (dni, sexo, nombre, apellido, fecha_nacimiento, email, telefono, fecha_creacion, fecha_modificacion)
+                    VALUES 
+                    (@dni, @sexo, @nombre, @apellido, @fecha_nacimiento, @email, @telefono, NOW(), NOW());
                     SELECT LAST_INSERT_ID();";
 
-                int personaId;
                 using (var command = new MySqlCommand(sqlPersona, connection))
                 {
                     command.Parameters.AddWithValue("@dni", p.Persona.Dni);
@@ -92,33 +106,65 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     command.Parameters.AddWithValue("@email", (object?)p.Persona.Email ?? DBNull.Value);
                     command.Parameters.AddWithValue("@telefono", (object?)p.Persona.Telefono ?? DBNull.Value);
 
+
                     personaId = Convert.ToInt32(command.ExecuteScalar());
-                }
-
-                // 2. Insertar en propietario (estado fijo en 'ACTIVO')
-                string sqlPropietario = @"
-                    INSERT INTO propietario 
-                    (persona_id, estado, fecha_creacion, fecha_modificacion, creado_por, modificado_por)
-                    VALUES (@persona_id, 'ACTIVO', NOW(), NOW(), @creado_por, @modificado_por);
-                    SELECT LAST_INSERT_ID();";
-
-                using (var command = new MySqlCommand(sqlPropietario, connection))
-                {
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddWithValue("@persona_id", personaId);
-                    command.Parameters.AddWithValue("@creado_por", (object?)p.CreadoPor ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@modificado_por", (object?)p.ModificadoPor ?? DBNull.Value);
-
-                    res = Convert.ToInt32(command.ExecuteScalar());
-
-                    p.Persona.Id = personaId;
-                    p.Id = res;
-
-                    connection.Close();
+                    p.Persona.Id = personaId; // asignamos Id recién creado
                 }
             }
-            return res;
-}
+            // 4. Verificar si ya existe un propietario para esa persona
+                var checkPropSql = "SELECT id, estado FROM propietario WHERE persona_id = @persona_id";
+                using (var checkPropCmd = new MySqlCommand(checkPropSql, connection))
+                {
+                    checkPropCmd.Parameters.AddWithValue("@persona_id", personaId);
+                    using var reader = checkPropCmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        int propietarioIdExistente = reader.GetInt32("id");
+                        string estadoActual = reader.GetString("estado");
+                        reader.Close();
+
+                        if (estadoActual == "INACTIVO")
+                        {
+                            // Actualizar a ACTIVO
+                            var updateSql = @"
+                                UPDATE propietario 
+                                SET estado = 'ACTIVO', fecha_modificacion = NOW(), modificado_por = @modificado_por 
+                                WHERE id = @id";
+                            using var updateCmd = new MySqlCommand(updateSql, connection);
+                            updateCmd.Parameters.AddWithValue("@modificado_por", (object?)p.ModificadoPor ?? DBNull.Value);
+                            updateCmd.Parameters.AddWithValue("@id", propietarioIdExistente);
+                            updateCmd.ExecuteNonQuery();
+
+                            p.Id = propietarioIdExistente;
+                            return propietarioIdExistente;
+                        }
+                        else
+                        {
+                            // Ya existe como propietario ACTIVO
+                            throw new Exception("La persona ya es un propietario activo.");
+                        }
+                    }
+                    reader.Close();
+                }
+            // 4. Insertar propietario usando personaId
+            string sqlPropietario = @"
+                INSERT INTO propietario 
+                (persona_id, estado, fecha_creacion, fecha_modificacion, creado_por, modificado_por)
+                VALUES 
+                (@persona_id, @estado, NOW(), NOW(), @creado_por, @modificado_por);
+                SELECT LAST_INSERT_ID();";
+
+            using var cmdProp = new MySqlCommand(sqlPropietario, connection);
+            cmdProp.Parameters.AddWithValue("@persona_id", personaId);
+            cmdProp.Parameters.AddWithValue("@estado", p.Estado ?? "ACTIVO");
+            cmdProp.Parameters.AddWithValue("@creado_por", (object?)p.CreadoPor ?? DBNull.Value);
+            cmdProp.Parameters.AddWithValue("@modificado_por", (object?)p.ModificadoPor ?? DBNull.Value);
+
+            int propietarioId = Convert.ToInt32(cmdProp.ExecuteScalar());
+            p.Id = propietarioId; // asignamos Id recién creado
+
+            return propietarioId;
+        }
 
 
         public Propietario ObtenerPorId(int id)
@@ -173,6 +219,40 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             }
             return p!;
         }
+
+       public Persona? ObtenerPorDni(string dni)
+        {
+            using var connection = new MySqlConnection(connectionString);
+            const string sql = @"
+                SELECT 
+                    id AS personaId,
+                    dni, sexo, nombre, apellido,
+                    fecha_nacimiento, email, telefono
+                FROM persona
+                WHERE dni = @dni
+                LIMIT 1;";
+
+            using var cmd = new MySqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@dni", dni);
+            connection.Open();
+
+            using var r = cmd.ExecuteReader();
+            if (!r.Read()) return null; // no existe la persona
+
+            return new Persona
+            {
+                Id = r.GetInt32("personaId"),
+                Dni = r.GetString("dni"),
+                Sexo = r["sexo"] == DBNull.Value ? "" : r.GetString("sexo"),
+                Nombre = r["nombre"] == DBNull.Value ? "" : r.GetString("nombre"),
+                Apellido = r["apellido"] == DBNull.Value ? "" : r.GetString("apellido"),
+                FechaNacimiento = r["fecha_nacimiento"] == DBNull.Value ? null : r.GetDateTime("fecha_nacimiento"),
+                Email = r["email"] == DBNull.Value ? "" : r.GetString("email"),
+                Telefono = r["telefono"] == DBNull.Value ? "" : r.GetString("telefono")
+            };
+        }
+
+
 
         public int Modificar(Propietario p)
         {

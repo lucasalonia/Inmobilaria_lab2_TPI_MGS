@@ -36,7 +36,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return propietarioRepository.ObtenerPorId(propietarioId);
         }
-
+        
+         public Persona? ObtenerPorDni(string dni)
+        {
+            return propietarioRepository.ObtenerPorDni(dni);
+        }
         public IList<Propietario> ObtenerTodos()
         {
             return propietarioRepository.ObtenerTodos();

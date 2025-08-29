@@ -1,4 +1,4 @@
-using Google.Protobuf;
+
 using Inmobilaria_lab2_TPI_MGS.Models;
 using Inmobilaria_lab2_TPI_MGS.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +27,27 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 throw;
             }
         }
+
+        [HttpGet]
+    public IActionResult BuscarPorDni(string dni)
+    {
+        var persona = propietarioService.ObtenerPorDni(dni);
+
+        var modelo = new Propietario
+        {
+            Persona = persona ?? new Persona(),
+            Estado = "ACTIVO"
+        };
+
+        if (persona == null)
+            TempData["Msg"] = $"No existe persona con DNI {dni}, puede crear nuevo propietario.";
+        else
+            TempData["Msg"] = $"La persona con DNI {dni} ya existe, puede continuar.";
+
+        return View("Create", modelo); // <-- devuelve Propietario, no Persona
+    }
+
+
 
         // GET: Propietarios/Create
         [HttpGet]
@@ -116,7 +137,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             {
                 return NotFound();
             }
-            return View(propietario); // opcional: vista de confirmación
+            return View(propietario);
         }
 
         // POST: Propietarios/Delete/5
@@ -126,7 +147,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         {
             try
             {
-                propietarioService.BajaLogica(id, 1); // acá podrías pasar el usuario logueado como modificadoPor
+                propietarioService.BajaLogica(id, 1);
                 TempData["Mensaje"] = "Propietario eliminado correctamente.";
             }
             catch (Exception ex)
