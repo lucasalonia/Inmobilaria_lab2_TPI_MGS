@@ -30,7 +30,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         public ActionResult Index()
         {
             var listaInquilinos = inquilinoService.ObtenerTodos();
-            var listaViewModel = new List<InquilinoCreateViewModel>();
+            var listaViewModel = new List<InquilinoViewModel>();
             foreach (var inquilino in listaInquilinos)
             {
                 var contrato = contratoService.ObtenerContratoVigente(inquilino.Id);
@@ -43,7 +43,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     };
                 }
 
-                listaViewModel.Add(new InquilinoCreateViewModel
+                listaViewModel.Add(new InquilinoViewModel
                 {
                     Persona = inquilino.Persona,
                     Inquilino = inquilino,
