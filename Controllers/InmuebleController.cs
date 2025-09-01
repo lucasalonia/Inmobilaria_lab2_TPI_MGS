@@ -36,9 +36,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
 
         // POST: Inmueble/Create
         [HttpPost]
-		[ValidateAntiForgeryToken]
-		public IActionResult Create(Inmueble inmueble)
-		{
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Inmueble inmueble)
+        {
             if (ModelState.IsValid)
             {
                 InmuebleService.Alta(inmueble);
@@ -53,7 +53,73 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 }
                 return View(inmueble);
             }
-		}
+        }
+
+        // GET: Inmueble/Edit/5
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var inmueble = InmuebleService.ObtenerPorId(id);
+            if (inmueble == null)
+            {
+                return NotFound();
+            }
+            return View(inmueble);
+        }
+
+        // POST: Inmueble/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Inmueble i)
+        {
+            if (id != i.Id)
+            {
+                return BadRequest();// ID no coincide
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    InmuebleService.Modificar(i);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    // Manejo de errores si algo falla en el update
+                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                }
+            }
+            return View(i);
+        }
+
+        // GET: Inmueble/Delete/5
+        public IActionResult Delete(int id)
+        {
+            var inmueble = InmuebleService.ObtenerPorId(id);
+            if (inmueble == null)
+            {
+                return NotFound();
+            }
+            return View(inmueble);
+        }
+
+        // POST: Inmueble/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            try
+            {
+                InmuebleService.BajaLogica(id, 1);
+                TempData["Mensaje"] = "Inmueble eliminado correctamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al eliminar: " + ex.Message;
+            }
+            return RedirectToAction(nameof(Index));
+        }
 
     }
 }

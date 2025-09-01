@@ -6,13 +6,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
     {
         IList<Inmueble> ObtenerTodos();
 
-        //int Modificar(Inmueble inmueble);
+        int Modificar(Inmueble inmueble);
 
         //int Baja(int idInmueble);
 
-        //int BajaLogica(int id, int? modificadoPor = null);
+        int BajaLogica(int id, int? modificadoPor = null);
 
-        //Propietario ObtenerPorId(int propietarioId);
+        Inmueble ObtenerPorId(int id);
 
         int Alta(Inmueble inmueble);
     }

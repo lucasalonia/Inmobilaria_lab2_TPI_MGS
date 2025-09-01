@@ -20,5 +20,20 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return inmuebleRepository.ObtenerTodos();
         }
+
+        public int Modificar(Inmueble inmueble)
+        {
+            return inmuebleRepository.Modificar(inmueble);
+        }
+
+        public Inmueble ObtenerPorId(int id)
+        {
+            return inmuebleRepository.ObtenerPorId(id);
+        }
+
+        public int BajaLogica(int id, int? modificadoPor = null)
+        {
+            return inmuebleRepository.BajaLogica(id, modificadoPor);
+        }
     }
 }
