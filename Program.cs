@@ -10,12 +10,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<PropietarioRepository>();
 builder.Services.AddScoped<InquilinoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<InmuebleRepository>();
 
 
 // Servicios
 builder.Services.AddScoped<PropietarioService, PropietarioServiceImpl>();
 builder.Services.AddScoped<InquilinoService, InquilinoServiceImpl>();
 builder.Services.AddScoped<UsuarioService, UsuarioServiceImpl>();
+builder.Services.AddScoped<InmuebleService, InmuebleServiceImpl>();
 
 var app = builder.Build();
 

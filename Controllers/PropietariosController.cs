@@ -14,38 +14,55 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             this.propietarioService = propietarioService;
         }
 
-        [Route("[controller]/Index")]
-        public ActionResult Index()
+
+
+        public IActionResult Index(int pagina = 1)
         {
-            try
-            {
-                var lista = propietarioService.ObtenerTodos();
-                return View(lista);// Views/Propietarios/Index.cshtml
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            int tamPagina = 10;
+            var totalRegistros = propietarioService.ContarPropietariosActivos();
+            var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
+
+            var lista = propietarioService.ObtenerTodos(pagina, tamPagina);
+
+            ViewBag.Pagina = pagina;
+            ViewBag.TotalPaginas = totalPaginas;
+
+            return View(lista);
         }
 
-        [HttpGet]
-    public IActionResult BuscarPorDni(string dni)
-    {
-        var persona = propietarioService.ObtenerPorDni(dni);
-
-        var modelo = new Propietario
+        public IActionResult ListarParaSeleccion(int pagina = 1)
         {
-            Persona = persona ?? new Persona(),
-            Estado = "ACTIVO"
-        };
+            int tamPagina = 5;
+            var totalRegistros = propietarioService.ContarPropietariosActivos();
+            var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
 
-        if (persona == null)
-            TempData["Msg"] = $"No existe persona con DNI {dni}, puede crear nuevo propietario.";
-        else
-            TempData["Msg"] = $"La persona con DNI {dni} ya existe, puede continuar.";
+            var lista = propietarioService.ObtenerTodos(pagina, tamPagina);
 
-        return View("Create", modelo); // <-- devuelve Propietario, no Persona
-    }
+            ViewBag.Pagina = pagina;
+            ViewBag.TotalPaginas = totalPaginas;
+
+            return PartialView("_ListaPropietariosSeleccion", lista);
+        }
+
+
+        [HttpGet]
+        public IActionResult BuscarPorDni(string dni)
+        {
+            var persona = propietarioService.ObtenerPorDni(dni);
+
+            var modelo = new Propietario
+            {
+                Persona = persona ?? new Persona(),
+                Estado = "ACTIVO"
+            };
+
+            if (persona == null)
+                TempData["Msg"] = $"No existe persona con DNI {dni}, puede crear nuevo propietario.";
+            else
+                TempData["Msg"] = $"La persona con DNI {dni} ya existe, puede continuar.";
+
+            return View("Create", modelo); // <-- devuelve Propietario, no Persona
+        }
 
 
 
@@ -127,8 +144,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             }
             return View(p);
         }
-        
-        
+
+
         // GET: Propietarios/Delete/5
         public IActionResult Delete(int id)
         {

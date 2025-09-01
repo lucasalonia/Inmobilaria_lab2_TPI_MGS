@@ -1,14 +1,14 @@
-@model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.Propietario>
+@model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.Inmueble>
 
 @{
-	ViewData["Title"] = "Propietarios";
+	ViewData["Title"] = "Inmuebles";
 	var Pagina = ViewBag.Pagina ?? 1;
 	var TotalPaginas = ViewBag.TotalPaginas ?? 1;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Propietarios</h2>
-    <a class="btn btn-success btn-sm" asp-action="Create" title="Nuevo Propietario" data-bs-toggle="tooltip">
+    <h2 class="mb-0">Inmuebles</h2>
+    <a class="btn btn-success btn-sm" asp-action="Create" title="Nuevo inmueble" data-bs-toggle="tooltip">
         <i class="fa-solid fa-plus"></i> Nuevo
     </a>
 </div>
@@ -18,16 +18,15 @@
         <thead class="table-dark">
             <tr>
                 <th>@Html.DisplayNameFor(model => model.Id)</th>
-                <th>@Html.DisplayNameFor(model => model.Persona.Nombre)</th>
-                <th>@Html.DisplayNameFor(model => model.Persona.Apellido)</th>
-                <th>@Html.DisplayNameFor(model => model.Persona.Dni)</th>
-                <th>@Html.DisplayNameFor(model => model.Persona.Telefono)</th>
-                <th>@Html.DisplayNameFor(model => model.Persona.Email)</th>
-                <th>@Html.DisplayNameFor(model => model.Persona.FechaNacimiento)</th>
+                <th>@Html.DisplayNameFor(model => model.Tipo)</th>
+                <th>@Html.DisplayNameFor(model => model.SuperficieM2)</th>
+                <th>@Html.DisplayNameFor(model => model.Ambientes)</th>
+                <th>@Html.DisplayNameFor(model => model.Banos)</th>
+                <th>@Html.DisplayNameFor(model => model.Cochera)</th>
+                <th>@Html.DisplayNameFor(model => model.Direccion)</th>
+                <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
                 <th>@Html.DisplayNameFor(model => model.FechaCreacion)</th>
                 <th>@Html.DisplayNameFor(model => model.FechaModificacion)</th>
-                <th>@Html.DisplayNameFor(model => model.CreadoPor)</th>
-                <th>@Html.DisplayNameFor(model => model.ModificadoPor)</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -36,16 +35,16 @@
             {
                 <tr>
                     <td>@item.Id</td>
-                    <td>@item.Persona.Nombre</td>
-                    <td>@item.Persona.Apellido</td>
-                    <td>@item.Persona.Dni</td>
-                    <td>@(item.Persona.Telefono ?? "-")</td>
-                    <td>@(item.Persona.Email ?? "-")</td>
-                    <td>@(item.Persona.FechaNacimiento?.ToString("dd/MM/yyyy") ?? "-")</td>
+                    <td>@(item.Tipo?? "-")</td>
+                    <td>@(item.SuperficieM2?.ToString() ?? "-")</td>
+                    <td>@(item.Ambientes?.ToString() ?? "-")</td>
+                    <td>@(item.Banos?.ToString() ?? "-")</td>
+                    <td>@(item.Cochera)</td>
+                    <td>@item.Direccion</td>
+                    <td>@(item.Descripcion?? "-")</td>
                     <td>@item.FechaCreacion.ToString("dd/MM/yyyy")</td>
                     <td>@item.FechaModificacion.ToString("dd/MM/yyyy")</td>
-                    <td>@(item.CreadoPor?.ToString() ?? "-")</td>
-                    <td>@(item.ModificadoPor?.ToString() ?? "-")</td>
+
                     <td>
                         <div class="btn-group btn-group-sm" role="group">
                             <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">
@@ -71,6 +70,7 @@
     <div class="alert alert-danger mt-3">@TempData["Error"]</div>
 }
 
+
 <!-- Paginación -->
 <nav aria-label="Page navigation">
 	<ul class="pagination">
@@ -78,7 +78,7 @@
 		@if (Pagina > 1)
 		{
 			<li class="page-item">
-				<a class="page-link" href="~/Propietarios/Index?pagina=@(Pagina - 1)" aria-label="Anterior">
+				<a class="page-link" href="~/Propietarios/Lista?pagina=@(Pagina - 1)" aria-label="Anterior">
 					<i class="fa-solid fa-angles-left"></i>
 				</a>
 			</li>
@@ -94,14 +94,14 @@
 		@for (int i = 1; i <= TotalPaginas; i++)
 		{
 			<li class="page-item @(i == Pagina ? "active" : "")">
-				<a class="page-link" href="~/Propietarios/Index?pagina=@i">@i</a>
+				<a class="page-link" href="~/Propietarios/Lista?pagina=@i">@i</a>
 			</li>
 		}
 		<!-- Botón "Siguiente" -->
 		@if (Pagina < TotalPaginas)
 		{
 			<li class="page-item">
-				<a class="page-link" href="~/Propietarios/Index?pagina=@(Pagina + 1)" aria-label="Siguiente">
+				<a class="page-link" href="~/Propietarios/Lista?pagina=@(Pagina + 1)" aria-label="Siguiente">
 					<i class="fa-solid fa-angles-right"></i>
 				</a>
 			</li>

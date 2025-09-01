@@ -6,6 +6,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
     {
         IList<Propietario> ObtenerTodos();
 
+        IList<Propietario> ObtenerTodos(int paginaNro = 1, int tamPagina = 10);
+
+        int ContarPropietariosActivos();
+
         int Modificar(Propietario propietario);
 
         int Baja(int idPropietario);

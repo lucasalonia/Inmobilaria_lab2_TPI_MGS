@@ -11,7 +11,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
 
         }
 
-        public IList<Propietario> ObtenerTodos()
+        public IList<Propietario> ObtenerTodos(int paginaNro = 1, int tamPagina = 10)
         {
             IList<Propietario> res = new List<Propietario>();
             using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -21,11 +21,18 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     per.dni, per.sexo, per.nombre, per.apellido, per.fecha_nacimiento,
                     per.email, per.telefono, per.fecha_creacion AS persona_fecha_creacion,
                     per.fecha_modificacion AS persona_fecha_modificacion
-                FROM propietario p
-                INNER JOIN persona per ON p.persona_id = per.id
-                WHERE p.estado = 'ACTIVO'";
+                    FROM propietario p
+                    INNER JOIN persona per ON p.persona_id = per.id
+                    WHERE p.estado = 'ACTIVO'
+                    ORDER BY p.id
+                    LIMIT @tamPagina OFFSET @offset;
+                    ";
                 using (MySqlCommand command = new MySqlCommand(sql, connection))
                 {
+                    int offset = (paginaNro - 1) * tamPagina;
+                    command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                    command.Parameters.AddWithValue("@offset", offset);
+
                     command.CommandType = CommandType.Text;
                     connection.Open();
                     using (var reader = command.ExecuteReader())
@@ -112,40 +119,40 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 }
             }
             // 4. Verificar si ya existe un propietario para esa persona
-                var checkPropSql = "SELECT id, estado FROM propietario WHERE persona_id = @persona_id";
-                using (var checkPropCmd = new MySqlCommand(checkPropSql, connection))
+            var checkPropSql = "SELECT id, estado FROM propietario WHERE persona_id = @persona_id";
+            using (var checkPropCmd = new MySqlCommand(checkPropSql, connection))
+            {
+                checkPropCmd.Parameters.AddWithValue("@persona_id", personaId);
+                using var reader = checkPropCmd.ExecuteReader();
+                if (reader.Read())
                 {
-                    checkPropCmd.Parameters.AddWithValue("@persona_id", personaId);
-                    using var reader = checkPropCmd.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        int propietarioIdExistente = reader.GetInt32("id");
-                        string estadoActual = reader.GetString("estado");
-                        reader.Close();
+                    int propietarioIdExistente = reader.GetInt32("id");
+                    string estadoActual = reader.GetString("estado");
+                    reader.Close();
 
-                        if (estadoActual == "INACTIVO")
-                        {
-                            // Actualizar a ACTIVO
-                            var updateSql = @"
+                    if (estadoActual == "INACTIVO")
+                    {
+                        // Actualizar a ACTIVO
+                        var updateSql = @"
                                 UPDATE propietario 
                                 SET estado = 'ACTIVO', fecha_modificacion = NOW(), modificado_por = @modificado_por 
                                 WHERE id = @id";
-                            using var updateCmd = new MySqlCommand(updateSql, connection);
-                            updateCmd.Parameters.AddWithValue("@modificado_por", (object?)p.ModificadoPor ?? DBNull.Value);
-                            updateCmd.Parameters.AddWithValue("@id", propietarioIdExistente);
-                            updateCmd.ExecuteNonQuery();
+                        using var updateCmd = new MySqlCommand(updateSql, connection);
+                        updateCmd.Parameters.AddWithValue("@modificado_por", (object?)p.ModificadoPor ?? DBNull.Value);
+                        updateCmd.Parameters.AddWithValue("@id", propietarioIdExistente);
+                        updateCmd.ExecuteNonQuery();
 
-                            p.Id = propietarioIdExistente;
-                            return propietarioIdExistente;
-                        }
-                        else
-                        {
-                            // Ya existe como propietario ACTIVO
-                            throw new Exception("La persona ya es un propietario activo.");
-                        }
+                        p.Id = propietarioIdExistente;
+                        return propietarioIdExistente;
                     }
-                    reader.Close();
+                    else
+                    {
+                        // Ya existe como propietario ACTIVO
+                        throw new Exception("La persona ya es un propietario activo.");
+                    }
                 }
+                reader.Close();
+            }
             // 4. Insertar propietario usando personaId
             string sqlPropietario = @"
                 INSERT INTO propietario 
@@ -220,7 +227,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             return p!;
         }
 
-       public Persona? ObtenerPorDni(string dni)
+        public Persona? ObtenerPorDni(string dni)
         {
             using var connection = new MySqlConnection(connectionString);
             const string sql = @"
@@ -316,7 +323,20 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 }
             }
             return res;
-}
+        }
+        
+        public int ContarPropietariosActivos()
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = "SELECT COUNT(*) FROM propietario WHERE estado = 'ACTIVO'";
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    connection.Open();
+                    return Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+        }
 
     }
 }

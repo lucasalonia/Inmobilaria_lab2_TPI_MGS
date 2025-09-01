@@ -1,0 +1,92 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.Inmueble
+
+@{
+    ViewData["Title"] = "Create";
+}
+<h2> Nuevo Inmueble</h2>
+
+<form asp-action="Create" asp-controller="Inmueble" method="post">
+    <input type="hidden" asp-for="Estado" value="ACTIVO" />
+
+    <label for="Tipo">Tipo</label>
+    <input type="text" asp-for="Tipo" class="form-control" as id="Tipo" name="Tipo" value="@Model?.Tipo" />
+
+    <label for="SuperficieM2">Superficie (m²)</label>
+    <input type="number" asp-for="SuperficieM2" class="form-control" id="SuperficieM2" name="SuperficieM2" value="@Model?.SuperficieM2" />
+
+    <label for="Ambientes">Ambientes</label>
+    <input type="number" asp-for="Ambientes" class="form-control" id="Ambientes" name="Ambientes" value="@Model?.Ambientes" />
+
+    <label for="Banos">Baños</label>
+    <input type="number" asp-for="Banos" class="form-control" id="Banos" name="Banos" value="@Model?.Banos" />
+
+    <label for="Cochera">Cocheras</label>
+    <input type="number" asp-for="Cochera" class="form-control" min="0" />
+
+    <label for="Direccion">Dirección</label>
+    <input type="text" asp-for="Direccion" class="form-control" id="Direccion" name="Direccion" value="@Model?.Direccion" />
+
+    <label for="Descripcion">Descripción</label>
+    <textarea class="form-control" asp-for="Descripcion" id="Descripcion" name="Descripcion">@Model?.Descripcion</textarea>
+
+    <div class="mb-3">
+        <label for="PropietarioId" class="form-label">Propietario</label>
+        <div class="input-group">
+            <input type="hidden" id="PropietarioId" name="PropietarioId" />
+            <input type="text" id="PropietarioNombre" class="form-control" readonly />
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPropietarios">
+                Seleccionar
+            </button>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+    <a href="@Url.Action("Index", "Inmueble")" class="btn btn-secondary mt-3">Cancelar</a>
+</form>
+
+<!-- Modal para seleccionar propietario -->
+<div class="modal fade" id="modalPropietarios" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Seleccionar Propietario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="contenedorPropietarios">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+<script>
+    function cargarPropietarios(pagina) {
+        $.get('/Propietarios/ListarParaSeleccion?pagina=' + pagina, function (data) {
+            $('#contenedorPropietarios').html(data);
+        });
+    }
+
+    // Cuando se abre el modal, cargamos la primera página
+    $('#modalPropietarios').on('shown.bs.modal', function () {
+        cargarPropietarios(1);
+    });
+
+    // Delegamos el click en la paginación
+    $(document).on('click', '.cargar-pagina', function () {
+        let pagina = $(this).data('pagina');
+        cargarPropietarios(pagina);
+    });
+
+    // Delegamos el click en "Seleccionar"
+    $(document).on('click', '.seleccionar-propietario', function () {
+        let id = $(this).data('id');
+        let nombre = $(this).data('nombre');
+
+        $('#PropietarioId').val(id);
+        $('#PropietarioNombre').val(nombre);
+
+        $('#modalPropietarios').modal('hide');
+    });
+</script>
+}

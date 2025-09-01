@@ -1,0 +1,47 @@
+@model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.Propietario>
+@{
+    var Pagina = ViewBag.Pagina ?? 1;
+    var TotalPaginas = ViewBag.TotalPaginas ?? 1;
+}
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover">
+        <thead>
+            <tr>
+                <th>DNI</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Persona.Dni</td>
+                <td>@item.Persona.Nombre</td>
+                <td>@item.Persona.Apellido</td>
+                <td>
+                    <button type="button" class="btn btn-success btn-sm seleccionar-propietario"
+                            data-id="@item.Id"
+                            data-nombre="@item.Persona.Nombre @item.Persona.Apellido">
+                        Seleccionar
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<!-- Paginación -->
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= TotalPaginas; i++)
+        {
+            <li class="page-item @(i == Pagina ? "active" : "")">
+                <a href="javascript:void(0)" class="page-link cargar-pagina" data-pagina="@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
