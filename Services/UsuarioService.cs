@@ -5,5 +5,6 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
     public interface UsuarioService
     {
         IList<Usuario> ObtenerTodos();
+        Persona BuscarPersona(string dni);
     }
 }

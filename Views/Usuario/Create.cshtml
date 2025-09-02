@@ -1,0 +1,264 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.Usuario
+@{
+    ViewData["Title"] = "Crear Usuario";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-plus me-2"></i>Crear Nuevo Usuario
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <!-- Paso 1: Búsqueda de Persona -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-search me-2"></i>Paso 1: Buscar o Crear Persona
+                            </h5>
+                        
+                        <!-- Buscador por DNI -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="dniBuscar" placeholder="Ingrese DNI para buscar persona existente" maxlength="8">
+                                    <button class="btn btn-outline-primary" type="button" id="btnBuscarPersona">
+                                        <i class="fas fa-search me-1"></i>Buscar
+                                    </button>
+                                    <button class="btn btn-outline-secondary" type="button" id="btnLimpiarPersona">
+                                        <i class="fas fa-eraser me-1"></i>Limpiar
+                                    </button>
+                                </div>
+                                <small class="text-muted">Si la persona ya existe, se cargarán sus datos automáticamente</small>
+                            </div>
+                        </div>
+
+                        <div id="resultadoBusqueda" class="alert" style="display: none;"></div>
+
+                        <!-- Campos de Persona -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">DNI *</label>
+                                    <input type="text" class="form-control" id="dni" name="Persona.Dni" maxlength="8" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Sexo *</label>
+                                    <select class="form-select" id="sexo" name="Persona.Sexo" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="M">Masculino</option>
+                                        <option value="F">Femenino</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="nombre" name="Persona.Nombre" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Apellido *</label>
+                                    <input type="text" class="form-control" id="apellido" name="Persona.Apellido" required />
+                                </div>
+                            </div>
+                        </div>
+
+                            <div class="row">
+                             <div class="col-md-6">
+                                 <div class="mb-3">
+                                     <label class="form-label">Email *</label>
+                                     <input type="email" class="form-control" id="email" name="Persona.Email" required />
+                                 </div>
+                             </div>
+                             <div class="col-md-6">
+                                 <div class="mb-3">
+                                     <label class="form-label">Teléfono</label>
+                                     <input type="tel" class="form-control" id="telefono" name="Persona.Telefono" />
+                                 </div>
+                             </div>
+                         </div>
+                         
+                         <div class="row">
+                             <div class="col-md-6">
+                                 <div class="mb-3">
+                                     <label class="form-label">Fecha de Nacimiento *</label>
+                                     <input type="date" class="form-control" id="fechaNacimiento" name="Persona.FechaNacimiento" required />
+                                 </div>
+                             </div>
+                         </div>
+                    </div>
+
+                    <!-- Paso 2: Datos de Usuario -->
+                    <div class="mb-4">
+                        <h5 class="text-success mb-3">
+                            <i class="fas fa-user-shield me-2"></i>Paso 2: Datos de Usuario
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre de Usuario *</label>
+                                    <input type="text" class="form-control" name="UserName" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Contraseña *</label>
+                                    <input type="password" class="form-control" name="Password" required />
+                                    <small class="text-muted">Mínimo 6 caracteres</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Estado *</label>
+                                    <select class="form-select" name="Estado" required>
+                                        <option value="">Seleccionar estado...</option>
+                                        <option value="Activo">Activo</option>
+                                        <option value="Inactivo">Inactivo</option>
+                                        <option value="Pendiente">Pendiente</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Confirmar Contraseña *</label>
+                                    <input type="password" class="form-control" id="confirmPassword" required />
+                                    <span class="text-danger" id="passwordError"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Crear Usuario
+                        </button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('btnBuscarPersona').addEventListener('click', function() {
+            const dni = document.getElementById('dniBuscar').value.trim();
+            if (!dni) {
+                mostrarResultado('Por favor ingrese un DNI válido', 'warning');
+                return;
+            }
+
+            mostrarResultado('Buscando persona...', 'info');
+            
+            fetch(`/Usuario/BuscarPersona?dni=${dni}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        cargarDatosPersona(data.persona);
+                        mostrarResultado('Persona encontrada. Los datos han sido cargados.', 'success');
+                    } else {
+                        mostrarResultado(data.message, 'warning');
+                        limpiarCamposPersona();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarResultado('Error al buscar persona. Intente nuevamente.', 'danger');
+                });
+        });
+
+        document.getElementById('btnLimpiarPersona').addEventListener('click', function() {
+            limpiarCamposPersona();
+            document.getElementById('dniBuscar').value = '';
+            mostrarResultado('Campos de persona limpiados. Puede ingresar nuevos datos.', 'info');
+        });
+
+        function mostrarResultado(mensaje, tipo) {
+            const resultadoDiv = document.getElementById('resultadoBusqueda');
+            resultadoDiv.className = `alert alert-${tipo}`;
+            resultadoDiv.textContent = mensaje;
+            resultadoDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                resultadoDiv.style.display = 'none';
+            }, 5000);
+        }
+
+         function cargarDatosPersona(persona) {
+             document.getElementById('dni').value = persona.dni;
+             document.getElementById('sexo').value = persona.sexo;
+             document.getElementById('nombre').value = persona.nombre;
+             document.getElementById('apellido').value = persona.apellido;
+             document.getElementById('email').value = persona.email;
+             document.getElementById('telefono').value = persona.telefono || '';
+             document.getElementById('fechaNacimiento').value = persona.fechaNacimiento || '';
+             
+             document.getElementById('dni').readOnly = true;
+             document.getElementById('sexo').disabled = true;
+             document.getElementById('nombre').readOnly = true;
+             document.getElementById('apellido').readOnly = true;
+             document.getElementById('email').readOnly = true;
+             document.getElementById('telefono').readOnly = true;
+             document.getElementById('fechaNacimiento').readOnly = true;
+         }
+
+         function limpiarCamposPersona() {
+             document.getElementById('dni').value = '';
+             document.getElementById('sexo').value = '';
+             document.getElementById('nombre').value = '';
+             document.getElementById('apellido').value = '';
+             document.getElementById('email').value = '';
+             document.getElementById('telefono').value = '';
+             document.getElementById('fechaNacimiento').value = '';
+             
+             document.getElementById('dni').readOnly = false;
+             document.getElementById('sexo').disabled = false;
+             document.getElementById('nombre').readOnly = false;
+             document.getElementById('apellido').readOnly = false;
+             document.getElementById('email').readOnly = false;
+             document.getElementById('telefono').readOnly = false;
+             document.getElementById('fechaNacimiento').readOnly = false;
+         }
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.querySelector('input[name="Password"]').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                document.getElementById('passwordError').textContent = 'Las contraseñas no coinciden.';
+                return false;
+            }
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('La contraseña debe tener al menos 6 caracteres.');
+                return false;
+            }
+            
+            document.getElementById('passwordError').textContent = '';
+        });
+
+        document.getElementById('dniBuscar').addEventListener('input', function() {
+            document.getElementById('dni').value = this.value;
+        });
+    </script>
+}

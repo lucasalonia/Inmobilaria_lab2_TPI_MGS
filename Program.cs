@@ -11,6 +11,7 @@ builder.Services.AddScoped<PropietarioRepository>();
 builder.Services.AddScoped<InquilinoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<InmuebleRepository>();
+builder.Services.AddScoped<PersonaRepository>();
 
 
 // Servicios
@@ -18,6 +19,7 @@ builder.Services.AddScoped<PropietarioService, PropietarioServiceImpl>();
 builder.Services.AddScoped<InquilinoService, InquilinoServiceImpl>();
 builder.Services.AddScoped<UsuarioService, UsuarioServiceImpl>();
 builder.Services.AddScoped<InmuebleService, InmuebleServiceImpl>();
+builder.Services.AddScoped<PersonService, PersonServiceImpl>();
 
 var app = builder.Build();
 
