@@ -1,10 +1,10 @@
-@model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.Persona>
+@model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.ViewModels.InquilinoViewModel>
 @{
 	ViewData["Title"] = "Index";
 
 }
 <h1>
-	Lista de Inquilinos
+	Historial de Inquilinos
 	<div class="btn-group pull-right">
 		<a class="btn btn-primary" asp-action="Agregar" title="Crear"><i class="fa-solid fa-plus"></i></a>
 	</div>
@@ -12,47 +12,64 @@
 <table class="table table-striped">
 	<thead>
 		<tr>
-			<th>@Html.DisplayNameFor(model => model.Id)</th>
-			<th>@Html.DisplayNameFor(model => model.Nombre)</th>
-			<th>@Html.DisplayNameFor(model => model.Apellido)</th>
-			<th>@Html.DisplayNameFor(model => model.Dni)</th>
-			<th>@Html.DisplayNameFor(model => model.Telefono)</th>
-			<th>@Html.DisplayNameFor(model => model.Email)</th>
+			<th>@Html.DisplayNameFor(model => model.Inquilino.Id)</th>
+			<th>@Html.DisplayNameFor(model => model.Persona.Nombre)</th>
+			<th>@Html.DisplayNameFor(model => model.Persona.Apellido)</th>
+			<th>@Html.DisplayNameFor(model => model.Persona.Dni)</th>
+			<th>@Html.DisplayNameFor(model => model.Persona.Telefono)</th>
+			<th>@Html.DisplayNameFor(model => model.Persona.Email)</th>
+			<th>@Html.DisplayNameFor(model => model.Contrato.Estado)</th>
 			<th>@Html.DisplayNameFor(model => model)</th>
 		</tr>
 	</thead>
 	<tbody>
-		@foreach (var item in Model)
+		@if (Model != null && Model.Any())
+		{
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@item.Inquilino.Id</td>
+					<td>@item.Persona.Nombre</td>
+					<td>@item.Persona.Apellido</td>
+					<td>@item.Persona.Dni</td>
+					<td>@item.Persona.Telefono</td>
+					<td>@item.Persona.Email</td>
+					<td
+						style=" text-align:center; background-color:@(item.Contrato == null ? "lightgray" : item.Contrato.Estado == "VIGENTE" ? "lightgreen" : "lightcoral")">
+						@(item.Contrato?.Estado)
+					</td>
+					<td>
+						<div class="btn-group" role="group">
+							<a class="btn btn-primary btn-editar" href="javascript:void(0);" data-id="@item.Persona.Id"
+								data-nombre="@item.Persona.Nombre" data-apellido="@item.Persona.Apellido"
+								data-dni="@item.Persona.Dni" data-telefono="@item.Persona.Telefono"
+								data-email="@item.Persona.Email" title="Editar">
+								<i class="fa-solid fa-pen"></i>
+							</a>
+
+							<a class="btn btn-danger btn-eliminar" href="javascript:void(0);" data-id="@item.Persona.Id"
+								data-nombre="@item.Persona.Nombre" data-apellido="@item.Persona.Apellido" title="Eliminar">
+								<i class="fa-solid fa-trash-can"></i>
+							</a>
+
+							<a class="btn btn-secondary" asp-route-id="@item.Inquilino.Id" title="Alquileres">
+								<i class="fa-solid fa-building"></i>
+							</a>
+						</div>
+					</td>
+				</tr>
+			}
+		}
+		else
 		{
 			<tr>
-				<td>@item.Id</td>
-				<td>@item.Nombre</td>
-				<td>@item.Apellido</td>
-				<td>@item.Dni</td>
-				<td>@item.Telefono</td>
-				<td>@item.Email</td>
-				<td>
-					<div class="btn-group" role="group">
-						<a class="btn btn-primary btn-editar" href="javascript:void(0);" data-id="@item.Id"
-							data-nombre="@item.Nombre" data-apellido="@item.Apellido" data-dni="@item.Dni"
-							data-telefono="@item.Telefono" data-email="@item.Email" title="Editar">
-							<i class="fa-solid fa-pen"></i>
-						</a>
-
-						<a class="btn btn-danger btn-eliminar" href="javascript:void(0);" data-id="@item.Id"
-						data-nombre="@item.Nombre" data-apellido="@item.Apellido"
-							title="Eliminar">
-							<i class="fa-solid fa-trash-can"></i>
-						</a>
-						
-						<a class="btn btn-secondary" asp-action="PorPropietario" asp-controller="Inmuebles"
-							asp-route-id="@item.Id" title="Mis Propiedades">
-							<i class="fa-solid fa-building"></i>
-						</a>
-					</div>
+				<td colspan="8" class="text-center text-muted py-4">
+					<i class="fas fa-info-circle me-2"></i>
+					No hay inquilinos registrados 
 				</td>
 			</tr>
 		}
+
 	</tbody>
 </table>
 
@@ -109,7 +126,7 @@
 				</div>
 				<div class="modal-body">
 					<p id="mensajeEliminar"></p>
-				
+
 					<input type="hidden" id="EliminarId" name="Id" />
 				</div>
 				<div class="modal-footer">
@@ -122,27 +139,27 @@
 </div>
 
 <script>
-document.querySelectorAll('.btn-editar').forEach(btn=>{
-    btn.addEventListener('click',function(){
-        document.getElementById('Id').value=this.dataset.id;
-        document.getElementById('Nombre').value=this.dataset.nombre;
-        document.getElementById('Apellido').value=this.dataset.apellido;
-        document.getElementById('Dni').value=this.dataset.dni;
-        document.getElementById('Telefono').value=this.dataset.telefono;
-        document.getElementById('Email').value=this.dataset.email;
-        new bootstrap.Modal(document.getElementById('editarModal')).show();
-    });
-});
-document.querySelectorAll('.btn-eliminar').forEach(btn=>{
-    btn.addEventListener('click',function(){
-		
-		const nombre = this.dataset.apellido + ' ' + this.dataset.nombre; 
-		
-        document.getElementById('EliminarId').value=this.dataset.id;
-		
-        new bootstrap.Modal(document.getElementById('eliminarModal')).show();
-		document.getElementById('mensajeEliminar').textContent = 
-            `¿Estás seguro que deseas eliminar al inquilino ${nombre}?`;
-    });
-});
+	document.querySelectorAll('.btn-editar').forEach(btn => {
+		btn.addEventListener('click', function () {
+			document.getElementById('Id').value = this.dataset.id;
+			document.getElementById('Nombre').value = this.dataset.nombre;
+			document.getElementById('Apellido').value = this.dataset.apellido;
+			document.getElementById('Dni').value = this.dataset.dni;
+			document.getElementById('Telefono').value = this.dataset.telefono;
+			document.getElementById('Email').value = this.dataset.email;
+			new bootstrap.Modal(document.getElementById('editarModal')).show();
+		});
+	});
+	document.querySelectorAll('.btn-eliminar').forEach(btn => {
+		btn.addEventListener('click', function () {
+
+			const nombre = this.dataset.apellido + ' ' + this.dataset.nombre;
+
+			document.getElementById('EliminarId').value = this.dataset.id;
+
+			new bootstrap.Modal(document.getElementById('eliminarModal')).show();
+			document.getElementById('mensajeEliminar').textContent =
+				`¿Estás seguro que deseas eliminar al inquilino ${nombre}?`;
+		});
+	});
 </script>

@@ -1,0 +1,238 @@
+@model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.Persona>
+
+@{
+	ViewData["Title"] = "Index";
+}
+
+<h1>Inquilinos Sin Contrato Vigente</h1>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>@Html.DisplayNameFor(model => model.Id)</th>
+			<th>@Html.DisplayNameFor(model => model.Nombre)</th>
+			<th>@Html.DisplayNameFor(model => model.Apellido)</th>
+			<th>@Html.DisplayNameFor(model => model.Dni)</th>
+			<th>@Html.DisplayNameFor(model => model.Telefono)</th>
+			<th>@Html.DisplayNameFor(model => model.Email)</th>
+			<th>Acciones</th>
+		</tr>
+	</thead>
+	<tbody>
+		@if (Model != null && Model.Any())
+		{
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@item.Id</td>
+					<td>@item.Nombre</td>
+					<td>@item.Apellido</td>
+					<td>@item.Dni</td>
+					<td>@item.Telefono</td>
+					<td>@item.Email</td>
+					<td>
+						<a class="btn btn-primary btn-editar" href="javascript:void(0);" data-id="@item.Id"
+							data-nombre="@item.Nombre" data-apellido="@item.Apellido" data-dni="@item.Dni"
+							data-telefono="@item.Telefono" data-email="@item.Email" title="Asignar Inmueble">
+							Asignar Inmueble <i class="bi bi-file-earmark-plus"></i>
+						</a>
+					</td>
+				</tr>
+			}
+		}
+		else
+		{
+			<tr>
+				<td colspan="8" class="text-center text-muted py-4">
+					<i class="fas fa-info-circle me-2"></i>
+					No se registran inquilinos sin contrato
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+
+
+<!-- Modal Tabla Inmuebles -->
+<div class="modal fade" id="modalInmuebles" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Seleccionar Inmueble</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+			</div>
+			<div class="modal-body">
+				<table id="propiedadesTable" class="table table-striped table-hover align-middle">
+					<thead>
+						<tr>
+							<th class="text-center" style="width: 150px;">Seleccionar</th>
+							<th>ID</th>
+							<th>Tipo</th>
+							<th>Dirección</th>
+							<th>Superficie (m2)</th>
+							<th>Ambientes</th>
+							<th>Baños</th>
+							<th>Cochera</th>
+							<th>Descripción</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="text-center">
+								<input class="form-check-input row-select" type="radio" name="rowSelect" value="1">
+							</td>
+							<td>1</td>
+							<td>Casa</td>
+							<td>Avenida Libertado 987</td>
+							<td>24</td>
+							<td>2</td>
+							<td>2</td>
+							<td>No</td>
+							<td>Es muy bonito</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" id="crearContratoBtn">Crear Contrato</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- Modal Formulario Contrato -->
+<div class="modal fade" id="modalContrato" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Nuevo Contrato</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+			</div>
+			<div class="modal-body">
+				<form id="formContrato">
+					<div class="row g-3">
+						<div class="col-md-6">
+							<label for="InmuebleId" class="form-label">Inmueble ID</label>
+							<input type="number" id="InmuebleId" class="form-control" placeholder="Ej: 101" readonly>
+						</div>
+						<div class="col-md-6">
+							<label for="InquilinoId" class="form-label">Inquilino ID</label>
+							<input type="number" id="InquilinoId" class="form-control" placeholder="Ej: 202" readonly>
+						</div>
+						<div class="col-md-6">
+							<label for="FechaInicio" class="form-label">Fecha Inicio</label>
+							<input type="date" id="FechaInicio" class="form-control">
+						</div>
+						<div class="col-md-6">
+							<label for="FechaFin" class="form-label">Fecha Fin</label>
+							<input type="date" id="FechaFin" class="form-control">
+						</div>
+						<div class="col-md-6">
+							<label for="Moneda" class="form-label">Moneda</label>
+							<select id="Moneda" class="form-select">
+								<option value="ARS">ARS</option>
+								<option value="USD">USD</option>
+							</select>
+						</div>
+						<div class="col-md-6">
+							<label for="MontoMensual" class="form-label">Monto Mensual</label>
+							<input type="number" id="MontoMensual" class="form-control" step="0.01">
+						</div>
+						<div class="col-md-6">
+							<label for="Deposito" class="form-label">Depósito</label>
+							<input type="number" id="Deposito" class="form-control" step="0.01">
+						</div>
+						<div class="col-12">
+							<label for="Observaciones" class="form-label">Observaciones</label>
+							<textarea id="Observaciones" class="form-control" rows="3"></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" id="guardarContrato">Guardar</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<!-- Modal Confirmación -->
+<div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Confirmar Envío de Contrato</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+			</div>
+			<div class="modal-body" id="confirmBody">
+				<!-- Datos se llenan con JS -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-primary" id="confirmarContrato">Confirmar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<script>
+	// Abrir modal de inmuebles al click de "Asignar Inmueble"
+	document.querySelectorAll(".btn-editar").forEach(btn => {
+		btn.addEventListener("click", () => {
+			const inquilinoId = btn.dataset.id;
+			document.getElementById("InquilinoId").value = inquilinoId;
+			const modal = new bootstrap.Modal(document.getElementById('modalInmuebles'));
+			modal.show();
+		});
+	});
+
+
+	document.getElementById("crearContratoBtn").addEventListener("click", () => {
+		const selected = document.querySelector('input[name="rowSelect"]:checked');
+		if (selected) {
+			document.getElementById("InmuebleId").value = selected.value;
+			bootstrap.Modal.getInstance(document.getElementById('modalInmuebles')).hide();
+			const contratoModal = new bootstrap.Modal(document.getElementById('modalContrato'));
+			contratoModal.show();
+		} else {
+			alert("Selecciona un inmueble primero");
+		}
+	});
+
+
+	document.getElementById("guardarContrato").addEventListener("click", () => {
+		const confirmModal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
+		const body = document.getElementById("confirmBody");
+		body.innerHTML = `
+      <p><strong>Inmueble ID:</strong> ${document.getElementById("InmuebleId").value}</p>
+      <p><strong>Inquilino ID:</strong> ${document.getElementById("InquilinoId").value}</p>
+      <p><strong>Fecha Inicio:</strong> ${document.getElementById("FechaInicio").value}</p>
+      <p><strong>Fecha Fin:</strong> ${document.getElementById("FechaFin").value}</p>
+      <p><strong>Moneda:</strong> ${document.getElementById("Moneda").value}</p>
+      <p><strong>Monto Mensual:</strong> ${document.getElementById("MontoMensual").value}</p>
+      <p><strong>Depósito:</strong> ${document.getElementById("Deposito").value}</p>
+      <p><strong>Observaciones:</strong> ${document.getElementById("Observaciones").value}</p>
+    `;
+		bootstrap.Modal.getInstance(document.getElementById('modalContrato')).hide();
+		confirmModal.show();
+	});
+
+
+	document.getElementById("confirmarContrato").addEventListener("click", () => {
+		const inquilinoId = document.getElementById("InquilinoId").value;
+		const inmuebleId = document.getElementById("InmuebleId").value;
+
+		alert(`Contrato enviado!\nInquilino ID: ${inquilinoId}\nInmueble ID: ${inmuebleId}`);
+		bootstrap.Modal.getInstance(document.getElementById('modalConfirmacion')).hide();
+	});
+
+</script>
