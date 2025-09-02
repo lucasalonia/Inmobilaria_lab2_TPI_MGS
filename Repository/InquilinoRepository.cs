@@ -355,9 +355,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
 
 
 
-        public IList<Persona> ListarInquilinosSinContrato()
+        public IList<Inquilino> ListarInquilinosSinContrato()
         {
-            IList<Persona> personas = new List<Persona>();
+            IList<Inquilino> inquilinos = new List<Inquilino>();
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 try
@@ -365,35 +365,56 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     connection.Open();
 
                     string query = @"
-                                SELECT i.id, i.estado, i.fecha_creacion, i.fecha_modificacion,
-                                p.id, p.dni, p.sexo, p.nombre, p.apellido, p.fecha_nacimiento, p.email, p.telefono,p.fecha_creacion, p.fecha_modificacion
+                                SELECT 
+                                    i.id AS InquilinoId,
+                                    i.estado AS InqEstado,
+                                    i.fecha_creacion AS InqFechaCreacion,
+                                    i.fecha_modificacion AS InqFechaModificacion,
+                                    p.id AS PersonaId,
+                                    p.dni,
+                                    p.sexo,
+                                    p.nombre,
+                                    p.apellido,
+                                    p.fecha_nacimiento,
+                                    p.email,
+                                    p.telefono,
+                                    p.fecha_creacion AS PersFechaCreacion,
+                                    p.fecha_modificacion AS PersFechaModificacion
                                 FROM persona p
                                 JOIN inquilino i ON p.id = i.persona_id
-                                LEFT JOIN contrato c 
-                                ON i.id = c.inquilino_id 
+                                LEFT JOIN contrato c ON i.id = c.inquilino_id 
                                 WHERE c.id IS NULL AND i.estado='ACTIVO';";
 
                     using (MySqlCommand cmd = new MySqlCommand(query, connection))
                     {
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
+                            //EN ESTE CASO LA PERSONA SE CONFIGURA CON EL ID DE INQUILINO. NO PASA LO MISMO CON OBTENERTODOS (Ver especificacion en el metodo) - LS
                             while (reader.Read())
                             {
-                                //EN ESTE CASO LA PERSONA SE CONFIGURA CON EL ID DE INQUILINO. NO PASA LO MISMO CON OBTENERTODOS (Ver especificacion en el metodo) - LS
-                                Persona persona = new Persona
+                                Inquilino inquilino = new Inquilino
                                 {
-                                    Id = reader.GetInt32("id"),
-                                    Dni = reader.GetString("dni"),
-                                    Sexo = reader.GetString("sexo"),
-                                    Nombre = reader.GetString("nombre"),
-                                    Apellido = reader.GetString("apellido"),
-                                    FechaNacimiento = reader.GetDateTime("fecha_nacimiento"),
-                                    Email = reader.GetString("email"),
-                                    Telefono = reader.GetString("telefono"),
-                                    FechaCreacion = reader.GetDateTime("fecha_creacion"),
-                                    FechaModificacion = reader.GetDateTime("fecha_modificacion")
+                                    Id = reader.GetInt32("InquilinoId"),
+                                    Estado = reader.GetString("InqEstado"),
+                                    FechaCreacion = reader.GetDateTime("InqFechaCreacion"),
+                                    FechaModificacion = reader.GetDateTime("InqFechaModificacion"),
+                                    Persona = new Persona
+                                    {
+                                        Id = reader.GetInt32("PersonaId"),
+                                        Dni = reader.GetString("dni"),
+                                        Sexo = reader.GetString("sexo"),
+                                        Nombre = reader.GetString("nombre"),
+                                        Apellido = reader.GetString("apellido"),
+                                        FechaNacimiento = reader.IsDBNull(reader.GetOrdinal("fecha_nacimiento"))
+                                                            ? null
+                                                            : reader.GetDateTime("fecha_nacimiento"),
+                                        Email = reader.GetString("email"),
+                                        Telefono = reader.GetString("telefono"),
+                                        FechaCreacion = reader.GetDateTime("PersFechaCreacion"),
+                                        FechaModificacion = reader.GetDateTime("PersFechaModificacion")
+                                    }
                                 };
-                                personas.Add(persona);
+                                inquilinos.Add(inquilino);
                             }
                         }
                     }
@@ -408,7 +429,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     connection.Close();
                 }
             }
-            return personas;
+            return inquilinos;
         }
     }
 

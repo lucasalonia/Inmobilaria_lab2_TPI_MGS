@@ -31,7 +31,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return inquilinoRepository.ObtenerTodos();
         }
-        public IList<Persona> ListarInquilinosSinContrato()
+        public IList<Inquilino> ListarInquilinosSinContrato()
         {
             return inquilinoRepository.ListarInquilinosSinContrato();
         }

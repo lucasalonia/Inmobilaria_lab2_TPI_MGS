@@ -16,5 +16,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return contratoRepository.ObtenerContratoVigente(inquilinoId);
         }
+        public IList<Inmueble> ListarInmueblesDisponibles(int paginaNro = 1, int tamPagina = 10)
+        {
+            return contratoRepository.ListarInmueblesDisponibles();
+        }
+        public bool Alta(Contrato contrato)
+        {
+            return contratoRepository.Alta(contrato);
+        }
     }
 }

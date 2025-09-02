@@ -35,5 +35,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return inmuebleRepository.BajaLogica(id, modificadoPor);
         }
+        public int ObtenerCantidadInmueblesActivos()
+        {
+            return inmuebleRepository.ObtenerCantidadInmueblesActivos();
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
     {
         public int Id { get; set; }
         public int PropietarioId { get; set; }
-        public required string Estado { get; set; }
+        public  string Estado { get; set; }
         public string? Tipo { get; set; }
         public int? SuperficieM2 { get; set; }
         public int? Ambientes { get; set; }

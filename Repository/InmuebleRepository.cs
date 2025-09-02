@@ -83,7 +83,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             Inmueble? inm = null;
             using (var connection = new MySqlConnection(connectionString))
             {
-               string sql = @"SELECT id, tipo, estado, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
+                string sql = @"SELECT id, tipo, estado, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
                FROM inmueble
                WHERE estado = 'ACTIVO' AND id = @id";
 
@@ -107,7 +107,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                 Direccion = reader.IsDBNull(reader.GetOrdinal("direccion")) ? null : reader.GetString("direccion"),
                                 Descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? null : reader.GetString("descripcion"),
                                 FechaCreacion = reader.GetDateTime("fecha_creacion"),
-                                FechaModificacion = reader.GetDateTime("fecha_modificacion"),                       
+                                FechaModificacion = reader.GetDateTime("fecha_modificacion"),
                             };
                         }
                     }
@@ -167,5 +167,26 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             }
             return res;
         }
+
+        //SE usa en ContratosController para paginacion - LS
+        public int ObtenerCantidadInmueblesActivos()
+        {
+            int res = 0;
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = "SELECT COUNT(id) FROM inmueble WHERE estado = 'ACTIVO';";
+
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    res = Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+
+            return res;
+        }
+
     }
 }

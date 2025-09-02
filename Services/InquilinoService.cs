@@ -5,7 +5,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
     public interface InquilinoService
     {
         IList<Inquilino> ObtenerTodos();
-        IList<Persona> ListarInquilinosSinContrato();
+        IList<Inquilino> ListarInquilinosSinContrato();
 
         bool Modificar(Persona persona);
 
