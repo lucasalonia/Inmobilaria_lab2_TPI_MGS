@@ -1,0 +1,159 @@
+@model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.Contrato>
+
+@{
+    ViewData["Title"] = "Lista";
+    var Pagina = ViewBag.Pagina ?? 1;
+    var TotalPaginas = ViewBag.TotalPaginas ?? 1;
+}
+
+<h1>Inquilinos Sin Contrato Vigente</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Id)</th>
+            <th>@Html.DisplayNameFor(model => model.FechaInicio)</th>
+            <th>@Html.DisplayNameFor(model => model.FechaFin)</th>
+            <th>@Html.DisplayNameFor(model => model.Estado)</th>
+            <th>@Html.DisplayNameFor(model => model.Moneda)</th>
+            <th>@Html.DisplayNameFor(model => model.MontoMensual)</th>
+            <th>@Html.DisplayNameFor(model => model.Deposito)</th>
+            <th>@Html.DisplayNameFor(model => model.Observaciones)</th>
+            <th>Acciones</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.FechaInicio.ToShortDateString()</td>
+                    <td>@item.FechaFin.ToShortDateString()</td>
+                    <td
+                        style=" text-align:center; background-color:@(item.Estado == null ? "lightgray" : item.Estado == "VIGENTE" ? "lightgreen" : "lightcoral")">
+                        @(item?.Estado)</td>
+                    <td>@item?.Moneda</td>
+                    <td>@item?.MontoMensual</td>
+                    <td>@item?.Deposito</td>
+                    <td>@item?.Observaciones</td>
+
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a class="btn btn-primary btn-editar" href="javascript:void(0);" data-id="@item.Id"
+                                data-fechainicio="@item.FechaInicio.ToString("yyyy-MM-dd")"
+                                data-fechafin="@item.FechaFin.ToString("yyyy-MM-dd")" data-estado="@item.Estado"
+                                data-moneda="@item.Moneda" data-montomensual="@item.MontoMensual" data-deposito="@item.Deposito"
+                                data-observaciones="@item.Observaciones" title="Editar">
+                                <i class="fa-solid fa-pen"></i>
+
+                                <a class="btn btn-danger btn-eliminar" href="javascript:void(0);" data-id="@item.Id"
+                                    title="Eliminar">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+
+                                <a class="btn btn-info" asp-route-id="@item.Id" title="Ver detelles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="9" class="text-center text-muted py-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No hay contratos activos
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<!-- Modal Editar Inquilino -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEditar" method="post" asp-action="Editar">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar Inquilino</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="Id" name="Id" />
+                    <div class="mb-3">
+                        <label for="FechaFin" class="form-label">Fecha fin</label>
+                        <input type="text" class="form-control" id="FechaFin" name="FechaFin" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Moneda" class="form-label">Moneda</label>
+                        <input type="text" class="form-control" id="Moneda" name="Moneda" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="MontoMensual" class="form-label">Monto mensual</label>
+                        <input type="text" class="form-control" id="MontoMensual" name="MontoMensual" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Observaciones" class="form-label">Observaciones</label>
+                        <input type="text" class="form-control" id="Observaciones" name="Observaciones" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmación Eliminar -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEliminar" method="post" asp-action="Eliminar">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="mensajeEliminar"></p>
+
+                    <input type="hidden" id="EliminarId" name="Id" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.btn-editar').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('Id').value = this.dataset.id;
+                document.getElementById('FechaFin').value = this.dataset.fechafin;
+                document.getElementById('Moneda').value = this.dataset.moneda;
+                document.getElementById('MontoMensual').value = this.dataset.montomensual;
+                document.getElementById('Observaciones').value = this.dataset.observaciones;
+                new bootstrap.Modal(document.getElementById('editarModal')).show();
+            });
+        });
+        document.querySelectorAll('.btn-eliminar').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('EliminarId').value = this.dataset.id;
+                document.getElementById('mensajeEliminar').textContent =
+                    `¿Estás seguro que deseas eliminar el contrato ${this.dataset.id}?`;
+                new bootstrap.Modal(document.getElementById('eliminarModal')).show();
+            });
+        });
+    </script>
+}

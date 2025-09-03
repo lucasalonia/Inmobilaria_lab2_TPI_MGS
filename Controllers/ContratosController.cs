@@ -52,6 +52,14 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 throw;
             }
         }
+        [Route("[controller]/Lista")]
+        public ActionResult Lista(int pagina = 1)
+        {
+            var listaContratos = contratoService.ListaContratosVigentes();
+
+            return View(listaContratos);
+        }
+
 
         [HttpPost]
         [Route("[controller]/Crear")]
@@ -70,6 +78,38 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
 
                 Console.WriteLine(ex.Message);
                 return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [Route("[controller]/Editar")]
+        public IActionResult Editar(Contrato contrato)
+        {
+            try
+            {
+                contratoService.Modificar(contrato);
+                return RedirectToAction("Lista");
+            }
+            catch
+            {
+                return RedirectToAction("Lista");
+            }
+        }
+
+        [HttpPost]
+        [Route("[controller]/Eliminar")]
+        public IActionResult Eliminar(Contrato contrato)
+        {
+            try
+            {
+                Console.WriteLine(contrato.Id);
+                contratoService.Baja(contrato.Id);
+
+                return RedirectToAction("Lista");
+            }
+            catch
+            {
+                return RedirectToAction("Lista");
             }
         }
     }

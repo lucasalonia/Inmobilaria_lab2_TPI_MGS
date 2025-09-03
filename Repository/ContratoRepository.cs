@@ -56,6 +56,140 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             return exito;
         }
 
+        public bool Modificar(Contrato contrato)
+        {
+            bool exito = false;
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"
+                                    UPDATE contrato
+                                    SET fecha_fin = @FechaFin,
+                                        estado = @Estado,
+                                        monto_mensual = @MontoMensual,
+                                        moneda = @Moneda,
+                                        deposito = @Deposito,
+                                        observaciones = @Observaciones,
+                                        fecha_modificacion = NOW(),
+                                        modificado_por = @ModificadoPor
+                                    WHERE id = @Id";
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", contrato.Id);
+                        command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
+                        command.Parameters.AddWithValue("@Estado", contrato.Estado);
+                        command.Parameters.AddWithValue("@MontoMensual", (object)contrato.MontoMensual ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Moneda", (object)contrato.Moneda ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Deposito", (object)contrato.Deposito ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Observaciones", (object)contrato.Observaciones ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@ModificadoPor", (object)contrato.ModificadoPor ?? DBNull.Value);
+                        int rowsAffected = command.ExecuteNonQuery();
+                        exito = rowsAffected > 0;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error al modificar contrato: {e.Message}");
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+            return exito;
+        }
+        public bool Baja(int contratoId)
+        {
+            bool exito = false;
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"UPDATE contrato
+                                     SET estado = 'NO VIGENTE',
+                                         fecha_modificacion = NOW()
+                                     WHERE id = @Id";
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", contratoId);
+                        int rowsAffected = command.ExecuteNonQuery();
+                        exito = rowsAffected > 0;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error al eliminar contrato: {e.Message}");
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+            return exito;
+         }
+
+        public IList<Contrato> ListaContratosVigentes()
+        {
+            IList<Contrato> contratos = new List<Contrato>();
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    string query = @"
+                                    SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones
+                                    FROM contrato
+                                    WHERE estado = 'VIGENTE' AND fecha_fin >= CURDATE()
+                                    ORDER BY fecha_inicio DESC";
+
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        using (MySqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                Contrato contrato = new Contrato
+                                {
+                                    Id = reader.GetInt32("id"),
+                                    InmuebleId = reader.GetInt32("inmueble_id"),
+                                    InquilinoId = reader.GetInt32("inquilino_id"),
+                                    FechaInicio = reader.GetDateTime("fecha_inicio"),
+                                    FechaFin = reader.GetDateTime("fecha_fin"),
+                                    Estado = reader.GetString("estado"),
+                                    MontoMensual = reader.IsDBNull(reader.GetOrdinal("monto_mensual")) ? (decimal?)null : reader.GetDecimal("monto_mensual"),
+                                    Moneda = reader.IsDBNull(reader.GetOrdinal("moneda")) ? null : reader.GetString("moneda"),
+                                    Deposito = reader.IsDBNull(reader.GetOrdinal("deposito")) ? (decimal?)null : reader.GetDecimal("deposito"),
+                                    Observaciones = reader.IsDBNull(reader.GetOrdinal("observaciones")) ? null : reader.GetString("observaciones")
+                                };
+
+                                contratos.Add(contrato);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error al obtener contratos vigentes: {e.Message}");
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+
+            return contratos;
+
+
+        }
+
         public Contrato ObtenerContratoVigente(int inquilinoId)
         {
             Contrato contrato = null;

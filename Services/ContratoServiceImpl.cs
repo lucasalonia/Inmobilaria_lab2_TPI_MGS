@@ -11,7 +11,18 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             this.contratoRepository = contratoRepository;
         }
-
+         public bool Alta(Contrato contrato)
+        {
+            return contratoRepository.Alta(contrato);
+        }
+        public bool Modificar(Contrato contrato)
+        {
+            return contratoRepository.Modificar(contrato);
+        }
+        public bool Baja(int id)
+        {
+            return contratoRepository.Baja(id);
+        }
         public Contrato ObtenerContratoVigente(int inquilinoId)
         {
             return contratoRepository.ObtenerContratoVigente(inquilinoId);
@@ -20,9 +31,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return contratoRepository.ListarInmueblesDisponibles();
         }
-        public bool Alta(Contrato contrato)
+       
+        public IList<Contrato> ListaContratosVigentes()
         {
-            return contratoRepository.Alta(contrato);
+            return contratoRepository.ListaContratosVigentes();
         }
     }
 }

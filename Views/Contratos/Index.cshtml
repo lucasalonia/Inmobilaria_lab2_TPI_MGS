@@ -33,12 +33,10 @@
 					<td>@item.Persona.Telefono</td>
 					<td>@item.Persona.Email</td>
 					<td>
-						<a class="btn btn-primary btn-editar" href="javascript:void(0);" data-id="@item.Id"
-							data-nombre="@item.Persona.Nombre" data-apellido="@item.Persona.Apellido"
-							data-dni="@item.Persona.Dni" data-telefono="@item.Persona.Telefono" data-email="@item.Persona.Email"
-							title="Asignar Inmueble">
-							Asignar Inmueble <i class="bi bi-file-earmark-plus"></i>
-						</a>
+						<button type="button" class="btn btn-primary btn-abrir-inmuebles" data-inquilino-id="@item.Id"
+							data-bs-toggle="modal" data-bs-target="#modalInmuebles">
+							Seleccionar Inmueble
+						</button>
 					</td>
 				</tr>
 			}
@@ -57,126 +55,21 @@
 
 
 
-<!-- Modal Tabla Inmuebles -->
 
+
+<!-- Modal para seleccionar propietario -->
 <div class="modal fade" id="modalInmuebles" tabindex="-1" aria-hidden="true">
-	<div class="modal-dialog modal-xl modal-dialog-centered">
-		<div class="modal-content">
+	<div class="modal-dialog modal-lg">
+		<div style="width: 1000px;" class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title">Seleccionar Inmueble</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 			</div>
-			<div class="modal-body">
-				<table id="propiedadesTable" class="table table-striped table-hover align-middle">
-
-					<thead>
-						<tr>
-							<th class="text-center" style="width: 150px;">Seleccionar</th>
-							<th>ID</th>
-							<th>Tipo</th>
-							<th>Dirección</th>
-							<th>Superficie (m2)</th>
-							<th>Ambientes</th>
-							<th>Baños</th>
-							<th>Cochera</th>
-							<th>Descripción</th>
-						</tr>
-					</thead>
-					<tbody id="tablaInmueblesBody">
-						@if (listaInmuebles != null && listaInmuebles.Any())
-						{
-							@foreach (var item in listaInmuebles)
-							{
-								<tr>
-									<td class="text-center">
-										<input class="form-check-input row-select" type="radio" name="rowSelect" value = "@item.Id">
-									</td>
-									<td>@item.Id</td>
-									<td>@item.Tipo</td>
-									<td>@item.Direccion</td>
-									<td>@item.SuperficieM2</td>
-									<td>@item.Ambientes</td>
-									<td>@item.Banos</td>
-									<td>@item.Cochera</td>
-									<td>@item.Descripcion</td>
-
-								</tr>
-							}
-						}
-						else
-						{
-							<tr>
-								<td colspan="9" class="text-center text-muted py-4">
-									<i class="fas fa-info-circle me-2"></i>
-									No se registran inmuebles disponibles
-								</td>
-							</tr>
-						}
-					</tbody>
-				</table>
-				@if (TempData["Mensaje"] != null)
-				{
-					<div class="alert alert-success mt-3">@TempData["Mensaje"]</div>
-				}
-				@if (TempData["Error"] != null)
-				{
-					<div class="alert alert-danger mt-3">@TempData["Error"]</div>
-				}
-				<!-- Paginación -->
-				<nav aria-label="Page navigation"></nav>
-				<ul class="pagination">
-					<!-- Botón "Anterior" -->
-					@if (Pagina > 1)
-					{
-						<li class="page-item">
-							<a class="page-link" href="~/Contratos/Index?pagina=@(Pagina - 1)" aria-label="Anterior">
-								<i class="fa-solid fa-angles-left"></i>
-							</a>
-						</li>
-					}
-					else
-					{
-						<li class="page-item disabled">
-							<span class="page-link"><i class="fa-solid fa-angles-left"></i></span>
-						</li>
-					}
-
-					<!-- Números de página -->
-					@for (int i = 1; i <= TotalPaginas; i++)
-					{
-						<li class="page-item @(i == Pagina ? "active" : "")">
-							<a class="page-link" href="~/Contratos/Index?pagina=@i">@i</a>
-						</li>
-					}
-					<!-- Botón "Siguiente" -->
-					@if (Pagina < TotalPaginas)
-					{
-						<li class="page-item">
-							<a class="page-link" href="~/Contratos/Index?pagina=@(Pagina + 1)" aria-label="Siguiente">
-								<i class="fa-solid fa-angles-right"></i>
-							</a>
-						</li>
-					}
-					else
-					{
-						<li class="page-item disabled">
-							<span class="page-link"><i class="fa-solid fa-angles-right"></i></span>
-						</li>
-					}
-				</ul>
-				</nav>
-			</div>
-
-			<div class="modal-footer">
-
-				<button type="button" class="btn btn-primary" id="crearContratoBtn">Crear Contrato</button>
-
+			<div class="modal-body" id="contenedorInmuebles">
 			</div>
 		</div>
 	</div>
 </div>
-
-
 
 
 <!-- Modal Formulario Contrato -->
@@ -261,55 +154,59 @@
 @section Scripts {
 	<script>
 
-		//AJAX para paginación
-		$(document).ready(function () {
-			$('.page-link').click(function (e) {
-				e.preventDefault();
-				var url = $(this).attr('href');
-				$.get(url, function (data) {
-					$('#tablaInmueblesBody').html($(data).find('#tablaInmueblesBody').html());
-				});
+		// Función para cargar propietarios en el modal. 
+		function cargarPropietarios(pagina) {
+			$.get('/Inmueble/ListarParaSeleccionInmuebles?pagina=' + pagina, function (data) {
+				$('#contenedorInmuebles').html(data);
 			});
+		}
+
+		// Cuando se abre el modal, cargamos la primera página
+		$('#modalInmuebles').on('shown.bs.modal', function () {
+			cargarPropietarios(1);
 		});
 
-
-		// Abrir modal de inmuebles al click de "Asignar Inmueble"
-		document.querySelectorAll(".btn-editar").forEach(btn => {
-			btn.addEventListener("click", () => {
-				const inquilinoId = btn.dataset.id;
-				document.getElementById("InquilinoId").value = inquilinoId;
-				const modal = new bootstrap.Modal(document.getElementById('modalInmuebles'));
-				modal.show();
-			});
+		// Delegamos el click en la paginación
+		$(document).on('click', '.cargar-pagina', function () {
+			let pagina = $(this).data('pagina');
+			cargarPropietarios(pagina);
 		});
 
+		// Delegamos el click en "Seleccionar"
+		$(document).on('click', '.seleccionar-inmueble', function () {
+			//El id del inmueble lo obtenemos del data set en el boton seleccionar de _ListaInmueblesSeleccion Partial
+			let inmuebleId = $(this).data('id');
 
-		document.getElementById("crearContratoBtn").addEventListener("click", () => {
-			const selected = document.querySelector('input[name="rowSelect"]:checked');
-			if (selected) {
-				document.getElementById("InmuebleId").value = selected.value;
-				bootstrap.Modal.getInstance(document.getElementById('modalInmuebles')).hide();
-				const contratoModal = new bootstrap.Modal(document.getElementById('modalContrato'));
-				contratoModal.show();
-			} else {
-				alert("Selecciona un inmueble primero");
-			}
+			//El id de inquilino lo obtenemos del data set del boton que abre el modal
+			let inquilinoId = $('.btn-abrir-inmuebles').data('inquilino-id');
+
+			$('#InmuebleId').val(inmuebleId);
+
+			$('#InquilinoId').val(inquilinoId);
+
+			// Cerrar modal de inmuebles
+			$('#modalInmuebles').modal('hide');
+
+			// Abrir modal de contrato
+			const contratoModal = new bootstrap.Modal(document.getElementById('modalContrato'));
+			contratoModal.show();
 		});
+
 
 
 		document.getElementById("guardarContrato").addEventListener("click", () => {
 			const confirmModal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
 			const body = document.getElementById("confirmBody");
 			body.innerHTML = `
-					      <p><strong>Inmueble ID:</strong> ${document.getElementById("InmuebleId").value}</p>
-					      <p><strong>Inquilino ID:</strong> ${document.getElementById("InquilinoId").value}</p>
-					      <p><strong>Fecha Inicio:</strong> ${document.getElementById("FechaInicio").value}</p>
-					      <p><strong>Fecha Fin:</strong> ${document.getElementById("FechaFin").value}</p>
-					      <p><strong>Moneda:</strong> ${document.getElementById("Moneda").value}</p>
-					      <p><strong>Monto Mensual:</strong> ${document.getElementById("MontoMensual").value}</p>
-					      <p><strong>Depósito:</strong> ${document.getElementById("Deposito").value}</p>
-					      <p><strong>Observaciones:</strong> ${document.getElementById("Observaciones").value}</p>
-					    `;
+									      <p><strong>Inmueble ID:</strong> ${document.getElementById("InmuebleId").value}</p>
+									      <p><strong>Inquilino ID:</strong> ${document.getElementById("InquilinoId").value}</p>
+									      <p><strong>Fecha Inicio:</strong> ${document.getElementById("FechaInicio").value}</p>
+									      <p><strong>Fecha Fin:</strong> ${document.getElementById("FechaFin").value}</p>
+									      <p><strong>Moneda:</strong> ${document.getElementById("Moneda").value}</p>
+									      <p><strong>Monto Mensual:</strong> ${document.getElementById("MontoMensual").value}</p>
+									      <p><strong>Depósito:</strong> ${document.getElementById("Deposito").value}</p>
+									      <p><strong>Observaciones:</strong> ${document.getElementById("Observaciones").value}</p>
+									    `;
 			bootstrap.Modal.getInstance(document.getElementById('modalContrato')).hide();
 			confirmModal.show();
 		});

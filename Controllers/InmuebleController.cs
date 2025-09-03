@@ -121,5 +121,28 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        public IActionResult ListarParaSeleccionInmuebles(int pagina = 1)
+        {
+            try
+            {
+                int tamPagina = 5;
+                var totalRegistros = InmuebleService.ObtenerCantidadInmueblesActivos();
+                var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
+
+
+                var lista = InmuebleService.ObtenerTodosParaContratos(pagina, tamPagina);
+
+                ViewBag.Pagina = pagina;
+                ViewBag.TotalPaginas = totalPaginas;
+
+                return PartialView("_ListaInmueblesSeleccion", lista);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
     }
 }

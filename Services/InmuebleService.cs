@@ -5,6 +5,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
     public interface InmuebleService
     {
         IList<Inmueble> ObtenerTodos();
+        public IList<Inmueble> ObtenerTodosParaContratos(int paginaNro = 1, int tamPagina = 5);
 
         int Modificar(Inmueble inmueble);
 

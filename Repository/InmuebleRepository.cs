@@ -188,5 +188,49 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             return res;
         }
 
+        //Cree este metodo para paginar la modal de inmuebles en contratos sin modificar el obtner todos original - LS
+        public IList<Inmueble> ObtenerTodosParaContratos(int paginaNro = 1, int tamPagina = 5)
+        {
+            IList<Inmueble> res = new List<Inmueble>();
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"SELECT id, tipo, estado, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
+                       FROM inmueble
+                       WHERE estado = 'ACTIVO'
+                       ORDER BY id
+                       LIMIT @TamPagina OFFSET @Offset";
+
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
+                {
+                    int offset = (paginaNro - 1) * tamPagina;
+                    command.Parameters.AddWithValue("@TamPagina", tamPagina);
+                    command.Parameters.AddWithValue("@Offset", offset);
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        Inmueble inmueble = new Inmueble
+                        {
+                            Id = reader.GetInt32("id"),
+                            Estado = reader.GetString("estado"),
+                            Tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? null : reader.GetString("tipo"),
+                            SuperficieM2 = reader.IsDBNull(reader.GetOrdinal("superficie_m2")) ? (int?)null : reader.GetInt32("superficie_m2"),
+                            Ambientes = reader.IsDBNull(reader.GetOrdinal("ambientes")) ? null : reader.GetInt32("ambientes"),
+                            Banos = reader.IsDBNull(reader.GetOrdinal("banos")) ? null : reader.GetInt32("banos"),
+                            Cochera = reader.GetInt32("cochera"),
+                            Direccion = reader.IsDBNull(reader.GetOrdinal("direccion")) ? null : reader.GetString("direccion"),
+                            Descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? null : reader.GetString("descripcion"),
+                            FechaCreacion = reader.GetDateTime("fecha_creacion"),
+                            FechaModificacion = reader.GetDateTime("fecha_modificacion"),
+                        };
+                        res.Add(inmueble);
+                    }
+                    connection.Close();
+                }
+            }
+            return res;
+        }
+
     }
 }

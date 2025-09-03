@@ -5,7 +5,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
     public interface ContratoService
     {
         bool Alta(Contrato contrato);
+        bool Modificar(Contrato contrato);
+        bool Baja(int id);
         Contrato ObtenerContratoVigente(int inquilinoId);
         IList<Inmueble> ListarInmueblesDisponibles(int paginaNro = 1, int tamPagina = 10);
+        public IList<Contrato> ListaContratosVigentes();
+        
+
+        
     }
 }
