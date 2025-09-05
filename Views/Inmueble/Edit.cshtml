@@ -32,8 +32,8 @@
     <div class="mb-3">
         <label asp-for="PropietarioId" class="form-label">Propietario</label>
         <div class="input-group">
-            <input type="hidden" id="PropietarioId" name="PropietarioId" />
-            <input type="text" id="PropietarioNombre" class="form-control" readonly />
+            <input type="hidden" id="PropietarioId" name="PropietarioId" value="@Model.PropietarioId" />
+            <input type="text" id="PropietarioNombre" class="form-control" value="@ViewBag.PropietarioNombre" readonly />
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPropietarios">
                 Seleccionar
             </button>

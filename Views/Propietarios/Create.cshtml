@@ -11,6 +11,12 @@
 {
     <div class="alert alert-warning">@TempData["Msg"]</div>
 }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
 @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
 
 <form asp-action="BuscarPorDni" asp-controller="Propietarios" method="get" class="mb-4">
@@ -24,7 +30,7 @@
     <input type="hidden" name="Persona.Id" value="@Model?.Persona?.Id" />
 
     <label for="Persona_Dni">DNI</label>
-    <input type="text" class="form-control" id="Persona_Dni" name="Persona.Dni" value="@Model?.Persona?.Dni" readonly="@personaEncontrada" />
+    <input type="number" class="form-control" id="Persona_Dni" name="Persona.Dni" value="@Model?.Persona?.Dni" readonly="@personaEncontrada" />
 
     <label for="Persona_Sexo">Sexo</label>
     @if (personaEncontrada)

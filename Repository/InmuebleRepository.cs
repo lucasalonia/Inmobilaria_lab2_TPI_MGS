@@ -83,9 +83,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             Inmueble? inm = null;
             using (var connection = new MySqlConnection(connectionString))
             {
-                string sql = @"SELECT id, tipo, estado, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
-               FROM inmueble
-               WHERE estado = 'ACTIVO' AND id = @id";
+                string sql = @"SELECT id, propietario_id, tipo, estado, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
+                FROM inmueble
+                WHERE estado = 'ACTIVO' AND id = @id";
 
                 using (var command = new MySqlCommand(sql, connection))
                 {
@@ -98,6 +98,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                             inm = new Inmueble
                             {
                                 Id = reader.GetInt32("id"),
+                                PropietarioId = reader.IsDBNull(reader.GetOrdinal("propietario_id")) ? 0 : reader.GetInt32("propietario_id"),
                                 Estado = reader.GetString("estado"),
                                 Tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? null : reader.GetString("tipo"),
                                 SuperficieM2 = reader.IsDBNull(reader.GetOrdinal("superficie_m2")) ? (int?)null : reader.GetInt32("superficie_m2"),

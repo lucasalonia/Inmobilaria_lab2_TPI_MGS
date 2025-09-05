@@ -86,6 +86,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             if (modelo.Persona == null)
                 modelo.Persona = new Persona();
 
+            if (string.IsNullOrEmpty(modelo.Persona.Dni) || string.IsNullOrEmpty(modelo.Persona.Nombre) || string.IsNullOrEmpty(modelo.Persona.Apellido) || string.IsNullOrEmpty(modelo.Persona.Sexo))
+            {
+                ModelState.AddModelError("", "Debe completar DNI, sexo, Nombre y Apellido obligatoriamente.");
+                return View(modelo);
+            }
             if (!ModelState.IsValid)
             {
                 return View(modelo);

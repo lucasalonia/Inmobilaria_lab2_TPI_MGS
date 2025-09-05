@@ -8,9 +8,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
     public class InmuebleController : Controller
     {
         private readonly InmuebleService InmuebleService;
-        public InmuebleController(InmuebleService InmuebleService)
+        private readonly PropietarioService propietarioService;
+        public InmuebleController(InmuebleService InmuebleService, PropietarioService propietarioService)
         {
             this.InmuebleService = InmuebleService;
+            this.propietarioService = propietarioService;
         }
 
         [Route("[controller]/Index")]
@@ -64,6 +66,18 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             {
                 return NotFound();
             }
+            // Para mostrar el nombre del propietario actual
+            string propietarioNombre = "";
+            if (inmueble.PropietarioId > 0) 
+            {
+                var propietario = propietarioService.ObtenerPorId(inmueble.PropietarioId);
+                if (propietario != null)
+                {
+                    propietarioNombre = propietario.Persona.Nombre + " " + propietario.Persona.Apellido + " (DNI: " + propietario.Persona.Dni + ")";
+                }
+            }
+
+            ViewBag.PropietarioNombre = propietarioNombre;
             return View(inmueble);
         }
 
