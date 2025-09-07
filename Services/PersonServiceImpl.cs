@@ -16,5 +16,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return personaRepository.ObtenerPorDni(dni);
         }
+
+        public int CrearPersona(Persona persona)
+        {
+            return personaRepository.CrearPersona(persona);
+        }
+
+        public bool ActualizarPersona(Persona persona)
+        {
+            return personaRepository.ActualizarPersona(persona);
+        }
     }
 }

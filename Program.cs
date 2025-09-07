@@ -10,6 +10,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<PropietarioRepository>();
 builder.Services.AddScoped<InquilinoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<RolRepository>();
+builder.Services.AddScoped<UsuarioRolRepository>();
 // HEAD
 builder.Services.AddScoped<InmuebleRepository>();
 builder.Services.AddScoped<PersonaRepository>();
@@ -21,6 +23,8 @@ builder.Services.AddScoped<ContratoRepository>();
 builder.Services.AddScoped<PropietarioService, PropietarioServiceImpl>();
 builder.Services.AddScoped<InquilinoService, InquilinoServiceImpl>();
 builder.Services.AddScoped<UsuarioService, UsuarioServiceImpl>();
+builder.Services.AddScoped<RolService, RolServiceImpl>();
+builder.Services.AddScoped<UsuarioRolService, UsuarioRolServiceImpl>();
 
 // HEAD
 builder.Services.AddScoped<InmuebleService, InmuebleServiceImpl>();

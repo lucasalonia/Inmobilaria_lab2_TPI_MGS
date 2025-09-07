@@ -13,14 +13,20 @@
                     </h3>
                 </div>
                 <div class="card-body">
+                    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>@ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
                     <form asp-action="Create" method="post">
-                        <!-- Paso 1: Búsqueda de Persona -->
                         <div class="mb-4">
                             <h5 class="text-primary mb-3">
                                 <i class="fas fa-search me-2"></i>Paso 1: Buscar o Crear Persona
                             </h5>
                         
-                        <!-- Buscador por DNI -->
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="input-group">
@@ -38,22 +44,23 @@
 
                         <div id="resultadoBusqueda" class="alert" style="display: none;"></div>
 
-                        <!-- Campos de Persona -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">DNI *</label>
-                                    <input type="text" class="form-control" id="dni" name="Persona.Dni" maxlength="8" required />
+                                    <input type="text" class="form-control" id="dni" name="Persona.Dni" maxlength="8" required asp-for="Persona.Dni" />
+                                    <span asp-validation-for="Persona.Dni" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Sexo *</label>
-                                    <select class="form-select" id="sexo" name="Persona.Sexo" required>
+                                    <select class="form-select" id="sexo" name="Persona.Sexo" required asp-for="Persona.Sexo">
                                         <option value="">Seleccionar...</option>
                                         <option value="M">Masculino</option>
                                         <option value="F">Femenino</option>
                                     </select>
+                                    <span asp-validation-for="Persona.Sexo" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -62,13 +69,15 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Nombre *</label>
-                                    <input type="text" class="form-control" id="nombre" name="Persona.Nombre" required />
+                                    <input type="text" class="form-control" id="nombre" name="Persona.Nombre" required asp-for="Persona.Nombre" />
+                                    <span asp-validation-for="Persona.Nombre" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Apellido *</label>
-                                    <input type="text" class="form-control" id="apellido" name="Persona.Apellido" required />
+                                    <input type="text" class="form-control" id="apellido" name="Persona.Apellido" required asp-for="Persona.Apellido" />
+                                    <span asp-validation-for="Persona.Apellido" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -77,13 +86,15 @@
                              <div class="col-md-6">
                                  <div class="mb-3">
                                      <label class="form-label">Email *</label>
-                                     <input type="email" class="form-control" id="email" name="Persona.Email" required />
+                                     <input type="email" class="form-control" id="email" name="Persona.Email" required asp-for="Persona.Email" />
+                                     <span asp-validation-for="Persona.Email" class="text-danger"></span>
                                  </div>
                              </div>
                              <div class="col-md-6">
                                  <div class="mb-3">
                                      <label class="form-label">Teléfono</label>
-                                     <input type="tel" class="form-control" id="telefono" name="Persona.Telefono" />
+                                     <input type="tel" class="form-control" id="telefono" name="Persona.Telefono" asp-for="Persona.Telefono" />
+                                     <span asp-validation-for="Persona.Telefono" class="text-danger"></span>
                                  </div>
                              </div>
                          </div>
@@ -92,13 +103,13 @@
                              <div class="col-md-6">
                                  <div class="mb-3">
                                      <label class="form-label">Fecha de Nacimiento *</label>
-                                     <input type="date" class="form-control" id="fechaNacimiento" name="Persona.FechaNacimiento" required />
+                                     <input type="date" class="form-control" id="fechaNacimiento" name="Persona.FechaNacimiento" required asp-for="Persona.FechaNacimiento" />
+                                     <span asp-validation-for="Persona.FechaNacimiento" class="text-danger"></span>
                                  </div>
                              </div>
                          </div>
                     </div>
 
-                    <!-- Paso 2: Datos de Usuario -->
                     <div class="mb-4">
                         <h5 class="text-success mb-3">
                             <i class="fas fa-user-shield me-2"></i>Paso 2: Datos de Usuario
@@ -108,14 +119,16 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Nombre de Usuario *</label>
-                                    <input type="text" class="form-control" name="UserName" required />
+                                    <input type="text" class="form-control" name="UserName" required asp-for="UserName" />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Contraseña *</label>
-                                    <input type="password" class="form-control" name="Password" required />
+                                    <input type="password" class="form-control" name="Password" required asp-for="Password" />
                                     <small class="text-muted">Mínimo 6 caracteres</small>
+                                    <span asp-validation-for="Password" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -124,14 +137,33 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Estado *</label>
-                                    <select class="form-select" name="Estado" required>
+                                    <select class="form-select" name="Estado" required asp-for="Estado">
                                         <option value="">Seleccionar estado...</option>
-                                        <option value="Activo">Activo</option>
-                                        <option value="Inactivo">Inactivo</option>
-                                        <option value="Pendiente">Pendiente</option>
+                                        <option value="ACTIVO">Activo</option>
+                                        <option value="INACTIVO">Inactivo</option>
                                     </select>
+                                    <span asp-validation-for="Estado" class="text-danger"></span>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Rol</label>
+                                    <select class="form-select" name="rolId">
+                                        <option value="0">Sin rol</option>
+                                        @if (ViewBag.Roles != null)
+                                        {
+                                            @foreach (var rol in ViewBag.Roles)
+                                            {
+                                                <option value="@rol.Id">@rol.Nombre</option>
+                                            }
+                                        }
+                                    </select>
+                                    <small class="text-muted">Seleccione un rol para el usuario (opcional)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Confirmar Contraseña *</label>
@@ -261,4 +293,6 @@
             document.getElementById('dni').value = this.value;
         });
     </script>
+    
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
