@@ -10,6 +10,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
 
         int ContarPropietariosActivos();
 
+        int ContarPropietarios();
+
         int Modificar(Propietario propietario);
 
         int Baja(int idPropietario);

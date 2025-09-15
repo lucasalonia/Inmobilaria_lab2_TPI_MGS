@@ -3,52 +3,94 @@
 @{
     ViewData["Title"] = "Editar Propietario";
 }
-<h2>Editar Propietario</h2>
 
-<form asp-action="Edit" asp-controller="Propietarios" method="post">
-    @* Ids ocultos *@
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="Persona.Id" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-plus me-2"></i>Editar datos personales
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" asp-controller="Propietarios" method="post">
+                        
+                        <input type="hidden" name="Persona.Id" value="@Model?.Persona?.Id" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Dni" class="form-label">DNI *</label>
+                                    <input type="text" class="form-control" asp-for="Persona.Dni" readonly />
+                                </div>
+                            </div>
 
-    <label asp-for="Persona.Dni"></label>
-    <input asp-for="Persona.Dni" class="form-control" />
+                        
+                            <div class="col-md-6">                         
+                                <div class="mb-3">
+                                    <label for="Persona_Sexo" class="form-label">Sexo *</label>
+                            
+                                   <select class="form-select" asp-for="Persona.Sexo">
+                                            <option value="M">Masculino</option>
+                                            <option value="F">Femenino</option>
+                                            <option value="X">Otro</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
-    <label asp-for="Persona.Sexo"></label>
-    <select asp-for="Persona.Sexo" class="form-control">
-        <option value="">-- Seleccione --</option>
-        <option value="M">M</option>
-        <option value="F">F</option>
-        <option value="X">X</option>
-    </select>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Nombre" class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" asp-for="Persona.Nombre" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Apellido" class="form-label">Apellido *</label>
+                                    <input type="text" class="form-control" asp-for="Persona.Apellido" />
+                                </div>
+                            </div>
+                        </div>
 
-    <label asp-for="Persona.Nombre"></label>
-    <input asp-for="Persona.Nombre" class="form-control" />
-
-    <label asp-for="Persona.Apellido"></label>
-    <input asp-for="Persona.Apellido" class="form-control" />
-
-    <label asp-for="Persona.FechaNacimiento"></label>
-    <input asp-for="Persona.FechaNacimiento" type="date" class="form-control" />
-
-    <label asp-for="Persona.Email"></label>
-    <input asp-for="Persona.Email" class="form-control" />
-
-    <label asp-for="Persona.Telefono"></label>
-    <input asp-for="Persona.Telefono" class="form-control" />
-
-    <hr />
-
-    <label asp-for="Estado"></label>
-    <select asp-for="Estado" class="form-control">
-        <option value="ACTIVO">ACTIVO</option>
-    </select>
-
-    <label asp-for="CreadoPor"></label>
-    <input asp-for="CreadoPor" class="form-control" />
-
-    <label asp-for="ModificadoPor"></label>
-    <input asp-for="ModificadoPor" class="form-control" />
-
-    <button type="submit" class="btn btn-primary mt-3">Modificar</button>
-    <a asp-action="Index" class="btn btn-secondary mt-3">Cancelar</a>
-</form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_FechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" asp-for="Persona.FechaNacimiento" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" asp-for="Persona.Email" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Telefono" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" asp-for="Persona.Telefono" />
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="Estado" asp-for=Estado />
+                        <input type="hidden" name="CreadoPor" value="1" />
+                        <input type="hidden" name="ModificadoPor" value="1" />
+                        <div class="mb-4"></div>
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

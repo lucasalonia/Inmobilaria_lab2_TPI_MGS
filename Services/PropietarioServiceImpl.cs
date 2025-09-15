@@ -50,10 +50,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return propietarioRepository.ObtenerTodos(paginaNro, tamPagina);
         }
-        
+
         public int ContarPropietariosActivos()
         {
             return propietarioRepository.ContarPropietariosActivos();
+        }
+        
+        public int ContarPropietarios()
+        {
+            return propietarioRepository.ContarPropietarios();
         }
     }
 }

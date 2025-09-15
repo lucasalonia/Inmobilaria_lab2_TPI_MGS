@@ -23,7 +23,6 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     per.fecha_modificacion AS persona_fecha_modificacion
                     FROM propietario p
                     INNER JOIN persona per ON p.persona_id = per.id
-                    WHERE p.estado = 'ACTIVO'
                     ORDER BY p.id
                     LIMIT @tamPagina OFFSET @offset;
                     ";
@@ -324,12 +323,25 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             }
             return res;
         }
-        
+
         public int ContarPropietariosActivos()
         {
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = "SELECT COUNT(*) FROM propietario WHERE estado = 'ACTIVO'";
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    connection.Open();
+                    return Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+        }
+        
+        public int ContarPropietarios()
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = "SELECT COUNT(*) FROM propietario";
                 using (var command = new MySqlCommand(sql, connection))
                 {
                     connection.Open();

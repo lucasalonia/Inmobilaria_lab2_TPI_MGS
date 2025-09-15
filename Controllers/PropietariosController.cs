@@ -19,14 +19,14 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         public IActionResult Index(int pagina = 1)
         {
             int tamPagina = 10;
-            var totalRegistros = propietarioService.ContarPropietariosActivos();
+            var totalRegistros = propietarioService.ContarPropietarios();
             var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
 
             var lista = propietarioService.ObtenerTodos(pagina, tamPagina);
 
             ViewBag.Pagina = pagina;
             ViewBag.TotalPaginas = totalPaginas;
-
+            ViewBag.TotalRegistros = totalRegistros;
             return View(lista);
         }
 
@@ -59,7 +59,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             if (persona == null)
                 TempData["Msg"] = $"No existe persona con DNI {dni}, puede crear nuevo propietario.";
             else
-                TempData["Msg"] = $"La persona con DNI {dni} ya existe, puede continuar.";
+                TempData["Msg"] = $"Persona encontrada. Los datos han sido cargados.";
 
             return View("Create", modelo); // <-- devuelve Propietario, no Persona
         }
@@ -177,6 +177,28 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 TempData["Error"] = "Error al eliminar: " + ex.Message;
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: UsuarioController/Details/5
+        public ActionResult Details(int id)
+        {
+            try
+            {
+                var propietario = propietarioService.ObtenerPorId(id);
+                if (propietario == null)
+                {
+                    TempData["ErrorMessage"] = "Propietario no encontrado.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(propietario);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en UsuarioController.Details: {ex.Message}");
+                TempData["ErrorMessage"] = $"Error al cargar usuario: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
     }
