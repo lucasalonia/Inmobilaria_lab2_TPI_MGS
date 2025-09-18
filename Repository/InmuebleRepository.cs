@@ -15,11 +15,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             IList<Inmueble> res = new List<Inmueble>();
             using (var connection = new MySqlConnection(connectionString))
             {
+                int offset = (paginaNro - 1) * tamPagina;
                 string sql = @"SELECT id, tipo, estado, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
                                FROM inmueble
-                               WHERE estado = 'ACTIVO'";
+                               LIMIT @tamPagina OFFSET @offset";
                 using (MySqlCommand command = new MySqlCommand(sql, connection))
                 {
+                    command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                    command.Parameters.AddWithValue("@offset", offset);
+
                     command.CommandType = CommandType.Text;
                     connection.Open();
                     var reader = command.ExecuteReader();
@@ -83,9 +87,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             Inmueble? inm = null;
             using (var connection = new MySqlConnection(connectionString))
             {
-                string sql = @"SELECT id, propietario_id, tipo, estado, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
-                FROM inmueble
-                WHERE estado = 'ACTIVO' AND id = @id";
+                string sql = @"
+            SELECT i.id, i.propietario_id, i.tipo, i.estado, i.superficie_m2, 
+                   i.ambientes, i.banos, i.cochera, i.direccion, i.descripcion, 
+                   i.fecha_creacion, i.fecha_modificacion,
+                   per.nombre AS propietario_nombre, per.apellido AS propietario_apellido
+            FROM inmueble i
+            LEFT JOIN propietario p ON i.propietario_id = p.id
+            LEFT JOIN persona per ON p.persona_id = per.id
+            WHERE i.id = @id;";
 
                 using (var command = new MySqlCommand(sql, connection))
                 {
@@ -109,7 +119,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                 Descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? null : reader.GetString("descripcion"),
                                 FechaCreacion = reader.GetDateTime("fecha_creacion"),
                                 FechaModificacion = reader.GetDateTime("fecha_modificacion"),
-                            };
+
+                                PropietarioNombre = reader["propietario_nombre"] == DBNull.Value
+                                    ? null
+                                    : $"{reader["propietario_nombre"]} {reader["propietario_apellido"]}"
+                                    };
                         }
                     }
                 }
@@ -189,6 +203,26 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             return res;
         }
 
+        //Se usa en InmuebleController para paginacion
+        public int ObtenerCantidadInmuebles()
+        {
+            int res = 0;
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = "SELECT COUNT(id) FROM inmueble";
+
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    res = Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+
+            return res;
+        }
+
         //Cree este metodo para paginar la modal de inmuebles en contratos sin modificar el obtner todos original - LS
         public IList<Inmueble> ObtenerTodosParaContratos(int paginaNro = 1, int tamPagina = 5)
         {
@@ -225,6 +259,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                             FechaCreacion = reader.GetDateTime("fecha_creacion"),
                             FechaModificacion = reader.GetDateTime("fecha_modificacion"),
                         };
+                        // guardar nombre completo en ViewBag
+                        var propietarioNombre = $"{reader["propietario_nombre"]} {reader["propietario_apellido"]}";
+                        inmueble.PropietarioNombre = propietarioNombre; // 🔹 agregá esta prop al modelo
                         res.Add(inmueble);
                     }
                     connection.Close();

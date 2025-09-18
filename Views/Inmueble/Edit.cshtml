@@ -3,46 +3,97 @@
 @{
     ViewData["Title"] = "Editar Inmueble";
 }
-<h2> Editar Inmueble</h2>
 
-<form asp-action="Edit" asp-controller="Inmueble" method="post">
-    <input type="hidden" asp-for="Estado" value="ACTIVO" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="bi bi-buildings-fill me-2"></i>Editar inmueble
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" asp-controller="Inmueble" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Tipo" class="form-label">Tipo</label>
+                                    <input type="text" asp-for="Tipo" class="form-control" as id="Tipo" name="Tipo"/>
+                                </div>
+                            </div>
 
-    <label asp-for="Tipo">Tipo</label>
-    <input type="text" asp-for="Tipo" class="form-control" as id="Tipo" name="Tipo"/>
+                        
+                            <div class="col-md-6">                         
+                                <div class="mb-3">
+                                    <label asp-for="SuperficieM2"  class="form-label">Superficie (m²)</label>
+                                    <input type="number" asp-for="SuperficieM2" class="form-control" id="SuperficieM2" name="SuperficieM2" />
+                                </div>
+                            </div>
+                        </div>
 
-    <label asp-for="SuperficieM2">Superficie (m²)</label>
-    <input type="number" asp-for="SuperficieM2" class="form-control" id="SuperficieM2" name="SuperficieM2" />
-
-    <label asp-for="Ambientes">Ambientes</label>
-    <input type="number" asp-for="Ambientes" class="form-control" id="Ambientes" name="Ambientes"/>
-
-    <label asp-for="Banos">Baños</label>
-    <input type="number" asp-for="Banos" class="form-control" id="Banos" name="Banos" />
-
-    <label asp-for="Cochera">Cocheras</label>
-    <input type="number" asp-for="Cochera" class="form-control" min="0" />
-
-    <label asp-for="Direccion">Dirección</label>
-    <input type="text" asp-for="Direccion" class="form-control" id="Direccion" name="Direccion"/>
-
-    <label asp-for="Descripcion">Descripción</label>
-    <textarea class="form-control" asp-for="Descripcion" id="Descripcion" name="Descripcion"></textarea>
-
-    <div class="mb-3">
-        <label asp-for="PropietarioId" class="form-label">Propietario</label>
-        <div class="input-group">
-            <input type="hidden" id="PropietarioId" name="PropietarioId" value="@Model.PropietarioId" />
-            <input type="text" id="PropietarioNombre" class="form-control" value="@ViewBag.PropietarioNombre" readonly />
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPropietarios">
-                Seleccionar
-            </button>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Ambientes">Ambientes</label>
+                                    <input type="number" asp-for="Ambientes" class="form-control" id="Ambientes" name="Ambientes"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Banos">Baños</label>
+                                    <input type="number" asp-for="Banos" class="form-control" id="Banos" name="Banos" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Cochera">Cocheras</label>
+                                    <input type="number" asp-for="Cochera" class="form-control" min="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Direccion">Dirección</label>
+                                    <input type="text" asp-for="Direccion" class="form-control" id="Direccion" name="Direccion"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Descripcion">Descripción</label>
+                                <textarea class="form-control" asp-for="Descripcion" id="Descripcion" name="Descripcion"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PropietarioId" class="form-label">Propietario</label>
+                                <div class="input-group">
+                                    <input type="hidden" id="PropietarioId" name="PropietarioId" value="@Model.PropietarioId" />
+                                    <input type="text" id="PropietarioNombre" class="form-control" value="@ViewBag.PropietarioNombre" readonly />
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPropietarios">
+                                        Seleccionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="Estado" asp-for=Estado />
+                        <input type="hidden" name="CreadoPor" value="1" />
+                        <input type="hidden" name="ModificadoPor" value="1" />
+                        <div class="mb-3"></div>
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-
-    <button type="submit" class="btn btn-primary mt-3">Modificar</button>
-    <a asp-action="Index" class="btn btn-secondary mt-3">Cancelar</a>
-</form>
+</div>
 
 <!-- Modal para seleccionar propietario -->
 <div class="modal fade" id="modalPropietarios" tabindex="-1" aria-hidden="true">

@@ -4,7 +4,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
 {
     public interface InmuebleService
     {
-        IList<Inmueble> ObtenerTodos();
+        IList<Inmueble> ObtenerTodos(int paginaNro = 1, int tamPagina = 10);
         public IList<Inmueble> ObtenerTodosParaContratos(int paginaNro = 1, int tamPagina = 5);
 
         int Modificar(Inmueble inmueble);
@@ -17,5 +17,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
 
         int Alta(Inmueble inmueble);
         int ObtenerCantidadInmueblesActivos();
+
+        int ObtenerCantidadInmuebles();
     }
 }

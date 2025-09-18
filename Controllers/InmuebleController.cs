@@ -15,12 +15,17 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             this.propietarioService = propietarioService;
         }
 
-        [Route("[controller]/Index")]
-        public ActionResult Index()
+        public IActionResult Index(int pagina = 1)
         {
+            int tamPagina = 10;
+            var totalRegistros = InmuebleService.ObtenerCantidadInmuebles();
+            var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
             try
             {
-                var lista = InmuebleService.ObtenerTodos();
+                var lista = InmuebleService.ObtenerTodos(pagina, tamPagina);
+                ViewBag.Pagina = pagina;
+                ViewBag.TotalPaginas = totalPaginas;
+                ViewBag.TotalRegistros = totalRegistros;
                 return View(lista);
             }
             catch (Exception ex)
@@ -68,7 +73,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             }
             // Para mostrar el nombre del propietario actual
             string propietarioNombre = "";
-            if (inmueble.PropietarioId > 0) 
+            if (inmueble.PropietarioId > 0)
             {
                 var propietario = propietarioService.ObtenerPorId(inmueble.PropietarioId);
                 if (propietario != null)
@@ -155,6 +160,28 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             catch (Exception ex)
             {
                 throw;
+            }
+        }
+        
+        // GET: InmuebleController/Details/5
+        public ActionResult Details(int id)
+        {
+            try
+            {
+                var inmueble = InmuebleService.ObtenerPorId(id);
+                if (inmueble == null)
+                {
+                    TempData["ErrorMessage"] = "Inmueble no encontrado.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(inmueble);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en InmuebleController.Details: {ex.Message}");
+                TempData["ErrorMessage"] = $"Error al cargar inmueble: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
 

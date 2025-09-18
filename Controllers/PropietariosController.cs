@@ -179,7 +179,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: UsuarioController/Details/5
+        // GET: PropietarioController/Details/5
         public ActionResult Details(int id)
         {
             try
@@ -195,8 +195,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error en UsuarioController.Details: {ex.Message}");
-                TempData["ErrorMessage"] = $"Error al cargar usuario: {ex.Message}";
+                Console.WriteLine($"Error en PropietarioController.Details: {ex.Message}");
+                TempData["ErrorMessage"] = $"Error al cargar Propietario: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
         }

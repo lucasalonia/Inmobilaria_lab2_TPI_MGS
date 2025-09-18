@@ -92,11 +92,16 @@
                                                     @if (item.Estado == "ACTIVO")
                                                     {
                                                         <a class="btn btn-sm btn-outline-danger" 
-                                                           asp-action="Delete" 
-                                                           asp-route-id="@item.Id" 
-                                                           title="Deshabilitar">
-                                                            <i class="fas fa-user-slash"></i>
-                                                        </a>
+                                                            href="javascript:void(0);"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#eliminarModal"
+                                                            data-id="@item.Id"
+                                                            data-nombre="@item.Persona.Nombre"
+                                                            data-apellido="@item.Persona.Apellido"
+                                                            data-dni="@item.Persona.Dni"
+                                                            title="Deshabilitar">
+                                                                <i class="fas fa-user-slash"></i>
+                                                         </a>
                                                     }
                                                     else
                                                     {
@@ -141,3 +146,49 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Confirmación Eliminar -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="formEliminar" method="post" asp-action="Delete">
+				<div class="modal-header">
+					<h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+				</div>
+				<div class="modal-body">
+					<p id="mensajeEliminar"></p>
+					<input type="hidden" id="EliminarId" name="Id" />
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+					<button type="submit" class="btn btn-danger">Deshabilitar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+    <script>
+        var eliminarModal = document.getElementById('eliminarModal');
+        eliminarModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget; // botón que abrió el modal
+
+            var id = button.getAttribute('data-id');
+            var nombre = button.getAttribute('data-nombre') || "-";
+            var apellido = button.getAttribute('data-apellido') || "-";
+            var dni = button.getAttribute('data-dni') || "-";
+
+            // mensaje
+            var mensaje = "¿Está seguro que desea deshabilitar el propietario?";
+            mensaje += "<br><strong>Nombre:</strong> " + nombre;
+            mensaje += "<br><strong>Apellido:</strong> " + apellido;
+            mensaje += "<br><strong>DNI::</strong> " + dni;
+
+            document.getElementById('mensajeEliminar').innerHTML = mensaje;
+            document.getElementById('EliminarId').value = id;
+        });
+    </script>
+}
+

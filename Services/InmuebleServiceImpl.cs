@@ -20,9 +20,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return inmuebleRepository.ObtenerTodos();
         }
-
+        
         //Sobre carga para usar en paginado de inmuebles - LS
-        public IList<Inmueble> ObtenerTodos(int paginaNro, int tamPagina)
+        public IList<Inmueble> ObtenerTodos(int paginaNro = 1, int tamPagina = 10)
         {
             return inmuebleRepository.ObtenerTodos(paginaNro, tamPagina);
         }
@@ -48,6 +48,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         public IList<Inmueble> ObtenerTodosParaContratos(int paginaNro = 1, int tamPagina = 5)
         {
             return inmuebleRepository.ObtenerTodosParaContratos(paginaNro, tamPagina);
+        }
+        public int ObtenerCantidadInmuebles()
+        {
+            return inmuebleRepository.ObtenerCantidadInmuebles();
         }
     }
 }

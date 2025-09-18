@@ -3,46 +3,97 @@
 @{
     ViewData["Title"] = "Create";
 }
-<h2> Nuevo Inmueble</h2>
 
-<form asp-action="Create" asp-controller="Inmueble" method="post">
-    <input type="hidden" asp-for="Estado" value="ACTIVO" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-plus me-2"></i>Crear Nuevo Inmueble
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" asp-controller="Inmueble" method="post">
+                        <input type="hidden" asp-for="Estado" value="ACTIVO" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Tipo">Tipo *</label>
+                                    <input type="text" asp-for="Tipo" class="form-control" as id="Tipo" name="Tipo" value="@Model?.Tipo" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="SuperficieM2">Superficie (m²)</label>
+                                    <input type="number" asp-for="SuperficieM2" class="form-control" id="SuperficieM2" name="SuperficieM2" value="@Model?.SuperficieM2" />
+                                </div>
+                            </div>
+                        </div>
 
-    <label for="Tipo">Tipo</label>
-    <input type="text" asp-for="Tipo" class="form-control" as id="Tipo" name="Tipo" value="@Model?.Tipo" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Ambientes">Ambientes</label>
+                                    <input type="number" asp-for="Ambientes" class="form-control" id="Ambientes" name="Ambientes" value="@Model?.Ambientes" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Banos">Baños</label>
+                                    <input type="number" asp-for="Banos" class="form-control" id="Banos" name="Banos" value="@Model?.Banos" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Cochera">Cocheras</label>
+                                    <input type="number" asp-for="Cochera" class="form-control" min="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Direccion">Dirección</label>
+                                    <input type="text" asp-for="Direccion" class="form-control" id="Direccion" name="Direccion" value="@Model?.Direccion" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Descripcion">Descripción</label>
+                                    <textarea class="form-control" asp-for="Descripcion" id="Descripcion" name="Descripcion">@Model?.Descripcion</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="PropietarioId" class="form-label">Propietario</label>
+                                    <div class="input-group">
+                                        <input type="hidden" id="PropietarioId" name="PropietarioId" />
+                                        <input type="text" id="PropietarioNombre" class="form-control" readonly />
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPropietarios">
+                                            Seleccionar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4"></div>
 
-    <label for="SuperficieM2">Superficie (m²)</label>
-    <input type="number" asp-for="SuperficieM2" class="form-control" id="SuperficieM2" name="SuperficieM2" value="@Model?.SuperficieM2" />
-
-    <label for="Ambientes">Ambientes</label>
-    <input type="number" asp-for="Ambientes" class="form-control" id="Ambientes" name="Ambientes" value="@Model?.Ambientes" />
-
-    <label for="Banos">Baños</label>
-    <input type="number" asp-for="Banos" class="form-control" id="Banos" name="Banos" value="@Model?.Banos" />
-
-    <label for="Cochera">Cocheras</label>
-    <input type="number" asp-for="Cochera" class="form-control" min="0" />
-
-    <label for="Direccion">Dirección</label>
-    <input type="text" asp-for="Direccion" class="form-control" id="Direccion" name="Direccion" value="@Model?.Direccion" />
-
-    <label for="Descripcion">Descripción</label>
-    <textarea class="form-control" asp-for="Descripcion" id="Descripcion" name="Descripcion">@Model?.Descripcion</textarea>
-
-    <div class="mb-3">
-        <label for="PropietarioId" class="form-label">Propietario</label>
-        <div class="input-group">
-            <input type="hidden" id="PropietarioId" name="PropietarioId" />
-            <input type="text" id="PropietarioNombre" class="form-control" readonly />
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPropietarios">
-                Seleccionar
-            </button>
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Crear Inmueble                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-
-    <button type="submit" class="btn btn-primary mt-3">Guardar</button>
-    <a href="@Url.Action("Index", "Inmueble")" class="btn btn-secondary mt-3">Cancelar</a>
-</form>
+</div>
 
 <!-- Modal para seleccionar propietario -->
 <div class="modal fade" id="modalPropietarios" tabindex="-1" aria-hidden="true">
