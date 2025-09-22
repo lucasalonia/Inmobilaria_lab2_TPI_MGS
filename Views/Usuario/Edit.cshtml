@@ -126,6 +126,23 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
+                                        <label class="form-label">Nueva Contraseña</label>
+                                        <input type="password" class="form-control" name="nuevaPassword" id="nuevaPassword" />
+                                        <small class="text-muted">Deje en blanco para mantener la contraseña actual</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Confirmar Nueva Contraseña</label>
+                                        <input type="password" class="form-control" name="confirmarPassword" id="confirmarPassword" />
+                                        <span id="passwordMatch" class="text-danger" style="display: none;">Las contraseñas no coinciden</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
                                         <label class="form-label">Rol</label>
                                         <select class="form-select" name="rolId">
                                             <option value="0">Sin rol</option>
@@ -163,4 +180,36 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const nuevaPassword = document.getElementById('nuevaPassword');
+            const confirmarPassword = document.getElementById('confirmarPassword');
+            const passwordMatch = document.getElementById('passwordMatch');
+            const form = document.querySelector('form');
+
+            function validatePasswords() {
+                if (nuevaPassword.value && confirmarPassword.value) {
+                    if (nuevaPassword.value !== confirmarPassword.value) {
+                        passwordMatch.style.display = 'block';
+                        return false;
+                    } else {
+                        passwordMatch.style.display = 'none';
+                        return true;
+                    }
+                }
+                return true;
+            }
+
+            confirmarPassword.addEventListener('input', validatePasswords);
+            nuevaPassword.addEventListener('input', validatePasswords);
+
+            form.addEventListener('submit', function(e) {
+                if (!validatePasswords()) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
 }

@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -30,45 +31,83 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Propietarios"
-                                asp-action="Index">Propietarios</a>
-                        </li>
-                        <li class="nav-item"></li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Inmueble"
-                            asp-action="Index">Inmuebles</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Inquilinos" asp-action="Index"
-                                style="font-weight">Inquilinos</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="contratosDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Contratos de alquiler
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="contratosDropdown">
-                                <li>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Contratos" asp-action="Index">
-                                        Crear nuevo contrato
-                                    </a>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Propietarios"
+                                    asp-action="Index">Propietarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Inmueble"
+                                    asp-action="Index">Inmuebles</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Inquilinos" asp-action="Index"
+                                    style="font-weight">Inquilinos</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="contratosDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    Contratos de alquiler
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="contratosDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Contratos" asp-action="Index">
+                                            Crear nuevo contrato
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Contratos"
+                                            asp-action="Lista">
+                                            Contratos activos
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Usuario"
+                                        asp-action="Index">Usuarios</a>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Contratos"
-                                        asp-action="Lista">
-                                        Contratos activos
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item"></li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Usuario"
-                            asp-action="Index">Usuarios</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home"
-                                asp-action="Privacy">Privacy</a>
-                        </li>
+                            }
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home"
+                                    asp-action="Privacy">Privacy</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user"></i> @User.FindFirst("FullName")?.Value
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <span class="dropdown-item-text">
+                                            <small class="text-muted">@User.FindFirst(ClaimTypes.Email)?.Value</small>
+                                        </span>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Auth" asp-action="Logout">
+                                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

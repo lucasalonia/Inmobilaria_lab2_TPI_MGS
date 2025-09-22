@@ -1,10 +1,32 @@
 using Inmobilaria_lab2_TPI_MGS.Repository;
 using Inmobilaria_lab2_TPI_MGS.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Autenticacion
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.LogoutPath = "/Auth/Logout";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
+    options.AddPolicy("RequireAuthentication", policy => policy.RequireAuthenticatedUser());
+});
 
 // Repos
 builder.Services.AddScoped<PropietarioRepository>();
@@ -33,6 +55,9 @@ builder.Services.AddScoped<PersonService, PersonServiceImpl>();
 builder.Services.AddScoped<ContratoService, ContratoServiceImpl>();
 // Modulo-Contrato
 
+// Auth Service
+builder.Services.AddScoped<AuthService, AuthServiceImpl>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -48,6 +73,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Middleware 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -1,6 +1,7 @@
 using Inmobilaria_lab2_TPI_MGS.Models;
 using Inmobilaria_lab2_TPI_MGS.Models.ViewModels;
 using Inmobilaria_lab2_TPI_MGS.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,17 +10,20 @@ using Microsoft.Extensions.Configuration;
 
 namespace Inmobilaria_lab2_TPI_MGS.Controllers
 {
+    [Authorize(Policy = "AdminOnly")]
     public class UsuarioController : Controller
     {
         private readonly UsuarioService usuarioService;
         private readonly RolService rolService;
         private readonly UsuarioRolService usuarioRolService;
+        private readonly AuthService authService;
 
-        public UsuarioController(UsuarioService usuarioService, RolService rolService, UsuarioRolService usuarioRolService)
+        public UsuarioController(UsuarioService usuarioService, RolService rolService, UsuarioRolService usuarioRolService, AuthService authService)
         {
             this.usuarioService = usuarioService;
             this.rolService = rolService;
             this.usuarioRolService = usuarioRolService;
+            this.authService = authService;
         }
 
         // GET: UsuarioController
@@ -79,7 +83,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    usuario.Password = HashPassword(usuario.Password);
+                    usuario.Password = authService.HashearContraseña(usuario.Password);
                     
                     int usuarioId = usuarioService.CrearUsuario(usuario);
                     
@@ -126,24 +130,6 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             return View(usuario);
         }
 
-        private string HashPassword(string password)
-        {
-            byte[] salt = new byte[128 / 8];
-            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(salt);
-            }
-
-            // Hash de la contraseña usando PBKDF2, cambiar a bcrypt despues
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8));
-
-            return $"{Convert.ToBase64String(salt)}.{hashed}";
-        }
 
         // GET: UsuarioController/Details/5
         public ActionResult Details(int id)
@@ -204,7 +190,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         // POST: UsuarioController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Usuario usuario, int? rolId)
+        public ActionResult Edit(int id, Usuario usuario, int? rolId, string? nuevaPassword, string? confirmarPassword)
         {
             try
             {
@@ -214,12 +200,28 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     return View(usuario);
                 }
 
+                // Validar que las contraseñas coincidan si se proporcionan
+                if (!string.IsNullOrEmpty(nuevaPassword) && nuevaPassword != confirmarPassword)
+                {
+                    ViewBag.ErrorMessage = "Las contraseñas no coinciden.";
+                    ModelState.AddModelError("confirmarPassword", "Las contraseñas no coinciden.");
+                }
+
                 if (ModelState.IsValid)
                 {
                     var usuarioActual = usuarioService.ObtenerPorId(id);
                     if (usuarioActual != null)
                     {
-                        usuario.Password = usuarioActual.Password;
+                        // Si se proporciona una nueva contraseña, hashearla con BCrypt
+                        if (!string.IsNullOrEmpty(nuevaPassword))
+                        {
+                            usuario.Password = authService.HashearContraseña(nuevaPassword);
+                        }
+                        else
+                        {
+                            // Mantener la contraseña actual si no se proporciona una nueva
+                            usuario.Password = usuarioActual.Password;
+                        }
                     }
 
                     bool actualizado = usuarioService.ActualizarUsuario(usuario);

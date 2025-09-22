@@ -1,5 +1,6 @@
 using Inmobilaria_lab2_TPI_MGS.Models;
 using Inmobilaria_lab2_TPI_MGS.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using Inmobilaria_lab2_TPI_MGS.Models.ViewModels;
 
 namespace Inmobilaria_lab2_TPI_MGS.Controllers
 {
+    [Authorize(Policy = "UserOrAdmin")]
     public class ContratosController : Controller
     {
         private readonly InquilinoService inquilinoService;
