@@ -14,6 +14,7 @@
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+
 </head>
 
 <body>
@@ -57,8 +58,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-area="" asp-controller="Contratos"
-                                            asp-action="Lista">
+                                        <a class="dropdown-item" asp-area="" asp-controller="Contratos" asp-action="Lista">
                                             Contratos activos
                                         </a>
                                     </li>
@@ -91,7 +91,9 @@
                                             <small class="text-muted">@User.FindFirst(ClaimTypes.Email)?.Value</small>
                                         </span>
                                     </li>
-                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
                                     <li>
                                         <a class="dropdown-item" asp-area="" asp-controller="Auth" asp-action="Logout">
                                             <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
@@ -125,8 +127,16 @@
                 asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

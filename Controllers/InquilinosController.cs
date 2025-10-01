@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Configuration;
 using Inmobilaria_lab2_TPI_MGS.Models.ViewModels;
+using System.Security.Claims;
 
 namespace Inmobilaria_lab2_TPI_MGS.Controllers
 {
@@ -28,15 +29,21 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         GENERAR MODALES ACORDES QUE SURGAN SEGUN EL RESULTADO DE LOS METODOS DEL REPO - LS*/
 
         // GET: InquilinosController
-        [Route("[controller]/Index")]
-        public ActionResult Index()
+        [HttpGet]
+        public IActionResult Index(int pagina = 1)
         {
-            var listaInquilinos = inquilinoService.ObtenerTodos();
+
+            int tamPagina = 10;
+            var totalRegistros = inquilinoService.ContarInquilinosActivos();
+            var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
+
+            var listaInquilinos = inquilinoService.ObtenerTodos(pagina, tamPagina);
             var listaViewModel = new List<InquilinoViewModel>();
+
             foreach (var inquilino in listaInquilinos)
             {
                 var contrato = contratoService.ObtenerContratoVigente(inquilino.Id);
-                
+
                 if (contrato == null)
                 {
                     contrato = new Contrato
@@ -52,7 +59,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     Contrato = contrato
                 });
             }
-
+            ViewBag.Pagina = pagina;
+            ViewBag.TotalPaginas = totalPaginas;
+            ViewBag.TotalRegistros = totalRegistros;
             return View(listaViewModel);
         }
 
@@ -68,6 +77,24 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 throw;
             }
         }
+         [HttpGet]
+        public IActionResult BuscarPorDni(string dni)
+        {
+            var persona = inquilinoService.ObtenerPorDni(dni);
+
+            var modelo = new Inquilino
+            {
+                Persona = persona ?? new Persona(),
+                Estado = "ACTIVO"
+            };
+
+            if (persona == null)
+                TempData["MsgNull"] = $"No existe persona con DNI {dni}, puede crear nuevo propietario.";
+            else
+                TempData["Msg"] = $"Persona encontrada. Los datos han sido cargados.";
+
+            return View("Agregar", modelo); 
+        }
 
 
 
@@ -79,8 +106,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         {
             try
             {
+                int? idUsuario = int.Parse(User.FindFirstValue("UserId"));
 
-                inquilinoService.Alta(persona);
+                inquilinoService.Alta(persona, idUsuario);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -95,7 +123,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         {
             try
             {
-                inquilinoService.Modificar(persona);
+                int? idUsuario = int.Parse(User.FindFirstValue("UserId"));
+                inquilinoService.Modificar(persona, idUsuario);
 
                 return RedirectToAction("Index");
             }
@@ -110,8 +139,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         {
             try
             {
-                Console.WriteLine(persona.Id);
-                inquilinoService.Baja(persona.Id);
+                int? idUsuario = int.Parse(User.FindFirstValue("UserId"));
+                inquilinoService.Baja(persona.Id, idUsuario);
 
                 return RedirectToAction("Index");
             }

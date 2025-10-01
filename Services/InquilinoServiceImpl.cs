@@ -12,28 +12,40 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
             this.inquilinoRepository = inquilinoRepository;
         }
 
-        public bool Alta(Persona persona)
+        public bool Alta(Persona persona, int? idUsuario)
         {
-            return inquilinoRepository.Alta(persona);
+            return inquilinoRepository.Alta(persona, idUsuario );
         }
 
-        public bool Baja(int idPersona)
+        public bool Baja(int idPersona, int? idUsuario)
         {
-            return inquilinoRepository.Baja(idPersona);
+            return inquilinoRepository.Baja(idPersona, idUsuario);
         }
 
-        public bool Modificar(Persona persona)
+        public bool Modificar(Persona persona, int? idUsuario)
         {
-            return inquilinoRepository.Modificar(persona);
+            return inquilinoRepository.Modificar(persona, idUsuario);
         }
 
-        public IList<Inquilino> ObtenerTodos()
+        public IList<Inquilino> ObtenerTodos(int paginaNro = 1, int tamPagina = 10)
         {
-            return inquilinoRepository.ObtenerTodos();
+            return inquilinoRepository.ObtenerTodos(paginaNro, tamPagina);
         }
-        public IList<Inquilino> ListarInquilinosSinContrato()
+        public IList<Inquilino> ListarInquilinosSinContrato( int pagina = 1, int tamPagina = 10)
         {
-            return inquilinoRepository.ListarInquilinosSinContrato();
+            return inquilinoRepository.ListarInquilinosSinContrato(pagina, tamPagina);
+        }
+        public int ContarInquilinosActivos()
+        {
+            return inquilinoRepository.ContarInquilinosActivos();
+        }
+        public int ContarInquilinosActivosSinContrato()
+        {
+            return inquilinoRepository.ContarInquilinosActivosSinContrato();
+        }
+        public Persona? ObtenerPorDni(string dni)
+        {
+            return inquilinoRepository.ObtenerPorDni(dni);
         }
     }
 }

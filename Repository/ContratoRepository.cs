@@ -12,7 +12,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
         }
 
 
-        public bool Alta(Contrato contrato)
+        public bool Alta(Contrato contrato, int? idUsuario)
         {
             bool exito = false;
             using (var connection = new MySqlConnection(connectionString))
@@ -22,9 +22,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     connection.Open();
                     string query = @"
                                     INSERT INTO contrato (inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, 
-                                    observaciones, fecha_creacion, fecha_modificacion, creado_por, modificado_por)
+                                    observaciones, fecha_creacion, fecha_modificacion, creado_por)
                                     VALUES (@InmuebleId, @InquilinoId, @FechaInicio, @FechaFin, 
-                                    @Estado, @MontoMensual, @Moneda, @Deposito, @Observaciones, NOW(), NOW(), @CreadoPor, @ModificadoPor)";
+                                    @Estado, @MontoMensual, @Moneda, @Deposito, @Observaciones, NOW(), NOW(), @CreadoPor)";
                     using (var command = new MySqlCommand(query, connection))
 
                     {
@@ -37,8 +37,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                         command.Parameters.AddWithValue("@Moneda", (object)contrato.Moneda ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Deposito", (object)contrato.Deposito ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Observaciones", (object)contrato.Observaciones ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@CreadoPor", (object)contrato.CreadoPor ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@ModificadoPor", (object)contrato.ModificadoPor ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@CreadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value);
                         int rowsAffected = command.ExecuteNonQuery();
                         exito = rowsAffected > 0;
                     }
@@ -56,7 +55,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             return exito;
         }
 
-        public bool Modificar(Contrato contrato)
+        public bool Modificar(Contrato contrato, int? idUsuario)
         {
             bool exito = false;
             using (var connection = new MySqlConnection(connectionString))
@@ -64,27 +63,56 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 try
                 {
                     connection.Open();
-                    string query = @"
+
+                    var updates = new List<string>();
+                    var parameters = new List<MySqlParameter>();
+
+                    if (contrato.FechaFin != default(DateTime))
+                    {
+                        updates.Add("fecha_fin = @FechaFin");
+                        parameters.Add(new MySqlParameter("@FechaFin", contrato.FechaFin));
+                    }
+                    if (!string.IsNullOrWhiteSpace(contrato.Estado))
+                    {
+                        updates.Add("estado = @Estado");
+                        parameters.Add(new MySqlParameter("@Estado", contrato.Estado));
+                    }
+                    if (contrato.MontoMensual.HasValue)
+                    {
+                        updates.Add("monto_mensual = @MontoMensual");
+                        parameters.Add(new MySqlParameter("@MontoMensual", contrato.MontoMensual.Value));
+                    }
+                    if (!string.IsNullOrWhiteSpace(contrato.Moneda))
+                    {
+                        updates.Add("moneda = @Moneda");
+                        parameters.Add(new MySqlParameter("@Moneda", contrato.Moneda));
+                    }
+                    if (contrato.Deposito.HasValue)
+                    {
+                        updates.Add("deposito = @Deposito");
+                        parameters.Add(new MySqlParameter("@Deposito", contrato.Deposito.Value));
+                    }
+                    if (!string.IsNullOrWhiteSpace(contrato.Observaciones))
+                    {
+                        updates.Add("observaciones = @Observaciones");
+                        parameters.Add(new MySqlParameter("@Observaciones", contrato.Observaciones));
+                    }
+
+
+                    updates.Add("fecha_modificacion = NOW()");
+                    updates.Add("modificado_por = @ModificadoPor");
+                    parameters.Add(new MySqlParameter("@ModificadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value));
+
+                    string query = $@"
                                     UPDATE contrato
-                                    SET fecha_fin = @FechaFin,
-                                        estado = @Estado,
-                                        monto_mensual = @MontoMensual,
-                                        moneda = @Moneda,
-                                        deposito = @Deposito,
-                                        observaciones = @Observaciones,
-                                        fecha_modificacion = NOW(),
-                                        modificado_por = @ModificadoPor
+                                    SET {string.Join(", ", updates)}
                                     WHERE id = @Id";
+
                     using (var command = new MySqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", contrato.Id);
-                        command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
-                        command.Parameters.AddWithValue("@Estado", contrato.Estado);
-                        command.Parameters.AddWithValue("@MontoMensual", (object)contrato.MontoMensual ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Moneda", (object)contrato.Moneda ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Deposito", (object)contrato.Deposito ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Observaciones", (object)contrato.Observaciones ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@ModificadoPor", (object)contrato.ModificadoPor ?? DBNull.Value);
+                        command.Parameters.AddRange(parameters.ToArray());
+
                         int rowsAffected = command.ExecuteNonQuery();
                         exito = rowsAffected > 0;
                     }
@@ -94,14 +122,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     Console.WriteLine($"Error al modificar contrato: {e.Message}");
                     throw;
                 }
-                finally
-                {
-                    connection.Close();
-                }
             }
             return exito;
         }
-        public bool Baja(int contratoId)
+        public bool Baja(int contratoId, int? idUsuario)
         {
             bool exito = false;
             using (var connection = new MySqlConnection(connectionString))
@@ -111,11 +135,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     connection.Open();
                     string query = @"UPDATE contrato
                                      SET estado = 'NO VIGENTE',
-                                         fecha_modificacion = NOW()
+                                         fecha_modificacion = NOW(),
+                                         modificado_por = @ModificadoPor
                                      WHERE id = @Id";
                     using (var command = new MySqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", contratoId);
+                        command.Parameters.AddWithValue("@ModificadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value);
                         int rowsAffected = command.ExecuteNonQuery();
                         exito = rowsAffected > 0;
                     }
@@ -131,9 +157,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 }
             }
             return exito;
-         }
+        }
 
-        public IList<Contrato> ListaContratosVigentes()
+        public IList<Contrato> ListaContratosVigentes(int paginaNro = 1, int tamPagina = 10)
         {
             IList<Contrato> contratos = new List<Contrato>();
 
@@ -147,10 +173,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                     SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones
                                     FROM contrato
                                     WHERE estado = 'VIGENTE' AND fecha_fin >= CURDATE()
-                                    ORDER BY fecha_inicio DESC";
+                                    ORDER BY fecha_inicio DESC
+                                    LIMIT @TamPagina OFFSET @Offset";
 
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
+                        int offset = (paginaNro - 1) * tamPagina;
+                        command.Parameters.AddWithValue("@TamPagina", tamPagina);
+                        command.Parameters.AddWithValue("@Offset", offset);
+                        
                         using (MySqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
@@ -188,6 +219,65 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             return contratos;
 
 
+        }
+        public Contrato ObtenerPorId(int contratoId)
+        {
+            Contrato contrato = null;
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    string query = @"
+                SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones, fecha_creacion, fecha_modificacion, creado_por
+                FROM contrato
+                WHERE id = @ContratoId
+                LIMIT 1";
+
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@ContratoId", contratoId);
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                contrato = new Contrato
+                                {
+                                    Id = reader.GetInt32("id"),
+                                    InmuebleId = reader.GetInt32("inmueble_id"),
+                                    InquilinoId = reader.GetInt32("inquilino_id"),
+                                    FechaInicio = reader.GetDateTime("fecha_inicio"),
+                                    FechaFin = reader.GetDateTime("fecha_fin"),
+                                    Estado = reader.GetString("estado"),
+                                    MontoMensual = reader.IsDBNull(reader.GetOrdinal("monto_mensual")) ? 0 : reader.GetDecimal("monto_mensual"),
+                                    Moneda = reader.IsDBNull(reader.GetOrdinal("moneda")) ? null : reader.GetString("moneda"),
+                                    Deposito = reader.IsDBNull(reader.GetOrdinal("deposito")) ? 0 : reader.GetDecimal("deposito"),
+                                    Observaciones = reader.IsDBNull(reader.GetOrdinal("observaciones")) ? null : reader.GetString("observaciones"),
+                                    FechaCreacion = reader.GetDateTime("fecha_creacion"),
+                                    FechaModificacion = reader.GetDateTime("fecha_modificacion"),
+                                    CreadoPor = reader.IsDBNull(reader.GetOrdinal("creado_por"))
+                                        ? (ulong?)null
+                                        : (ulong)reader.GetInt32("creado_por")
+                                };
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al obtener contrato: {ex.Message}");
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+
+            return contrato;
         }
 
         public Contrato ObtenerContratoVigente(int inquilinoId)
@@ -400,6 +490,46 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             }
 
             return inmuebles;
+        }
+        public Contrato? ObtenerContratoVigentePorInmuebleId(int inmuebleId)
+        {
+            Contrato? contrato = null;
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"
+            SELECT *
+            FROM contrato
+            WHERE inmueble_id = @inmuebleId
+              AND estado = 'VIGENTE'
+              AND fecha_fin >= CURDATE()
+            LIMIT 1;";
+
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@inmuebleId", inmuebleId);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            contrato = new Contrato
+                            {
+                                Id = reader.GetInt32("id"),
+                                InmuebleId = reader.GetInt32("inmueble_id"),
+                                InquilinoId = reader.GetInt32("inquilino_id"),
+                                FechaInicio = reader.GetDateTime("fecha_inicio"),
+                                FechaFin = reader.GetDateTime("fecha_fin"),
+                                Estado = reader.GetString("estado"),
+                                MontoMensual = reader.GetDecimal("monto_mensual"),
+                                Moneda = reader.GetString("moneda"),
+                                Deposito = reader.IsDBNull(reader.GetOrdinal("deposito")) ? (decimal?)null : reader.GetDecimal("deposito"),
+                                Observaciones = reader.IsDBNull(reader.GetOrdinal("observaciones")) ? null : reader.GetString("observaciones")
+                            };
+                        }
+                    }
+                }
+            }
+            return contrato;
         }
 
     }
