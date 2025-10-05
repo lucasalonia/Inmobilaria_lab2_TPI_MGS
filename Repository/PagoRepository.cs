@@ -105,10 +105,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                         updates.Add("observaciones = @Observaciones");
                         parameters.Add(new MySqlParameter("@Observaciones", pago.Observaciones));
                     }
+                    updates.Add("importe = @Importe");
+                    parameters.Add(new MySqlParameter("@Importe", pago.Importe));
 
                     updates.Add("fecha_modificacion = NOW()");
                     updates.Add("modificado_por = @ModificadoPor");
                     parameters.Add(new MySqlParameter("@ModificadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value));
+
 
                     string query = $@"
                         UPDATE pago 

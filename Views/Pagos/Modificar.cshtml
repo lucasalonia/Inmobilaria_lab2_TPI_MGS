@@ -9,7 +9,7 @@
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas fa-money-bill-wave me-2"></i>Registrar Pago / @ViewBag.PeriodoMes
-                        @ViewBag.PeriodoAnio
+                        @ViewBag.PeriodoAnio / Importe: $@ViewBag.Importe
                     </h3>
                 </div>
                 <div class="card-body">
@@ -21,7 +21,8 @@
                         </div>
                     }
 
-                    <form asp-action="CreateOrEdit" method="post">
+                    <form asp-action="Editar" method="post">
+                    <input type="hidden" asp-for="Id" />
                         <div class="mb-4">
                             <h5 class="text-primary mb-3">
                                 <i class="fas fa-receipt me-2"></i>Datos del Pago
@@ -100,3 +101,52 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <text>
+                    toastr.options = {
+                        "positionClass": "toast-top-center",
+                        "timeOut": "5000"
+                    };
+                    toastr.error("@error.ErrorMessage");
+                </text>
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector("form");
+            form.addEventListener("submit", (e) => {
+                const importePagado = parseFloat(document.querySelector("[name='ImportePagado']").value);
+                const medioPago = document.querySelector("[name='MedioPago']").value;
+                const importeOriginal = parseFloat("@ViewBag.Importe");
+                let errores = [];
+
+                if (isNaN(importePagado) || importePagado <= 0) {
+                    errores.push("El importe pagado debe ser un número mayor a 0.");
+                }
+
+                if (importePagado > importeOriginal) {
+                    errores.push("El importe pagado no puede ser mayor al importe total del pago ($" + importeOriginal.toFixed(2) + ").");
+                }
+
+                if (!medioPago) {
+                    errores.push("Debe seleccionar un medio de pago.");
+                }
+
+                if (errores.length > 0) {
+                    e.preventDefault();
+                    toastr.options = {
+                        "positionClass": "toast-top-center",
+                        "timeOut": "4000"
+                    };
+                    errores.forEach(msg => toastr.error(msg));
+                }
+            });
+        });
+    </script>
+}

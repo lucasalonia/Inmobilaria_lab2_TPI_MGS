@@ -97,7 +97,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     return NotFound();
                 }
 
-                if (pago.Estado == "PAGADO" && pago.FechaPago != null && pago.ImportePagado != null)
+                if (pago.Estado == "PAGADO"  && pago.ImportePagado != null)
                 {
                     return NotFound();
                 }
@@ -105,6 +105,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 ViewBag.PeriodoMes = DateTimeFormatInfo.CurrentInfo.GetMonthName(pago.PeriodoMes);
                 ViewBag.PeriodoAnio = pago.PeriodoAnio;
                 ViewBag.Estado = pago.Estado;
+                ViewBag.Importe = pago.Importe;
                 ViewBag.FechaVencimiento = pago.FechaVencimiento;
 
                 return View();
@@ -114,6 +115,55 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 throw;
             }
 
+        }
+
+        [HttpPost]
+        public IActionResult Editar(Pago pago)
+        {
+            try
+            {
+               
+                if (ModelState.IsValid)
+                {
+                    int? idUsuario = int.Parse(User.FindFirstValue("UserId"));
+                    pago.FechaPago = DateTime.Now;
+                    Pago pagoAux = pagoService.ObtenerPorId(pago.Id);
+
+                    decimal resta =  (decimal)pagoAux.Importe - (decimal)pago.ImportePagado;
+
+                    if (resta == 0)
+                    {
+                        pago.Estado = "PAGADO";
+                        pago.Importe = resta;
+                    }
+                    else if (resta > 0)
+                    {
+                        pago.Estado = "PENDIENTE";
+                        pago.Importe = resta;
+                    }
+                    else
+                    {
+                        throw new Exception("El importe pagado no puede ser mayor al importe del pago.");
+                    }
+
+                    pagoService.Modificar(pago, idUsuario);
+                    return RedirectToAction("Lista", new { id = pagoAux.ContratoId });
+                }
+                else
+                {
+                    // Si el modelo no es válido, vuelve a la vista con los errores de validación
+                    ViewBag.PeriodoMes = DateTimeFormatInfo.CurrentInfo.GetMonthName(pago.PeriodoMes);
+                    ViewBag.PeriodoAnio = pago.PeriodoAnio;
+                    ViewBag.Estado = pago.Estado;
+                    ViewBag.FechaVencimiento = pago.FechaVencimiento;
+
+                    return View("Modificar", pago);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }
