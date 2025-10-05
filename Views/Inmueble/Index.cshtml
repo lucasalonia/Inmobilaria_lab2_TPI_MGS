@@ -1,4 +1,5 @@
 @model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.Inmueble>
+@await Html.PartialAsync("_ModalSeleccionPropietario")
 
 @{
 	ViewData["Title"] = "Inmuebles";
@@ -32,14 +33,33 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-12">
+                        <div class="col-6">
                             <p class="text-muted mb-0">
                                 Mostrando @((Pagina - 1) * tamPagina + 1) a 
                                 @Math.Min(Pagina * tamPagina, TotalRegistros) de 
                                 @TotalRegistros inmuebles
                             </p>
                         </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center mb-3 gap-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-list"></i> Todos
+                                </a>
+                                <a asp-action="Disponibles" class="btn btn-outline-success me-2">
+                                    <i class="fas fa-home"></i> Disponibles
+                                </a>
+
+                                <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalPropietarios">
+                                    <i class="fas fa-user"></i> Buscar por Propietario
+                                </button>
+                            </div>
+
+                            <!-- Campo oculto donde guardás el ID seleccionado -->
+                            <input type="hidden" id="PropietarioId" />
+                            
+                        </div>
                     </div>
+
                     <div class="table-responsive">
                         <table class="table table-striped table-hover">
                             <thead class="table-dark">
@@ -72,9 +92,17 @@
                                             {
                                                 <span class="badge bg-danger">INACTIVO</span>
                                             }
+                                        </td>
                                         <td><small>@item.FechaCreacion.ToString("dd/MM/yyyy")</small></td>
                                         <td class="text-center">
                                                 <div class="btn-group" role="group">
+                                                    <a class="btn btn-sm btn-outline-info"
+                                                        asp-action="Imagenes"
+                                                        asp-route-id="@item.Id"
+                                                        title="Ver fotos">
+                                                        <i class="fas fa-image"></i>
+                                                    </a>
+                                                        
                                                     <a class="btn btn-sm btn-outline-primary" 
                                                        asp-action="Details" 
                                                        asp-route-id="@item.Id" 
@@ -187,6 +215,36 @@
             document.getElementById('mensajeEliminar').innerHTML = mensaje;
             document.getElementById('EliminarId').value = id;
         });
-    </script>
+
+
+    function cargarPropietarios(pagina) {
+        $.get('/Propietarios/ListarParaSeleccion?pagina=' + pagina, function (data) {
+            $('#contenedorPropietarios').html(data);
+        });
+    }
+
+    // Cuando se abre el modal, cargamos la primera página
+    $('#modalPropietarios').on('shown.bs.modal', function () {
+        cargarPropietarios(1);
+    });
+
+    // Delegamos el click en la paginación
+    $(document).on('click', '.cargar-pagina', function () {
+        let pagina = $(this).data('pagina');
+        cargarPropietarios(pagina);
+    });
+
+    // Seleccionar propietario redirige a Inmueble/PorPropietario
+    $(document).on('click', '.seleccionar-propietario', function () {
+        const id = $(this).data('id');
+        const nombre = $(this).data('nombre');
+        
+    // Cerrar modal
+    $('#modalPropietarios').modal('hide');
+
+    // Redirigir al listado de inmuebles de ese propietario
+    window.location.href = '@Url.Action("PorPropietario", "Inmueble")' + '?idPropietario=' + id;
+    });
+</script>
 }
 

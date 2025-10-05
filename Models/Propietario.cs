@@ -12,7 +12,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
         public int? CreadoPor { get; set; }
         public int? ModificadoPor { get; set; }
         
-   
+        public string? CreadoPorNombre { get; set; }
+        public string? ModificadoPorNombre { get; set; }
     }
     
 }

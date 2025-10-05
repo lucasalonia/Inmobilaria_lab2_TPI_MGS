@@ -179,15 +179,20 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"
-                    SELECT pr.id, pr.estado, pr.fecha_creacion, pr.fecha_modificacion, 
-                        pr.creado_por, pr.modificado_por,
-                        pe.id as personaId, pe.dni, pe.sexo, pe.nombre, pe.apellido, 
-                        pe.fecha_nacimiento, pe.email, pe.telefono,
-                        pe.fecha_creacion as persona_creacion, 
-                        pe.fecha_modificacion as persona_modificacion
-                    FROM propietario pr
-                    INNER JOIN persona pe ON pr.persona_id = pe.id
-                    WHERE pr.id = @id;";
+                    SELECT 
+                     pr.id, pr.estado, pr.fecha_creacion, pr.fecha_modificacion, 
+                pr.creado_por, pr.modificado_por,
+                uc.username AS creado_por_username,
+                um.username AS modificado_por_username,
+                pe.id AS personaId, pe.dni, pe.sexo, pe.nombre, pe.apellido, 
+                pe.fecha_nacimiento, pe.email, pe.telefono,
+                pe.fecha_creacion AS persona_creacion, 
+                pe.fecha_modificacion AS persona_modificacion
+            FROM propietario pr
+            INNER JOIN persona pe ON pr.persona_id = pe.id
+            LEFT JOIN usuario uc ON pr.creado_por = uc.id
+            LEFT JOIN usuario um ON pr.modificado_por = um.id
+            WHERE pr.id = @id;";
 
                 using (var command = new MySqlCommand(sql, connection))
                 {
@@ -203,8 +208,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                 Estado = reader.GetString("estado"),
                                 FechaCreacion = reader.GetDateTime("fecha_creacion"),
                                 FechaModificacion = reader.GetDateTime("fecha_modificacion"),
-                                CreadoPor = reader["creado_por"] as int?,
-                                ModificadoPor = reader["modificado_por"] as int?,
+                                CreadoPor = reader["creado_por"] == DBNull.Value ? null : (int?)Convert.ToInt32(reader["creado_por"]),
+                                ModificadoPor = reader["modificado_por"] == DBNull.Value ? null : (int?)Convert.ToInt32(reader["modificado_por"]),
+                                CreadoPorNombre = reader["creado_por_username"] == DBNull.Value ? null : reader.GetString("creado_por_username"),
+                                ModificadoPorNombre = reader["modificado_por_username"] == DBNull.Value ? null : reader.GetString("modificado_por_username"),
                                 Persona = new Persona
                                 {
                                     Id = reader.GetInt32("personaId"),

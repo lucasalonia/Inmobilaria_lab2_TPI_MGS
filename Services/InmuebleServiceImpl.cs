@@ -12,6 +12,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
             this.inmuebleRepository = inmuebleRepository;
         }
 
+        public IList<Inmueble> BuscarPorPropietario(int idPropietario)
+        {
+            return inmuebleRepository.BuscarPorPropietario(idPropietario);
+        }  
+        public IList<Inmueble> BuscarDisponibles()
+        {
+            return inmuebleRepository.BuscarDisponibles();
+        }
+
         public int Alta(Inmueble inmueble)
         {
             return inmuebleRepository.Alta(inmueble);
@@ -20,16 +29,16 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return inmuebleRepository.ObtenerTodos();
         }
-        
+
         //Sobre carga para usar en paginado de inmuebles - LS
         public IList<Inmueble> ObtenerTodos(int paginaNro = 1, int tamPagina = 10)
         {
             return inmuebleRepository.ObtenerTodos(paginaNro, tamPagina);
         }
 
-        public int Modificar(Inmueble inmueble)
+        public int Modificar(Inmueble inmueble, int? modificadoPor = null)
         {
-            return inmuebleRepository.Modificar(inmueble);
+            return inmuebleRepository.Modificar(inmueble, modificadoPor);
         }
 
         public Inmueble ObtenerPorId(int id)
@@ -52,6 +61,14 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         public int ObtenerCantidadInmuebles()
         {
             return inmuebleRepository.ObtenerCantidadInmuebles();
+        }
+        public void ModificarPortada(int inmuebleId, string nuevaUrl)
+        {
+            inmuebleRepository.ModificarPortada(inmuebleId, nuevaUrl);
+        }
+        public void QuitarPortada(int inmuebleId)
+        {
+            inmuebleRepository.QuitarPortada(inmuebleId);
         }
     }
 }

@@ -50,6 +50,49 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             }
             return res;
         }
+
+        public IList<Inmueble> BuscarDisponibles()
+        {
+            var lista = new List<Inmueble>();
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"
+                    SELECT id, propietario_id, tipo, estado, superficie_m2, ambientes, banos,
+                        cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
+                    FROM inmueble
+                    WHERE estado = 'ACTIVO';";
+
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var i = new Inmueble
+                            {
+                                Id = reader.GetInt32("id"),
+                                PropietarioId = reader.GetInt32("propietario_id"),
+                                Estado = reader.GetString("estado"),
+                                Tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? null : reader.GetString("tipo"),
+                                SuperficieM2 = reader.IsDBNull(reader.GetOrdinal("superficie_m2")) ? (int?)null : reader.GetInt32("superficie_m2"),
+                                Ambientes = reader.IsDBNull(reader.GetOrdinal("ambientes")) ? null : reader.GetInt32("ambientes"),
+                                Direccion = reader.IsDBNull(reader.GetOrdinal("direccion")) ? null : reader.GetString("direccion"),
+                                Banos = reader.IsDBNull(reader.GetOrdinal("banos")) ? null : reader.GetInt32("banos"),
+                                Cochera = reader.GetInt32("cochera"),
+                                Descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? null : reader.GetString("descripcion"),
+                                FechaCreacion = reader.GetDateTime("fecha_creacion"),
+                                FechaModificacion = reader.GetDateTime("fecha_modificacion"),
+                            };
+                            lista.Add(i);
+                        }
+                    }
+                }
+            }
+
+            return lista;
+        }
         public int Alta(Inmueble inmueble)
         {
             using MySqlConnection connection = new MySqlConnection(connectionString);
@@ -88,14 +131,19 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"
-            SELECT i.id, i.propietario_id, i.tipo, i.estado, i.superficie_m2, 
-                   i.ambientes, i.banos, i.cochera, i.direccion, i.descripcion, 
-                   i.fecha_creacion, i.fecha_modificacion,
-                   per.nombre AS propietario_nombre, per.apellido AS propietario_apellido
-            FROM inmueble i
-            LEFT JOIN propietario p ON i.propietario_id = p.id
-            LEFT JOIN persona per ON p.persona_id = per.id
-            WHERE i.id = @id;";
+                SELECT 
+                    i.id, i.propietario_id, i.tipo, i.estado, i.superficie_m2, 
+                    i.ambientes, i.banos, i.cochera, i.direccion, i.descripcion, 
+                    i.fecha_creacion, i.fecha_modificacion, i.portada,
+                    per.nombre AS propietario_nombre, per.apellido AS propietario_apellido,
+                    uc.username AS creado_por_username,
+                    um.username AS modificado_por_username
+                FROM inmueble i
+                LEFT JOIN propietario p ON i.propietario_id = p.id
+                LEFT JOIN persona per ON p.persona_id = per.id
+                LEFT JOIN usuario uc ON i.creado_por = uc.id
+                LEFT JOIN usuario um ON i.modificado_por = um.id
+                WHERE i.id = @id;";
 
                 using (var command = new MySqlCommand(sql, connection))
                 {
@@ -119,11 +167,20 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                 Descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? null : reader.GetString("descripcion"),
                                 FechaCreacion = reader.GetDateTime("fecha_creacion"),
                                 FechaModificacion = reader.GetDateTime("fecha_modificacion"),
-
+                                Portada = reader.IsDBNull(reader.GetOrdinal("portada")) ? null : reader.GetString("portada"),
                                 PropietarioNombre = reader["propietario_nombre"] == DBNull.Value
-                                    ? null
-                                    : $"{reader["propietario_nombre"]} {reader["propietario_apellido"]}"
-                                    };
+                                ? null
+                                : $"{reader["propietario_nombre"]} {reader["propietario_apellido"]}",
+
+                            CreadoPorNombre = reader["creado_por_username"] == DBNull.Value
+                                ? "Sistema"
+                                : reader.GetString("creado_por_username"),
+
+                            ModificadoPorNombre = reader["modificado_por_username"] == DBNull.Value
+                                ? "Sistema"
+                                : reader.GetString("modificado_por_username")
+
+                            };
                         }
                     }
                 }
@@ -131,7 +188,55 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             return inm!;
         }
 
-        public int Modificar(Inmueble inmueble)
+        public IList<Inmueble> BuscarPorPropietario(int idPropietario)
+        {
+            var res = new List<Inmueble>();
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"
+                    SELECT 
+                        i.id, i.propietario_id, i.tipo, i.estado, i.superficie_m2, 
+                        i.ambientes, i.banos, i.cochera, i.direccion, i.descripcion, 
+                        i.fecha_creacion, i.fecha_modificacion
+                    FROM inmueble i
+                    WHERE i.propietario_id = @idPropietario;";
+
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@idPropietario", idPropietario);
+                    connection.Open();
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var entidad = new Inmueble
+                            {
+                                Id = reader.GetInt32("id"),
+                                PropietarioId = reader.GetInt32("propietario_id"),
+                                Estado = reader.GetString("estado"),
+                                Tipo = reader.IsDBNull("tipo") ? null : reader.GetString("tipo"),
+                                SuperficieM2 = reader.IsDBNull("superficie_m2") ? (int?)null : reader.GetInt32("superficie_m2"),
+                                Ambientes = reader.IsDBNull("ambientes") ? null : reader.GetInt32("ambientes"),
+                                Direccion = reader.IsDBNull("direccion") ? null : reader.GetString("direccion"),
+                                Banos = reader.IsDBNull("banos") ? null : reader.GetInt32("banos"),
+                                Cochera = reader.GetInt32("cochera"),
+                                Descripcion = reader.IsDBNull("descripcion") ? null : reader.GetString("descripcion"),
+                                FechaCreacion = reader.GetDateTime("fecha_creacion"),
+                                FechaModificacion = reader.GetDateTime("fecha_modificacion"),
+                            };
+                            res.Add(entidad);
+                        }
+                    }
+                }
+            }
+
+            return res;
+        }
+
+
+        public int Modificar(Inmueble inmueble, int? modificadoPor=null)
         {
             int res = -1;
             using (var connection = new MySqlConnection(connectionString))
@@ -143,7 +248,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                         propietario_id=@propietario_id, estado=@estado,
                         tipo=@tipo, superficie_m2=@superficie_m2, ambientes=@ambientes,
                         banos=@banos, cochera=@cochera, direccion=@direccion, descripcion=@descripcion,
-                        fecha_modificacion=NOW()
+                        modificado_por=@modificadoPor, fecha_modificacion=NOW()
                     WHERE id=@id;";
                 using (var command = new MySqlCommand(sqlPersona, connection))
                 {
@@ -157,7 +262,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     command.Parameters.AddWithValue("@cochera", inmueble.Cochera);
                     command.Parameters.AddWithValue("@direccion", (object?)inmueble.Direccion ?? DBNull.Value);
                     command.Parameters.AddWithValue("@descripcion", inmueble.Descripcion);
-                    command.ExecuteNonQuery();
+                    command.Parameters.AddWithValue("@modificadoPor", (object?)modificadoPor ?? DBNull.Value);
+                    res = command.ExecuteNonQuery();
                 }
             }
             return res;
@@ -172,11 +278,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 string sql = @"
                     UPDATE inmueble SET 
                         estado='INACTIVO',
-                        fecha_modificacion=NOW()
+                        fecha_modificacion=NOW(),
+                        modificado_por = @modificadoPor
                     WHERE id = @id;";
                 using (var command = new MySqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@id", id);
+                    command.Parameters.AddWithValue("@modificadoPor", (object?)modificadoPor ?? DBNull.Value);
                     res = command.ExecuteNonQuery();
                 }
             }
@@ -268,6 +376,37 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 }
             }
             return res;
+        }
+
+        public void ModificarPortada(int inmuebleId, string nuevaUrl)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = @"UPDATE inmueble 
+                            SET portada = @portada, fecha_modificacion = NOW()
+                            WHERE id = @id;";
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@portada", nuevaUrl);
+                    command.Parameters.AddWithValue("@id", inmuebleId);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+        
+        public void QuitarPortada(int inmuebleId)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"UPDATE inmueble SET portada = NULL WHERE id = @id;";
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@id", inmuebleId);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
     }

@@ -77,6 +77,13 @@
                                         <td><small>@item.FechaCreacion.ToString("dd/MM/yyyy")</small></td>
                                         <td class="text-center">
                                                 <div class="btn-group" role="group">
+                                                   <a class="btn btn-sm btn-outline-success"
+                                                        asp-controller="Inmueble"
+                                                        asp-action="PorPropietario"
+                                                        asp-route-idPropietario="@item.Id" class="btn btn-sm btn-info"
+                                                        title="Ver Inmuebles">
+                                                        <i class="fas fa-building"></i>
+                                                    </a>
                                                     <a class="btn btn-sm btn-outline-primary" 
                                                        asp-action="Details" 
                                                        asp-route-id="@item.Id" 

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Inmobilaria_lab2_TPI_MGS.Models
 {
     public class Inmueble
@@ -16,8 +17,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
         public DateTime FechaModificacion { get; set; }
         public int? CreadoPor { get; set; }
         public int? ModificadoPor { get; set; }
-        
+
         public string? PropietarioNombre { get; set; }
+        public string? CreadoPorNombre { get; set; }
+        public string? ModificadoPorNombre { get; set; }
+
+        public string? Portada { get; set; }
+        [NotMapped]
+        public IFormFile? PortadaFile { get; set; }
+        public IList<Imagen> Imagenes { get; set; } = new List<Imagen>();
 
     }
 }
