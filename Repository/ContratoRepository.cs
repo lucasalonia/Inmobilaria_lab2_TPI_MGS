@@ -39,7 +39,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                         command.Parameters.AddWithValue("@Observaciones", (object)contrato.Observaciones ?? DBNull.Value);
                         command.Parameters.AddWithValue("@CreadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value);
                         int rowsAffected = command.ExecuteNonQuery();
-                        exito = rowsAffected > 0;
+                        bool insertado = rowsAffected > 0;
+
+                        if (insertado)
+                        {
+
+                            contrato.Id = (int)command.LastInsertedId;
+                        }
                     }
                 }
                 catch (Exception e)
@@ -181,7 +187,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                         int offset = (paginaNro - 1) * tamPagina;
                         command.Parameters.AddWithValue("@TamPagina", tamPagina);
                         command.Parameters.AddWithValue("@Offset", offset);
-                        
+
                         using (MySqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
@@ -231,10 +237,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     connection.Open();
 
                     string query = @"
-                SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones, fecha_creacion, fecha_modificacion, creado_por
-                FROM contrato
-                WHERE id = @ContratoId
-                LIMIT 1";
+                                SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones, fecha_creacion, fecha_modificacion, creado_por
+                                FROM contrato
+                                WHERE id = @ContratoId
+                                LIMIT 1";
 
                     using (var command = new MySqlCommand(query, connection))
                     {

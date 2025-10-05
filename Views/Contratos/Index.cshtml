@@ -162,9 +162,19 @@
 									<input type="date" id="FechaFin" name="FechaFin" class="form-control" required>
 								</div>
 								<div class="col-md-6">
+									<label for="FechaVencimiento" class="form-label">Vencimiento de pagos</label>
+									<select id="FechaVencimiento" name="FechaVencimiento" class="form-select" required>
+										<option value="">-- Selección --</option>
+										<option value="5">Día 5 de cada mes</option>
+										<option value="10">Día 10 de cada mes</option>
+										<option value="15">Día 15 de cada mes</option>
+										<option value="20">Día 20 de cada mes</option>
+									</select>
+								</div>
+								<div class="col-md-6">
 									<label for="Moneda" class="form-label">Moneda</label>
 									<select id="Moneda" name="Moneda" class="form-select" required>
-										<option value="">-- Seleccione --</option>
+										<option value="">-- Selección --</option>
 										<option value="ARS">ARS</option>
 										<option value="USD">USD</option>
 									</select>
@@ -223,15 +233,15 @@
 
 @section Scripts {
 		<script>
-				@if (!ViewData.ModelState.IsValid)
+			@if (!ViewData.ModelState.IsValid)
 				{
-		            foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+				            foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
 					{
 						<text>
 							toastr.options = {
 								"positionClass": "toast-top-center",
 							"timeOut": "5000"
-			                    };
+						                    };
 							toastr.error("@error.ErrorMessage");
 						</text>
 				}
@@ -294,7 +304,7 @@
 				const fechaMinima = new Date(fechaInicio);
 				fechaMinima.setMonth(fechaMinima.getMonth() + 6);
 
-				
+
 				if (fechaMinima.getDate() !== fechaInicio.getDate()) {
 					fechaMinima.setDate(0);
 				}
@@ -312,15 +322,15 @@
 				const confirmModal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
 				const body = document.getElementById("confirmBody");
 				body.innerHTML = `
-							<p><strong>Inmueble ID:</strong> ${document.getElementById("InmuebleId").value}</p>
-							<p><strong>Inquilino ID:</strong> ${document.getElementById("InquilinoId").value}</p>
-							<p><strong>Fecha Inicio:</strong> ${document.getElementById("FechaInicio").value}</p>
-							<p><strong>Fecha Fin:</strong> ${document.getElementById("FechaFin").value}</p>
-							<p><strong>Moneda:</strong> ${document.getElementById("Moneda").value}</p>
-							<p><strong>Monto Mensual:</strong> ${document.getElementById("MontoMensual").value}</p>
-							<p><strong>Depósito:</strong> ${document.getElementById("Deposito").value}</p>
-							<p><strong>Observaciones:</strong> ${document.getElementById("Observaciones").value}</p>
-							`;
+								<p><strong>Inmueble ID:</strong> ${document.getElementById("InmuebleId").value}</p>
+								<p><strong>Inquilino ID:</strong> ${document.getElementById("InquilinoId").value}</p>
+								<p><strong>Fecha Inicio:</strong> ${document.getElementById("FechaInicio").value}</p>
+								<p><strong>Fecha Fin:</strong> ${document.getElementById("FechaFin").value}</p>
+								<p><strong>Moneda:</strong> ${document.getElementById("Moneda").value}</p>
+								<p><strong>Monto Mensual:</strong> ${document.getElementById("MontoMensual").value}</p>
+								<p><strong>Depósito:</strong> ${document.getElementById("Deposito").value}</p>
+								<p><strong>Observaciones:</strong> ${document.getElementById("Observaciones").value}</p>
+								`;
 				bootstrap.Modal.getInstance(document.getElementById('modalContrato')).hide();
 				confirmModal.show();
 			});

@@ -17,18 +17,18 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         private readonly InquilinoService inquilinoService;
         private readonly ContratoService contratoService;
         private readonly InmuebleService inmuebleService;
+        private readonly PagoService pagoService;
 
-
-
-        public ContratosController(InquilinoService inquilinoService, ContratoService contratoService, InmuebleService inmuebleService)
+        public ContratosController(InquilinoService inquilinoService, ContratoService contratoService, InmuebleService inmuebleService, PagoService pagoService)
         {
             this.inquilinoService = inquilinoService;
             this.contratoService = contratoService;
             this.inmuebleService = inmuebleService;
+            this.pagoService = pagoService;
         }
 
         // GET: ContratosController
-        [Route("[controller]/Index")]
+        [HttpGet]
         public ActionResult Index(int pagina = 1)
         {
             try
@@ -68,8 +68,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
 
 
         [HttpPost]
-        [Route("[controller]/Crear")]
-        public ActionResult Crear(Contrato contrato)
+        public ActionResult Crear(Contrato contrato, int FechaVencimiento)
         {
             try
             {
@@ -115,12 +114,46 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
 
                     return View("Index", contrato);
                 }
+
+                if (FechaVencimiento < 1 || FechaVencimiento > 25)
+                {
+                    ModelState.AddModelError("", "El día de vencimiento debe estar entre 1 y 25.");
+                    return View("Index", contrato);
+                }
+
                 Contrato contratoPrevio = contratoService.ObtenerContratoVigentePorInmuebleId(contrato.InmuebleId);
                 Console.WriteLine(contratoPrevio);
                 if (contratoPrevio == null)
                 {
                     int? idUsuario = int.Parse(User.FindFirstValue("UserId"));
                     contratoService.Alta(contrato, idUsuario);
+
+                    //Para calcular la cantidad de pagos que se van a generar necesitamos la cantidad de meses entre las dos fechas de contrato
+                    int totalMeses = (contrato.FechaFin.Year - contrato.FechaInicio.Year) * 12
+                        + contrato.FechaFin.Month - contrato.FechaInicio.Month + 1;
+
+                    var fecha = new DateTime(contrato.FechaInicio.Year, contrato.FechaInicio.Month, FechaVencimiento);
+                    for (int i = 0; i < totalMeses; i++)
+                    {
+                        Pago pago = new Pago
+                        {
+                            ContratoId = contrato.Id,
+                            Estado = "PENDIENTE",
+                            PeriodoAnio = (short)fecha.Year,
+                            PeriodoMes = (byte)fecha.Month,
+                            FechaVencimiento = fecha,
+                            Importe = contrato.MontoMensual ?? 0,
+                            Descuento = 0,
+                            Recargo = 0
+                        };
+
+                        pagoService.Alta(pago, null);
+
+
+                        fecha = fecha.AddMonths(1);
+                    }
+
+
                     return RedirectToAction("Lista");
                 }
                 else
@@ -175,6 +208,30 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             catch
             {
                 return RedirectToAction("Lista");
+            }
+        }
+        
+        public ActionResult Detalle(int id)
+        {
+            try
+            {
+                var contrato = contratoService.ObtenerPorId(id);
+                if (contrato == null)
+                {
+                    return NotFound();
+                }
+
+                var inquilino = inquilinoService.ObtenerPorId(contrato.InquilinoId);
+                var inmueble = inmuebleService.ObtenerPorId(contrato.InmuebleId);
+
+                ViewBag.Inquilino = inquilino;
+                ViewBag.Inmueble = inmueble;
+    
+                return View(contrato);
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
     }

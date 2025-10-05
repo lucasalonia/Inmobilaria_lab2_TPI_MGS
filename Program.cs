@@ -34,6 +34,7 @@ builder.Services.AddScoped<InquilinoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<RolRepository>();
 builder.Services.AddScoped<UsuarioRolRepository>();
+builder.Services.AddScoped<PagoRepository>();
 // HEAD
 builder.Services.AddScoped<InmuebleRepository>();
 builder.Services.AddScoped<PersonaRepository>();
@@ -47,6 +48,7 @@ builder.Services.AddScoped<InquilinoService, InquilinoServiceImpl>();
 builder.Services.AddScoped<UsuarioService, UsuarioServiceImpl>();
 builder.Services.AddScoped<RolService, RolServiceImpl>();
 builder.Services.AddScoped<UsuarioRolService, UsuarioRolServiceImpl>();
+builder.Services.AddScoped<PagoService, PagoServiceImpl>();
 
 // HEAD
 builder.Services.AddScoped<InmuebleService, InmuebleServiceImpl>();

@@ -1,0 +1,69 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.Contrato
+
+<div class="container mt-4">
+<div class="mx-auto" style="max-width: 900px;">
+    <h2 class="mb-4 text-center">Detalle del Contrato</h2>
+
+    <div class="row">
+        <!-- Ficha Inquilino -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"> <i class="bi bi-person-fill me-2"></i> Datos del Inquilino</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nombre:</strong> @ViewBag.Inquilino.Persona.Nombre @ViewBag.Inquilino.Persona.Apellido</p>
+                    <p><strong>DNI:</strong> @ViewBag.Inquilino.Persona.Dni</p>
+                    <p><strong>Email:</strong> @ViewBag.Inquilino.Persona.Email</p>
+                    <p><strong>Teléfono:</strong> @ViewBag.Inquilino.Persona.Telefono</p>
+                    <p><strong>Estado:</strong> @ViewBag.Inquilino.Estado</p>
+                    <p class="text-muted"><small>Creado: @ViewBag.Inquilino.FechaCreacion.ToShortDateString()</small></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ficha Inmueble -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"> <i class="bi bi-house-door-fill me-2"></i> Datos del Inmueble</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Dirección:</strong> @ViewBag.Inmueble.Direccion</p>
+                    <p><strong>Tipo:</strong> @ViewBag.Inmueble.Tipo</p>
+                    <p><strong>Superficie:</strong> @ViewBag.Inmueble.SuperficieM2 m²</p>
+                    <p><strong>Ambientes:</strong> @ViewBag.Inmueble.Ambientes</p>
+                    <p><strong>Baños:</strong> @ViewBag.Inmueble.Banos</p>
+                    <p><strong>Cochera:</strong> @(ViewBag.Inmueble.Cochera == 1 ? "Sí" : "No")</p>
+                    <p><strong>Propietario:</strong> @ViewBag.Inmueble.PropietarioNombre</p>
+                    <p><strong>Estado:</strong> @ViewBag.Inmueble.Estado</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ficha Contrato -->
+    <div class="row">
+    <div class="mx-auto" style="max-width: 500px;">
+        <div class="col-md-12">
+            <div class="card border-secondary shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"> <i class="bi bi-receipt me-2"></i> Datos del Inmueble</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID Contrato:</strong> @Model.Id</p>
+                    <p><strong>Fecha de Inicio:</strong> @Model.FechaInicio.ToShortDateString()</p>
+                    <p><strong>Fecha de Fin:</strong> @Model.FechaFin.ToShortDateString()</p>
+                    <p><strong>Monto:</strong> $@Model.MontoMensual</p>
+                    <p><strong>Estado:</strong> @Model.Estado</p>
+                    <a asp-controller="Pagos" asp-action="Lista" asp-route-id="@Model.Id"
+                                                    class="btn btn-primary btn-sm" title="Registrar Pago">
+                                                    <i class="fas fa-file-contract"></i> Lista de Pagos
+                                                </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+</div>

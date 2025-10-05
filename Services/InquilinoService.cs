@@ -16,5 +16,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         Persona? ObtenerPorDni(string dni);
 
         public int ContarInquilinosActivosSinContrato();
+
+        public Inquilino ObtenerInquilinoPorContrato(int contratoId);
+        public Inquilino ObtenerPorId(int id);
     }
 }

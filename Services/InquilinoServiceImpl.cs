@@ -14,7 +14,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
 
         public bool Alta(Persona persona, int? idUsuario)
         {
-            return inquilinoRepository.Alta(persona, idUsuario );
+            return inquilinoRepository.Alta(persona, idUsuario);
         }
 
         public bool Baja(int idPersona, int? idUsuario)
@@ -31,7 +31,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return inquilinoRepository.ObtenerTodos(paginaNro, tamPagina);
         }
-        public IList<Inquilino> ListarInquilinosSinContrato( int pagina = 1, int tamPagina = 10)
+        public IList<Inquilino> ListarInquilinosSinContrato(int pagina = 1, int tamPagina = 10)
         {
             return inquilinoRepository.ListarInquilinosSinContrato(pagina, tamPagina);
         }
@@ -46,6 +46,14 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         public Persona? ObtenerPorDni(string dni)
         {
             return inquilinoRepository.ObtenerPorDni(dni);
+        }
+        public Inquilino ObtenerInquilinoPorContrato(int contratoId)
+        {
+            return inquilinoRepository.ObtenerInquilinoPorContrato(contratoId);
+        }
+        public Inquilino ObtenerPorId(int id)
+        {
+            return inquilinoRepository.ObtenerPorId(id);
         }
     }
 }

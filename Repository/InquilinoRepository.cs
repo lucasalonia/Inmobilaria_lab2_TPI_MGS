@@ -508,7 +508,153 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 Telefono = r["telefono"] == DBNull.Value ? "" : r.GetString("telefono")
             };
         }
+        public Inquilino ObtenerInquilinoPorContrato(int contratoId)
+        {
+            Inquilino inquilino = null;
 
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    string query = @"
+                                    SELECT i.id AS InquilinoId,
+                                        i.estado AS InquilinoEstado,
+                                        i.fecha_creacion AS InquilinoFechaCreacion,
+                                        i.fecha_modificacion AS InquilinoFechaModificacion,
+                                        i.creado_por AS InquilinoCreadoPor,
+                                        i.modificado_por AS InquilinoModificadoPor,
+                                        p.id AS PersonaId,
+                                        p.nombre,
+                                        p.apellido,
+                                        p.dni,
+                                        p.sexo,
+                                        p.fecha_nacimiento,
+                                        p.email,
+                                        p.telefono,
+                                        p.fecha_creacion AS PersonaFechaCreacion,
+                                        p.fecha_modificacion AS PersonaFechaModificacion
+                                    FROM inquilino i
+                                    JOIN persona p ON i.persona_id = p.id
+                                    JOIN contrato c ON c.inquilino_id = i.id
+                                    WHERE c.id = @ContratoId
+                                    LIMIT 1;
+                                ";
+
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@ContratoId", contratoId);
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                inquilino = new Inquilino
+                                {
+                                    Id = reader.GetInt32("InquilinoId"),
+                                    Estado = reader.GetString("InquilinoEstado"),
+                                    FechaCreacion = reader.GetDateTime("InquilinoFechaCreacion"),
+                                    FechaModificacion = reader.GetDateTime("InquilinoFechaModificacion"),
+                                    CreadoPor = reader.IsDBNull(reader.GetOrdinal("InquilinoCreadoPor")) ? (int?)null : reader.GetInt32("InquilinoCreadoPor"),
+                                    ModificadoPor = reader.IsDBNull(reader.GetOrdinal("InquilinoModificadoPor")) ? (int?)null : reader.GetInt32("InquilinoModificadoPor"),
+                                    Persona = new Persona
+                                    {
+                                        Id = reader.GetInt32("PersonaId"),
+                                        Nombre = reader.GetString("nombre"),
+                                        Apellido = reader.GetString("apellido"),
+                                        Dni = reader.GetString("dni"),
+                                        Sexo = reader.GetString("sexo"),
+                                        FechaNacimiento = reader.IsDBNull(reader.GetOrdinal("fecha_nacimiento")) ? (DateTime?)null : reader.GetDateTime("fecha_nacimiento"),
+                                        Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString("email"),
+                                        Telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? null : reader.GetString("telefono"),
+                                        FechaCreacion = reader.GetDateTime("PersonaFechaCreacion"),
+                                        FechaModificacion = reader.GetDateTime("PersonaFechaModificacion")
+                                    }
+                                };
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al obtener inquilino por contrato: {ex.Message}");
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+
+            return inquilino;
+        }
+
+        public Inquilino ObtenerPorId(int id)
+        {
+            Inquilino inquilino = null;
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"
+                    SELECT 
+                        i.id AS InquilinoId,
+                        i.estado AS EstadoInquilino,
+                        i.fecha_creacion AS FechaCreacion,
+                        i.fecha_modificacion AS FechaModificacion,
+                        i.creado_por AS CreadoPor,
+                        i.modificado_por AS ModificadoPor,
+                        p.id AS PersonaId,
+                        p.dni,
+                        p.nombre,
+                        p.apellido,
+                        p.email,
+                        p.telefono,
+                        p.sexo,
+                        p.fecha_nacimiento
+                    FROM inquilino i
+                    INNER JOIN persona p ON i.persona_id = p.id
+                    WHERE i.id = @id;
+                ";
+
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@id", id);
+                    connection.Open();
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var persona = new Persona
+                            {
+                                Id = Convert.ToInt32(reader["PersonaId"]),
+                                Dni = reader["dni"].ToString(),
+                                Nombre = reader["nombre"].ToString(),
+                                Apellido = reader["apellido"].ToString(),
+                                Email = reader["email"].ToString(),
+                                Telefono = reader["telefono"] != DBNull.Value ? reader["telefono"].ToString() : null,
+                                Sexo = reader["sexo"].ToString(),
+                                FechaNacimiento = Convert.ToDateTime(reader["fecha_nacimiento"])
+                            };
+
+                            inquilino = new Inquilino
+                            {
+                                Id = Convert.ToInt32(reader["InquilinoId"]),
+                                Persona = persona,
+                                Estado = reader["EstadoInquilino"].ToString(),
+                                FechaCreacion = Convert.ToDateTime(reader["FechaCreacion"]),
+                                FechaModificacion = Convert.ToDateTime(reader["FechaModificacion"]),
+                                CreadoPor = reader["CreadoPor"] != DBNull.Value ? Convert.ToInt32(reader["CreadoPor"]) : null,
+                                ModificadoPor = reader["ModificadoPor"] != DBNull.Value ? Convert.ToInt32(reader["ModificadoPor"]) : null
+                            };
+                        }
+                    }
+                }
+            }
+
+            return inquilino;
+        }
     }
 
 

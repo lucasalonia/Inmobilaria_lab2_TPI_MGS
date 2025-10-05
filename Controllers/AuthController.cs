@@ -80,7 +80,6 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 {
                     return Redirect(returnUrl);
                 }
-
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
