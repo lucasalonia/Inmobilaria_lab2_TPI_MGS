@@ -1,165 +1,234 @@
 @model IEnumerable<Inmobilaria_lab2_TPI_MGS.Models.ViewModels.InquilinoViewModel>
+
 @{
-	ViewData["Title"] = "Index";
-
+    ViewData["Title"] = "Inquilinos";
+    var Pagina = ViewBag.Pagina ?? 1;
+    var TotalPaginas = ViewBag.TotalPaginas ?? 1;
+    var TotalRegistros = ViewBag.TotalRegistros ?? 0;
+    int tamPagina = 10;
 }
-<h1>
-	Historial de Inquilinos
-	<div class="btn-group pull-right">
-		<a class="btn btn-primary" asp-action="Agregar" title="Crear"><i class="fa-solid fa-plus"></i></a>
-	</div>
-</h1>
-<table class="table table-striped">
-	<thead>
-		<tr>
-			<th>@Html.DisplayNameFor(model => model.Inquilino.Id)</th>
-			<th>@Html.DisplayNameFor(model => model.Persona.Nombre)</th>
-			<th>@Html.DisplayNameFor(model => model.Persona.Apellido)</th>
-			<th>@Html.DisplayNameFor(model => model.Persona.Dni)</th>
-			<th>@Html.DisplayNameFor(model => model.Persona.Telefono)</th>
-			<th>@Html.DisplayNameFor(model => model.Persona.Email)</th>
-			<th>@Html.DisplayNameFor(model => model.Contrato.Estado)</th>
-			<th>@Html.DisplayNameFor(model => model)</th>
-		</tr>
-	</thead>
-	<tbody>
-		@if (Model != null && Model.Any())
-		{
-			@foreach (var item in Model)
-			{
-				<tr>
-					<td>@item.Inquilino.Id</td>
-					<td>@item.Persona.Nombre</td>
-					<td>@item.Persona.Apellido</td>
-					<td>@item.Persona.Dni</td>
-					<td>@item.Persona.Telefono</td>
-					<td>@item.Persona.Email</td>
-					<td
-						style=" text-align:center; background-color:@(item.Contrato == null ? "lightgray" : item.Contrato.Estado == "VIGENTE" ? "lightgreen" : "lightcoral")">
-						@(item.Contrato?.Estado)
-					</td>
-					<td>
-						<div class="btn-group" role="group">
-							<a class="btn btn-primary btn-editar" href="javascript:void(0);" data-id="@item.Persona.Id"
-								data-nombre="@item.Persona.Nombre" data-apellido="@item.Persona.Apellido"
-								data-dni="@item.Persona.Dni" data-telefono="@item.Persona.Telefono"
-								data-email="@item.Persona.Email" title="Editar">
-								<i class="fa-solid fa-pen"></i>
-							</a>
 
-							<a class="btn btn-danger btn-eliminar" href="javascript:void(0);" data-id="@item.Persona.Id"
-								data-nombre="@item.Persona.Nombre" data-apellido="@item.Persona.Apellido" title="Eliminar">
-								<i class="fa-solid fa-trash-can"></i>
-							</a>
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success mt-3">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+}
 
-							<a class="btn btn-secondary" asp-route-id="@item.Inquilino.Id" title="Alquileres">
-								<i class="fa-solid fa-building"></i>
-							</a>
-						</div>
-					</td>
-				</tr>
-			}
-		}
-		else
-		{
-			<tr>
-				<td colspan="8" class="text-center text-muted py-4">
-					<i class="fas fa-info-circle me-2"></i>
-					No hay inquilinos registrados 
-				</td>
-			</tr>
-		}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-users me-2"></i>Historial de Inquilinos
+                </h3>
+                <a class="btn btn-primary" asp-action="Agregar" title="Nuevo Inquilino" data-bs-toggle="tooltip">
+                    <i class="fas fa-plus me-1"></i>Crear Inquilino
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <p class="text-muted mb-0">
+                            Mostrando @((Pagina - 1) * tamPagina + 1) a
+                            @Math.Min(Pagina * tamPagina, TotalRegistros) de
+                            @TotalRegistros inquilinos
+                        </p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>DNI</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Estado Contrato</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Inquilino.Id</td>
+                                        <td>@item.Persona.Nombre</td>
+                                        <td>@item.Persona.Apellido</td>
+                                        <td>@item.Persona.Dni</td>
+                                        <td>@(item.Persona.Telefono ?? "-")</td>
+                                        <td>@(item.Persona.Email ?? "-")</td>
+                                        <td class="text-center">
+                                            @if (item.Contrato == null)
+                                            {
+                                                <span class="badge bg-secondary">SIN CONTRATO</span>
+                                            }
+                                            else if (item.Contrato.Estado == "VIGENTE")
+                                            {
+                                                <span class="badge bg-success">VIGENTE</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">@item.Contrato.Estado</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a class="btn btn-sm btn-outline-primary btn-editar" href="javascript:void(0);"
+                                                    data-id="@item.Persona.Id" data-nombre="@item.Persona.Nombre"
+                                                    data-apellido="@item.Persona.Apellido" data-dni="@item.Persona.Dni"
+                                                    data-telefono="@item.Persona.Telefono" data-email="@item.Persona.Email"
+                                                    title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
 
-	</tbody>
-</table>
+                                                <a class="btn btn-sm btn-outline-danger btn-eliminar" href="javascript:void(0);"
+                                                    data-id="@item.Persona.Id" data-nombre="@item.Persona.Nombre"
+                                                    data-apellido="@item.Persona.Apellido" title="Eliminar">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
 
+                                                <a class="btn btn-sm btn-outline-secondary" asp-route-id="@item.Inquilino.Id"
+                                                    title="Alquileres">
+                                                    <i class="fas fa-building"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <i class="fas fa-info-circle me-2"></i>No hay inquilinos registrados
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
 
-<!-- Modal Editar Inquilino -->
+                @if (TotalPaginas > 1)
+                {
+                    <nav aria-label="Navegación de páginas">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(Pagina <= 1 ? "disabled" : "")">
+                                <a class="page-link" href="~/Inquilinos/Index?pagina=@(Pagina - 1)">
+                                    <i class="fas fa-angle-left"></i> Anterior
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= TotalPaginas; i++)
+                            {
+                                <li class="page-item @(i == Pagina ? "active" : "")">
+                                    <a class="page-link" href="~/Inquilinos/Index?pagina=@i">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Pagina >= TotalPaginas ? "disabled" : "")">
+                                <a class="page-link" href="~/Inquilinos/Index?pagina=@(Pagina + 1)">
+                                    Siguiente <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar -->
 <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<form id="formEditar" method="post" asp-action="Editar">
-				<div class="modal-header">
-					<h5 class="modal-title" id="editarModalLabel">Editar Inquilino</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-				</div>
-				<div class="modal-body">
-					<input type="hidden" id="Id" name="Id" />
-					<div class="mb-3">
-						<label for="Nombre" class="form-label">Nombre</label>
-						<input type="text" class="form-control" id="Nombre" name="Nombre" required />
-					</div>
-					<div class="mb-3">
-						<label for="Apellido" class="form-label">Apellido</label>
-						<input type="text" class="form-control" id="Apellido" name="Apellido" required />
-					</div>
-					<div class="mb-3">
-						<label for="Dni" class="form-label">DNI</label>
-						<input type="text" class="form-control" id="Dni" name="Dni" required />
-					</div>
-					<div class="mb-3">
-						<label for="Telefono" class="form-label">Teléfono</label>
-						<input type="text" class="form-control" id="Telefono" name="Telefono" />
-					</div>
-					<div class="mb-3">
-						<label for="Email" class="form-label">Email</label>
-						<input type="email" class="form-control" id="Email" name="Email" />
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-					<button type="submit" class="btn btn-primary">Guardar cambios</button>
-				</div>
-			</form>
-		</div>
-	</div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEditar" method="post" asp-action="Editar">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar Inquilino</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="Id" name="Id" />
+                    <div class="mb-3">
+                        <label for="Nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="Nombre" name="Nombre" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Apellido" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="Apellido" name="Apellido" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Dni" class="form-label">DNI</label>
+                        <input type="text" class="form-control" id="Dni" name="Dni" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Telefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="Telefono" name="Telefono" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="Email" name="Email" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<!-- Modal Confirmación Eliminar -->
+<!-- Modal Eliminar -->
 <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<form id="formEliminar" method="post" asp-action="Eliminar">
-				<div class="modal-header">
-					<h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-				</div>
-				<div class="modal-body">
-					<p id="mensajeEliminar"></p>
-
-					<input type="hidden" id="EliminarId" name="Id" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-					<button type="submit" class="btn btn-danger">Eliminar</button>
-				</div>
-			</form>
-		</div>
-	</div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEliminar" method="post" asp-action="Eliminar">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="mensajeEliminar"></p>
+                    <input type="hidden" id="EliminarId" name="Id" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<script>
-	document.querySelectorAll('.btn-editar').forEach(btn => {
-		btn.addEventListener('click', function () {
-			document.getElementById('Id').value = this.dataset.id;
-			document.getElementById('Nombre').value = this.dataset.nombre;
-			document.getElementById('Apellido').value = this.dataset.apellido;
-			document.getElementById('Dni').value = this.dataset.dni;
-			document.getElementById('Telefono').value = this.dataset.telefono;
-			document.getElementById('Email').value = this.dataset.email;
-			new bootstrap.Modal(document.getElementById('editarModal')).show();
-		});
-	});
-	document.querySelectorAll('.btn-eliminar').forEach(btn => {
-		btn.addEventListener('click', function () {
-
-			const nombre = this.dataset.apellido + ' ' + this.dataset.nombre;
-
-			document.getElementById('EliminarId').value = this.dataset.id;
-
-			new bootstrap.Modal(document.getElementById('eliminarModal')).show();
-			document.getElementById('mensajeEliminar').textContent =
-				`¿Estás seguro que deseas eliminar al inquilino ${nombre}?`;
-		});
-	});
-</script>
+@section Scripts {
+    <script>
+        document.querySelectorAll('.btn-editar').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('Id').value = this.dataset.id;
+                document.getElementById('Nombre').value = this.dataset.nombre;
+                document.getElementById('Apellido').value = this.dataset.apellido;
+                document.getElementById('Dni').value = this.dataset.dni;
+                document.getElementById('Telefono').value = this.dataset.telefono;
+                document.getElementById('Email').value = this.dataset.email;
+                new bootstrap.Modal(document.getElementById('editarModal')).show();
+            });
+        });
+        document.querySelectorAll('.btn-eliminar').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const nombre = this.dataset.apellido + ' ' + this.dataset.nombre;
+                document.getElementById('EliminarId').value = this.dataset.id;
+                document.getElementById('mensajeEliminar').innerHTML =
+                    `¿Estás seguro que deseas eliminar al inquilino <strong>${nombre}</strong>?`;
+                new bootstrap.Modal(document.getElementById('eliminarModal')).show();
+            });
+        });
+    </script>
+}

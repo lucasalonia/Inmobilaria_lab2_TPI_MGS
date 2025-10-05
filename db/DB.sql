@@ -31,6 +31,7 @@ CREATE TABLE `usuario` (
   `fecha_modificacion` TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `creado_por`         BIGINT UNSIGNED NULL,
   `modificado_por`     BIGINT UNSIGNED NULL,
+  `foto_perfil`        VARCHAR(255)    NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_usuario_username` (`username`),
   UNIQUE KEY `uk_usuario_persona`  (`persona_id`),
@@ -172,6 +173,7 @@ CREATE TABLE `contrato` (
   `fecha_modificacion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `creado_por`         BIGINT UNSIGNED NULL,
   `modificado_por`     BIGINT UNSIGNED NULL,
+  `terminado_por`     BIGINT UNSIGNED NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_contrato_inmueble`
     FOREIGN KEY (`inmueble_id`) REFERENCES `inmueble`(`id`)
@@ -185,6 +187,9 @@ CREATE TABLE `contrato` (
   CONSTRAINT `fk_contrato_modificado_por`
     FOREIGN KEY (`modificado_por`) REFERENCES `usuario`(`id`)
     ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_contrato_terminado_por`
+    FOREIGN KEY (`terminado_por`) REFERENCES `usuario`(`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `ck_contrato_fechas` CHECK (`fecha_fin` > `fecha_inicio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -193,7 +198,7 @@ CREATE TABLE `contrato` (
 -- ===========================================================
 CREATE TABLE `pago` (
   `id`                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `contrato_id`        BIGINT UNSIGNED NOT NULL,
+  `contrato_id`        INT NOT NULL,
   `estado`             VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE',
   `periodo_anio`       SMALLINT NOT NULL,
   `periodo_mes`        TINYINT  NOT NULL,
@@ -207,8 +212,8 @@ CREATE TABLE `pago` (
   `observaciones`      TEXT,
   `fecha_creacion`     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_modificacion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `creado_por`         BIGINT UNSIGNED NULL,
-  `modificado_por`     BIGINT UNSIGNED NULL,
+  `creado_por`         INT NULL,
+  `modificado_por`     INT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_pago_periodo` (`contrato_id`,`periodo_anio`,`periodo_mes`),
   CONSTRAINT `fk_pago_contrato`

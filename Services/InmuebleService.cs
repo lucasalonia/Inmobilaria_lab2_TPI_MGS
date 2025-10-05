@@ -24,5 +24,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         void ModificarPortada(int inmuebleId, string nuevaUrl);
 
         void QuitarPortada(int inmuebleId);
+        IList<Contrato> ObtenerContratosPorInmuebleId(int inmuebleId);
+        Models.ViewModels.PaginatedListViewModel<Contrato> ObtenerContratosPorInmuebleId(int inmuebleId, int pagina, int tamPagina);
+        int ContarContratosPorInmuebleId(int inmuebleId);
     }
 }

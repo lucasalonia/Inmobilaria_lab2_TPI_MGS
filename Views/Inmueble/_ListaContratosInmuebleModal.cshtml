@@ -1,0 +1,53 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.ViewModels.PaginatedListViewModel<Inmobilaria_lab2_TPI_MGS.Models.Contrato>
+<div class="modal-header">
+	<h5 class="modal-title">Contratos del inmueble</h5>
+	<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+	@if (!Model.Items.Any())
+	{
+		<p class="text-muted mb-0">Este inmueble no tiene contratos registrados.</p>
+	}
+	else
+	{
+		<div class="table-responsive">
+			<table class="table table-sm table-striped">
+				<thead>
+					<tr>
+						<th>Desde</th>
+						<th>Hasta</th>
+						<th>Estado</th>
+						<th>Monto</th>
+						<th>Moneda</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var c in Model.Items)
+					{
+						<tr>
+							<td>@c.FechaInicio.ToString("dd/MM/yyyy")</td>
+							<td>@c.FechaFin.ToString("dd/MM/yyyy")</td>
+							<td>@c.Estado</td>
+							<td>@(c.MontoMensual?.ToString("N2") ?? "-")</td>
+							<td>@(string.IsNullOrWhiteSpace(c.Moneda) ? "-" : c.Moneda)</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+		<nav aria-label="Paginación de contratos">
+			<ul class="pagination justify-content-center mb-0">
+				<li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+					<a class="page-link" href="#" onclick="return cargarContratosPagina(@ViewBag.InmuebleId, @(Model.PageIndex - 1));">Anterior</a>
+				</li>
+				<li class="page-item disabled"><span class="page-link">Página @Model.PageIndex de @Model.TotalPages</span></li>
+				<li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+					<a class="page-link" href="#" onclick="return cargarContratosPagina(@ViewBag.InmuebleId, @(Model.PageIndex + 1));">Siguiente</a>
+				</li>
+			</ul>
+		</nav>
+	}
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+</div>

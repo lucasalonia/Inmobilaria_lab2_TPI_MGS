@@ -48,6 +48,25 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 }
 
                 // Crear claims para el usuario
+                string? fotoPerfilClaim = null;
+                if (!string.IsNullOrWhiteSpace(usuario.FotoPerfil))
+                {
+                    var fp = usuario.FotoPerfil;
+                    if (fp!.Contains("inmobiliaria\\perfil"))
+                    {
+                        try
+                        {
+                            var fileName = System.IO.Path.GetFileName(fp);
+                            fotoPerfilClaim = $"/perfil/{usuario.Id}/{fileName}";
+                        }
+                        catch { fotoPerfilClaim = null; }
+                    }
+                    else
+                    {
+                        fotoPerfilClaim = fp.Replace('\\', '/');
+                    }
+                }
+
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
@@ -56,6 +75,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     new Claim("FullName", $"{usuario.Persona.Nombre} {usuario.Persona.Apellido}"),
                     new Claim("UserId", usuario.Id.ToString())
                 };
+
+                if (!string.IsNullOrWhiteSpace(fotoPerfilClaim))
+                {
+                    claims.Add(new Claim("FotoPerfil", fotoPerfilClaim));
+                }
 
                 // Agregar rol si existe
                 if (usuario.RolActual != null)
@@ -80,7 +104,6 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 {
                     return Redirect(returnUrl);
                 }
-
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)

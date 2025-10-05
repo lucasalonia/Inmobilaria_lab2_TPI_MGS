@@ -1,79 +1,256 @@
-@model Inmobilaria_lab2_TPI_MGS.Models.ViewModels.InquilinoViewModel
+@model Inmobilaria_lab2_TPI_MGS.Models.Inquilino
+
 @{
     ViewData["Title"] = "Crear";
+    bool personaEncontrada = Model?.Persona != null && Model.Persona.Id > 0;
 }
 
-@*PERSONA*@
-<form asp-action="Create" style="max-width: 600px; margin: auto;">
-    <h4> Nuevo Inquilino</h4>
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <hr>
-    <h5>Ingrese datos personales</h5>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-plus me-2"></i>Crear Nuevo Inquilino
+                    </h3>
+                </div>
+                <div class="card-body">
 
-    <div class="form-group">
-        <label asp-for="Persona.Nombre">Nombre</label>
-        <input asp-for="Persona.Nombre" type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
-    </div>
+                    <!-- Formulario de búsqueda de persona -->
+                    <form asp-action="BuscarPorDni" asp-controller="Inquilinos" method="get" class="mb-4">
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-search me-2"></i>Buscar o Crear Persona
+                            </h5>
 
-    <br>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="dni"
+                                            placeholder="Ingrese DNI para buscar persona existente" maxlength="8" />
+                                        <button class="btn btn-outline-primary" type="submit">
+                                            <i class="fas fa-search me-1"></i>Buscar
+                                        </button>
+                                        <button class="btn btn-outline-secondary" type="button" id="btnLimpiarPersona">
+                                            <i class="fas fa-eraser me-1"></i>Limpiar
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">Si la persona ya existe, se cargarán sus datos
+                                        automáticamente</small>
+                                </div>
+                            </div>
 
-    <div class="form-group">
-        <label asp-for="Persona.Apellido">Apelldio</label>
-        <input asp-for="Persona.Apellido" type="text" class="form-control" id="apellido" placeholder="Ingrese su apellido">
-    </div>
+                            @if (TempData["Msg"] != null)
+                            {
+                                <div class="alert alert-success">
+                                    @TempData["Msg"]
 
-    <br>
+                                </div>
+                            }
+                            else if (TempData["MsgNull"] != null)
+                            {
+                                <div class="alert alert-danger">
+                                    @TempData["MsgNull"]
 
-    <div class="form-group">
-        <label asp-for="Persona.Dni">DNI</label>
-        <input asp-for="Persona.Dni" type="text" class="form-control" id="dni" placeholder="Ingrese su DNI">
-    </div>
+                                </div>
+                            }
+                            @if (TempData["Error"] != null)
+                            {
+                                <div class="alert alert-danger">
+                                    @TempData["Error"]
+                                </div>
+                            }
 
-    <br>
+                            @if (TempData["Msg"] != null || TempData["Error"] != null)
+                            {
+                                <script>
+                                    setTimeout(function () {
+                                        var alerts = document.querySelectorAll('.alert');
+                                        alerts.forEach(function (alert) {
+                                            alert.classList.add('fade');
+                                            setTimeout(() => alert.remove(), 500);
+                                        });
+                                    }, 4000);
+                                </script>
+                            }
 
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+                        </div>
+                    </form>
 
-    <div class="form-group">
-        <label asp-for="Persona.Telefono">Telefono</label>
-        <input asp-for="Persona.Telefono" type="tel" class="form-control" id="telefono" placeholder="Ingrese su telefono">
-    </div>
-    
-    <br>
+                    <!-- Formulario de creación -->
+                    <form asp-action="Create" asp-controller="Inquilinos" method="post">
 
-    <div class="form-group">
-        <label asp-for="Persona.Email" for="email">Email</label>
-        <input asp-for="Persona.Email" type="email" class="form-control" id="email" placeholder="Ingrese su email">
-    </div>
+                        <input type="hidden" name="Persona.Id" value="@Model?.Persona?.Id" />
 
-    <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Nombre" class="form-label">Nombre *</label>
+                                    @if (personaEncontrada)
+                                    {
+                                        <input type="hidden" name="Persona.Nombre" value="@Model.Persona.Nombre" />
+                                        <input type="text" id="Persona_Nombre" class="form-control"
+                                            value="@Model.Persona.Nombre" readonly />
+                                    }
+                                    else
+                                    {
+                                        <input type="text" id="Persona_Nombre" class="form-control" name="Persona.Nombre"
+                                            value="@Model?.Persona?.Nombre" />
+                                    }
+                                </div>
+                            </div>
 
-    <div class="form-group">
-        <label asp-for="Persona.FechaNacimiento">Fecha de Nacimiento</label>
-        <input asp-for="Persona.FechaNacimiento" type="date" class="form-control" id="fechaNacimiento">
-    </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Apellido" class="form-label">Apellido *</label>
+                                    @if (personaEncontrada)
+                                    {
+                                        <input type="hidden" name="Persona.Apellido" value="@Model.Persona.Apellido" />
+                                        <input type="text" id="Persona_Apellido" class="form-control"
+                                            value="@Model.Persona.Apellido" readonly />
+                                    }
+                                    else
+                                    {
+                                        <input type="text" id="Persona_Apellido" class="form-control"
+                                            name="Persona.Apellido" value="@Model?.Persona?.Apellido" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
 
-    <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Dni" class="form-label">DNI *</label>
+                                    @if (personaEncontrada)
+                                    {
+                                        <input type="hidden" name="Persona.Dni" value="@Model.Persona.Dni" />
+                                        <input type="text" id="Persona_Dni" class="form-control"
+                                            value="@Model.Persona.Dni" readonly />
+                                    }
+                                    else
+                                    {
+                                        <input type="text" id="Persona_Dni" class="form-control" name="Persona.Dni"
+                                            value="@Model?.Persona?.Dni" />
+                                    }
+                                </div>
+                            </div>
 
-    <div class="form-group">
-        <label asp-for="Persona.Sexo">Sexo</label><br>
-        <div class="form-check form-check-inline">
-            <input asp-for="Persona.Sexo"  class="form-check-input" type="radio"  id="sexoMasculino" value="M">
-            <label class="form-check-label" for="sexoMasculino">Masculino</label>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Sexo" class="form-label">Sexo *</label>
+                                    <select id="Persona_Sexo" name="Persona.Sexo" class="form-control"
+                                        @(personaEncontrada ? "disabled" : "")>
+                                        <option value="">-- Seleccione --</option>
+                                        <option value="M" selected="@(Model?.Persona?.Sexo == "M")">M</option>
+                                        <option value="F" selected="@(Model?.Persona?.Sexo == "F")">F</option>
+                                        <option value="X" selected="@(Model?.Persona?.Sexo == "X")">X</option>
+                                    </select>
+                                    @if (personaEncontrada)
+                                    {
+                                        <input type="hidden" name="Persona.Sexo" value="@Model.Persona.Sexo" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_FechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    @if (personaEncontrada)
+                                    {
+                                        <input type="hidden" name="Persona.FechaNacimiento"
+                                            value="@Model.Persona.FechaNacimiento?.ToString("yyyy-MM-dd")" />
+                                        <input type="date" id="Persona_FechaNacimiento" class="form-control"
+                                            value="@Model.Persona.FechaNacimiento?.ToString("yyyy-MM-dd")" readonly />
+                                    }
+                                    else
+                                    {
+                                        <input type="date" id="Persona_FechaNacimiento" class="form-control"
+                                            name="Persona.FechaNacimiento"
+                                            value="@(Model?.Persona?.FechaNacimiento?.ToString("yyyy-MM-dd"))" />
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Email" class="form-label">Email</label>
+                                    @if (personaEncontrada)
+                                    {
+                                        <input type="hidden" name="Persona.Email" value="@Model.Persona.Email" />
+                                        <input type="email" id="Persona_Email" class="form-control"
+                                            value="@Model.Persona.Email" readonly />
+                                    }
+                                    else
+                                    {
+                                        <input type="email" id="Persona_Email" class="form-control" name="Persona.Email"
+                                            value="@Model?.Persona?.Email" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="Persona_Telefono" class="form-label">Teléfono</label>
+                                    @if (personaEncontrada)
+                                    {
+                                        <input type="hidden" name="Persona.Telefono" value="@Model.Persona.Telefono" />
+                                        <input type="text" id="Persona_Telefono" class="form-control"
+                                            value="@Model.Persona.Telefono" readonly />
+                                    }
+                                    else
+                                    {
+                                        <input type="text" id="Persona_Telefono" class="form-control"
+                                            name="Persona.Telefono" value="@Model?.Persona?.Telefono" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Datos por defecto -->
+                        <input type="hidden" name="Estado" value="ACTIVO" />
+                        <input type="hidden" name="CreadoPor" value="1" />
+                        <input type="hidden" name="ModificadoPor" value="1" />
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Crear Inquilino
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
         </div>
-
-        <br>
-
-        <div class="form-check form-check-inline">
-            <input asp-for="Persona.Sexo" class="form-check-input" type="radio" id="sexoFemenino" value="F">
-            <label class="form-check-label" for="sexoFemenino">Femenino</label>
-        </div>
-
-        <br>
-
-        <div class="form-check form-check-inline">
-            <input asp-for="Persona.Sexo" class="form-check-input" type="radio" id="sexoX" value="X">
-            <label class="form-check-label" for="sexoX">No especifica</label>
-        </div>
-        
     </div>
-    <button type="submit" class="btn btn-primary">Guardar datos</button>
-</form>
+</div>
+
+<script>
+    document.getElementById('btnLimpiarPersona').addEventListener('click', function (event) {
+        event.preventDefault();
+        document.getElementById('Persona_Dni').value = '';
+        document.getElementById('Persona_Sexo').value = "";
+        document.getElementById('Persona_Nombre').value = '';
+        document.getElementById('Persona_Apellido').value = '';
+        document.getElementById('Persona_FechaNacimiento').value = '';
+        document.getElementById('Persona_Email').value = '';
+        document.getElementById('Persona_Telefono').value = '';
+
+        // Habilitar campos para edición
+        document.getElementById('Persona_Dni').readOnly = false;
+        document.getElementById('Persona_Sexo').disabled = false;
+        document.getElementById('Persona_Nombre').readOnly = false;
+        document.getElementById('Persona_Apellido').readOnly = false;
+        document.getElementById('Persona_FechaNacimiento').readOnly = false;
+        document.getElementById('Persona_Email').readOnly = false;
+        document.getElementById('Persona_Telefono').readOnly = false;
+    });
+</script>

@@ -26,5 +26,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
         public Usuario? ModificadoPor { get; set; }
         
         public Rol? RolActual { get; set; }
+
+        public string? FotoPerfil { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             {
                 string sql = @"SELECT u.id, u.persona_id, u.username, u.password, u.estado, 
                     u.fecha_creacion, u.fecha_modificacion, u.ultimo_login,
-                    u.creado_por, u.modificado_por,
+                    u.creado_por, u.modificado_por, u.foto_perfil,
                     per.dni, per.sexo, per.nombre, per.apellido, per.fecha_nacimiento,
                     per.email, per.telefono, per.fecha_creacion AS persona_fecha_creacion,
                     per.fecha_modificacion AS persona_fecha_modificacion
@@ -44,6 +44,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                 UltimoLogin = reader.IsDBNull(reader.GetOrdinal("ultimo_login")) ? (DateTime?)null : reader.GetDateTime("ultimo_login"),
                                 CreadoPor = reader.IsDBNull(reader.GetOrdinal("creado_por")) ? null : new Usuario { Id = reader.GetInt32("creado_por") },
                                 ModificadoPor = reader.IsDBNull(reader.GetOrdinal("modificado_por")) ? null : new Usuario { Id = reader.GetInt32("modificado_por") },
+                                FotoPerfil = reader.IsDBNull(reader.GetOrdinal("foto_perfil")) ? null : reader.GetString("foto_perfil"),
 
                                 Persona = new Persona
                                 {
@@ -75,8 +76,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 using (var connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
-                    string sql = @"INSERT INTO usuario (persona_id, username, password, estado, fecha_creacion, fecha_modificacion, ultimo_login, creado_por, modificado_por) 
-                                  VALUES (@PersonaId, @UserName, @Password, @Estado, @FechaCreacion, @FechaModificacion, @UltimoLogin, @CreadoPor, @ModificadoPor);
+                    string sql = @"INSERT INTO usuario (persona_id, username, password, estado, fecha_creacion, fecha_modificacion, ultimo_login, creado_por, modificado_por, foto_perfil) 
+                                  VALUES (@PersonaId, @UserName, @Password, @Estado, @FechaCreacion, @FechaModificacion, @UltimoLogin, @CreadoPor, @ModificadoPor, @FotoPerfil);
                                   SELECT LAST_INSERT_ID();";
                     
                     using (var command = new MySqlCommand(sql, connection))
@@ -90,6 +91,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                         command.Parameters.AddWithValue("@UltimoLogin", usuario.UltimoLogin ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@CreadoPor", usuario.CreadoPor?.Id ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@ModificadoPor", usuario.ModificadoPor?.Id ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@FotoPerfil", (object?)usuario.FotoPerfil ?? DBNull.Value);
                         
                         var result = command.ExecuteScalar();
                         return Convert.ToInt32(result);
@@ -112,7 +114,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     connection.Open();
                     string sql = @"SELECT u.id, u.persona_id, u.username, u.password, u.estado, 
                         u.fecha_creacion, u.fecha_modificacion, u.ultimo_login,
-                        u.creado_por, u.modificado_por,
+                        u.creado_por, u.modificado_por, u.foto_perfil,
                         per.dni, per.sexo, per.nombre, per.apellido, per.fecha_nacimiento,
                         per.email, per.telefono, per.fecha_creacion AS persona_fecha_creacion,
                         per.fecha_modificacion AS persona_fecha_modificacion
@@ -138,6 +140,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                     UltimoLogin = reader.IsDBNull(reader.GetOrdinal("ultimo_login")) ? (DateTime?)null : reader.GetDateTime("ultimo_login"),
                                     CreadoPor = reader.IsDBNull(reader.GetOrdinal("creado_por")) ? null : new Usuario { Id = reader.GetInt32("creado_por") },
                                     ModificadoPor = reader.IsDBNull(reader.GetOrdinal("modificado_por")) ? null : new Usuario { Id = reader.GetInt32("modificado_por") },
+                                    FotoPerfil = reader.IsDBNull(reader.GetOrdinal("foto_perfil")) ? null : reader.GetString("foto_perfil"),
 
                                     Persona = new Persona
                                     {
@@ -179,7 +182,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                   estado = @Estado, 
                                   fecha_modificacion = @FechaModificacion,
                                   ultimo_login = @UltimoLogin,
-                                  modificado_por = @ModificadoPor
+                                  modificado_por = @ModificadoPor,
+                                  foto_perfil = @FotoPerfil
                                   WHERE id = @Id";
                     
                     using (var command = new MySqlCommand(sql, connection))
@@ -191,6 +195,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                         command.Parameters.AddWithValue("@FechaModificacion", usuario.FechaModificacion);
                         command.Parameters.AddWithValue("@UltimoLogin", usuario.UltimoLogin ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@ModificadoPor", usuario.ModificadoPor?.Id ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@FotoPerfil", (object?)usuario.FotoPerfil ?? DBNull.Value);
                         
                         int rowsAffected = command.ExecuteNonQuery();
                         return rowsAffected > 0;
@@ -242,7 +247,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     connection.Open();
                     string sql = @"SELECT u.id, u.persona_id, u.username, u.password, u.estado, 
                         u.fecha_creacion, u.fecha_modificacion, u.ultimo_login,
-                        u.creado_por, u.modificado_por,
+                        u.creado_por, u.modificado_por, u.foto_perfil,
                         per.dni, per.sexo, per.nombre, per.apellido, per.fecha_nacimiento,
                         per.email, per.telefono, per.fecha_creacion AS persona_fecha_creacion,
                         per.fecha_modificacion AS persona_fecha_modificacion
@@ -267,7 +272,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                     FechaModificacion = reader.GetDateTime("fecha_modificacion"),
                                     UltimoLogin = reader.IsDBNull(reader.GetOrdinal("ultimo_login")) ? (DateTime?)null : reader.GetDateTime("ultimo_login"),
                                     CreadoPor = reader.IsDBNull(reader.GetOrdinal("creado_por")) ? null : new Usuario { Id = reader.GetInt32("creado_por") },
-                                    ModificadoPor = reader.IsDBNull(reader.GetOrdinal("modificado_por")) ? null : new Usuario { Id = reader.GetInt32("modificado_por") },
+                                ModificadoPor = reader.IsDBNull(reader.GetOrdinal("modificado_por")) ? null : new Usuario { Id = reader.GetInt32("modificado_por") },
+                                FotoPerfil = reader.IsDBNull(reader.GetOrdinal("foto_perfil")) ? null : reader.GetString("foto_perfil"),
 
                                     Persona = new Persona
                                     {

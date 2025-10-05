@@ -1,0 +1,152 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.Pago
+@{
+    ViewData["Title"] = "Modificar Pago";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-money-bill-wave me-2"></i>Registrar Pago / @ViewBag.PeriodoMes
+                        @ViewBag.PeriodoAnio / Importe: $@ViewBag.Importe
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>@ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Editar" method="post">
+                    <input type="hidden" asp-for="Id" />
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-receipt me-2"></i>Datos del Pago
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Importe Pagado *</label>
+                                        <input type="number" step="0.01" class="form-control" name="ImportePagado"
+                                            asp-for="ImportePagado" required />
+                                        <span asp-validation-for="ImportePagado" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Medio de Pago *</label>
+                                        <select class="form-select" name="MedioPago" asp-for="MedioPago" required>
+                                            <option value="">Seleccionar...</option>
+                                            <option value="Efectivo">Efectivo</option>
+                                            <option value="Tarjeta">Tarjeta</option>
+                                            <option value="Transferencia">Transferencia</option>
+                                            <option value="MercadoPago">MercadoPago</option>
+                                        </select>
+                                        <span asp-validation-for="MedioPago" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Recargo</label>
+                                        @if (ViewBag.Estado == "PENDIENTE")
+                                        {
+                                            <input type="number" step="0.01" class="form-control" asp-for="Recargo"
+                                                disabled />
+                                        }
+                                        else
+                                        {
+                                            <input type="number" step="0.01" class="form-control" asp-for="Recargo" />
+                                        }
+                                        <span asp-validation-for="Recargo" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label"> Descuento </label>
+                                        <input type="number" step="0.01" class="form-control" asp-for="Descuento" />
+                                        <span asp-validation-for="Descuento" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Observaciones</label>
+                                <textarea class="form-control" name="Observaciones" asp-for="Observaciones"
+                                    rows="3"></textarea>
+                                <span asp-validation-for="Observaciones" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-dollar-sign me-1"></i>Guardar Pago
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <text>
+                    toastr.options = {
+                        "positionClass": "toast-top-center",
+                        "timeOut": "5000"
+                    };
+                    toastr.error("@error.ErrorMessage");
+                </text>
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector("form");
+            form.addEventListener("submit", (e) => {
+                const importePagado = parseFloat(document.querySelector("[name='ImportePagado']").value);
+                const medioPago = document.querySelector("[name='MedioPago']").value;
+                const importeOriginal = parseFloat("@ViewBag.Importe");
+                let errores = [];
+
+                if (isNaN(importePagado) || importePagado <= 0) {
+                    errores.push("El importe pagado debe ser un número mayor a 0.");
+                }
+
+                if (importePagado > importeOriginal) {
+                    errores.push("El importe pagado no puede ser mayor al importe total del pago ($" + importeOriginal.toFixed(2) + ").");
+                }
+
+                if (!medioPago) {
+                    errores.push("Debe seleccionar un medio de pago.");
+                }
+
+                if (errores.length > 0) {
+                    e.preventDefault();
+                    toastr.options = {
+                        "positionClass": "toast-top-center",
+                        "timeOut": "4000"
+                    };
+                    errores.forEach(msg => toastr.error(msg));
+                }
+            });
+        });
+    </script>
+}
