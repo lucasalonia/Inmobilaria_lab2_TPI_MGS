@@ -6,10 +6,12 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
     public class InmuebleServiceImpl : InmuebleService
     {
         private readonly InmuebleRepository inmuebleRepository;
+        private readonly ContratoRepository contratoRepository;
 
-        public InmuebleServiceImpl(InmuebleRepository inmuebleRepository)
+        public InmuebleServiceImpl(InmuebleRepository inmuebleRepository, ContratoRepository contratoRepository)
         {
             this.inmuebleRepository = inmuebleRepository;
+            this.contratoRepository = contratoRepository;
         }
 
         public int Alta(Inmueble inmueble)
@@ -52,6 +54,21 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         public int ObtenerCantidadInmuebles()
         {
             return inmuebleRepository.ObtenerCantidadInmuebles();
+        }
+
+        public IList<Contrato> ObtenerContratosPorInmuebleId(int inmuebleId)
+        {
+            return contratoRepository.ObtenerPorInmuebleId(inmuebleId);
+        }
+        public Models.ViewModels.PaginatedListViewModel<Contrato> ObtenerContratosPorInmuebleId(int inmuebleId, int pagina, int tamPagina)
+        {
+            var total = contratoRepository.ContarPorInmuebleId(inmuebleId);
+            var items = contratoRepository.ObtenerPorInmuebleId(inmuebleId, pagina, tamPagina);
+            return Models.ViewModels.PaginatedListViewModel<Contrato>.Create(items, pagina, tamPagina);
+        }
+        public int ContarContratosPorInmuebleId(int inmuebleId)
+        {
+            return contratoRepository.ContarPorInmuebleId(inmuebleId);
         }
     }
 }

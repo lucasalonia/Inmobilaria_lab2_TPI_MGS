@@ -81,6 +81,11 @@
                                                        title="Ver Detalles">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-info" 
+                                                            data-bs-toggle="modal" data-bs-target="#contratosModal"
+                                                            data-inmueble-id="@item.Id" title="Ver contratos">
+                                                        <i class="bi bi-file-text"></i>
+                                                    </button>
                                                     <a class="btn btn-sm btn-outline-warning" 
                                                        asp-action="Edit" 
                                                        asp-route-id="@item.Id" 
@@ -167,8 +172,48 @@
 	</div>
 </div>
 
+<!-- Modal contratos -->
+<div class="modal fade" id="contratosModal" tabindex="-1" aria-labelledby="contratosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="contratosModalContent">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contratosModalLabel">Contratos del inmueble</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center text-muted py-5">Cargando...</div>
+            </div>
+        </div>
+    </div>
+    </div>
+
 @section Scripts {
     <script>
+        var contratosModal = document.getElementById('contratosModal');
+        contratosModal.addEventListener('show.bs.modal', async function (event) {
+            var button = event.relatedTarget;
+            var inmuebleId = button.getAttribute('data-inmueble-id');
+            var url = '@Url.Action("Contratos","Inmueble")' + '?id=' + encodeURIComponent(inmuebleId) + '&pagina=1';
+            try {
+                var resp = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                var html = await resp.text();
+                document.getElementById('contratosModalContent').innerHTML = html;
+            } catch (e) {
+                document.querySelector('#contratosModal .modal-body').innerHTML = '<div class="text-danger">Error al cargar contratos</div>';
+            }
+        });
+        window.cargarContratosPagina = async function (inmuebleId, pagina) {
+            if (pagina < 1) return false;
+            var url = '@Url.Action("Contratos","Inmueble")' + '?id=' + encodeURIComponent(inmuebleId) + '&pagina=' + encodeURIComponent(pagina);
+            try {
+                var resp = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                var html = await resp.text();
+                document.getElementById('contratosModalContent').innerHTML = html;
+            } catch (e) {
+                // ignore
+            }
+            return false;
+        }
         var eliminarModal = document.getElementById('eliminarModal');
         eliminarModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget; // botón que abrió el modal

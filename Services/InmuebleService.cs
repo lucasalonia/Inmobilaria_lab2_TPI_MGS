@@ -19,5 +19,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         int ObtenerCantidadInmueblesActivos();
 
         int ObtenerCantidadInmuebles();
+
+        IList<Contrato> ObtenerContratosPorInmuebleId(int inmuebleId);
+        Models.ViewModels.PaginatedListViewModel<Contrato> ObtenerContratosPorInmuebleId(int inmuebleId, int pagina, int tamPagina);
+        int ContarContratosPorInmuebleId(int inmuebleId);
     }
 }

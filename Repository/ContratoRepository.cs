@@ -396,6 +396,108 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
 
             return contratos;
         }
+
+        public int ContarPorInmuebleId(int inmuebleId)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "SELECT COUNT(*) FROM contrato WHERE inmueble_id = @InmuebleId";
+                using (var command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@InmuebleId", inmuebleId);
+                    return Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+        }
+
+        public IList<Contrato> ObtenerPorInmuebleId(int inmuebleId)
+        {
+            IList<Contrato> contratos = new List<Contrato>();
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"
+                                    SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones
+                                    FROM contrato
+                                    WHERE inmueble_id = @InmuebleId
+                                    ORDER BY fecha_inicio DESC";
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@InmuebleId", inmuebleId);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                contratos.Add(new Contrato
+                                {
+                                    Id = reader.GetInt32("id"),
+                                    InmuebleId = reader.GetInt32("inmueble_id"),
+                                    InquilinoId = reader.GetInt32("inquilino_id"),
+                                    FechaInicio = reader.GetDateTime("fecha_inicio"),
+                                    FechaFin = reader.GetDateTime("fecha_fin"),
+                                    Estado = reader.GetString("estado"),
+                                    MontoMensual = reader.IsDBNull(reader.GetOrdinal("monto_mensual")) ? (decimal?)null : reader.GetDecimal("monto_mensual"),
+                                    Moneda = reader.IsDBNull(reader.GetOrdinal("moneda")) ? null : reader.GetString("moneda"),
+                                    Deposito = reader.IsDBNull(reader.GetOrdinal("deposito")) ? (decimal?)null : reader.GetDecimal("deposito"),
+                                    Observaciones = reader.IsDBNull(reader.GetOrdinal("observaciones")) ? null : reader.GetString("observaciones")
+                                });
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error al obtener contratos por inmueble: {e.Message}");
+                    throw;
+                }
+            }
+            return contratos;
+        }
+
+        public IList<Contrato> ObtenerPorInmuebleId(int inmuebleId, int paginaNro, int tamPagina)
+        {
+            IList<Contrato> contratos = new List<Contrato>();
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = @"
+                                SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones
+                                FROM contrato
+                                WHERE inmueble_id = @InmuebleId
+                                ORDER BY fecha_inicio DESC
+                                LIMIT @Tam OFFSET @Off";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    int offset = (paginaNro - 1) * tamPagina;
+                    command.Parameters.AddWithValue("@InmuebleId", inmuebleId);
+                    command.Parameters.AddWithValue("@Tam", tamPagina);
+                    command.Parameters.AddWithValue("@Off", offset);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            contratos.Add(new Contrato
+                            {
+                                Id = reader.GetInt32("id"),
+                                InmuebleId = reader.GetInt32("inmueble_id"),
+                                InquilinoId = reader.GetInt32("inquilino_id"),
+                                FechaInicio = reader.GetDateTime("fecha_inicio"),
+                                FechaFin = reader.GetDateTime("fecha_fin"),
+                                Estado = reader.GetString("estado"),
+                                MontoMensual = reader.IsDBNull(reader.GetOrdinal("monto_mensual")) ? (decimal?)null : reader.GetDecimal("monto_mensual"),
+                                Moneda = reader.IsDBNull(reader.GetOrdinal("moneda")) ? null : reader.GetString("moneda"),
+                                Deposito = reader.IsDBNull(reader.GetOrdinal("deposito")) ? (decimal?)null : reader.GetDecimal("deposito"),
+                                Observaciones = reader.IsDBNull(reader.GetOrdinal("observaciones")) ? null : reader.GetString("observaciones")
+                            });
+                        }
+                    }
+                }
+            }
+            return contratos;
+        }
         public Contrato ObtenerInmuebleSinContrato(int inmuebleId)
         {
             Contrato contrato = null;

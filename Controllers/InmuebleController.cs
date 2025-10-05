@@ -187,5 +187,21 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult Contratos(int id, int pagina = 1)
+        {
+            try
+            {
+                const int tamPagina = 10;
+                var paginados = InmuebleService.ObtenerContratosPorInmuebleId(id, pagina, tamPagina);
+                ViewBag.InmuebleId = id;
+                return PartialView("_ListaContratosInmuebleModal", paginados);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }
