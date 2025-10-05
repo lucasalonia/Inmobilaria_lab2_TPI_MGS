@@ -25,5 +25,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
 
         public ulong? CreadoPor { get; set; }         
         public ulong? ModificadoPor { get; set; }  
+
+        public int? TerminadoPor { get; set; }
     }
 }
