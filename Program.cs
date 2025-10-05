@@ -2,6 +2,7 @@ using Inmobilaria_lab2_TPI_MGS.Repository;
 using Inmobilaria_lab2_TPI_MGS.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,15 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Exponer fotos de perfil desde C:\inmobiliaria\perfil bajo /perfil
+var perfilRoot = @"C:\\inmobiliaria\\perfil";
+try { Directory.CreateDirectory(perfilRoot); } catch { /* ignore */ }
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(perfilRoot),
+    RequestPath = "/perfil"
+});
 
 app.UseRouting();
 

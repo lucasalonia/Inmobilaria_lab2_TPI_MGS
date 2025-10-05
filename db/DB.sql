@@ -31,6 +31,7 @@ CREATE TABLE `usuario` (
   `fecha_modificacion` TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `creado_por`         BIGINT UNSIGNED NULL,
   `modificado_por`     BIGINT UNSIGNED NULL,
+  `foto_perfil`        VARCHAR(255)    NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_usuario_username` (`username`),
   UNIQUE KEY `uk_usuario_persona`  (`persona_id`),

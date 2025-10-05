@@ -86,9 +86,11 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button"
+                                <a class="nav-link dropdown-toggle text-dark d-flex align-items-center" href="#" id="userDropdown" role="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user"></i> @User.FindFirst("FullName")?.Value
+                                    <img id="navbarAvatar" src="@(string.IsNullOrWhiteSpace(User.FindFirst("FotoPerfil")?.Value) ? "/img/avatar-default.svg" : User.FindFirst("FotoPerfil")!.Value)"
+                                         alt="Avatar" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover;" />
+                                    @User.FindFirst("FullName")?.Value
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                     <li>
@@ -137,12 +139,20 @@
                         <h5 class="modal-title" id="profileModalLabel">Modificar perfil</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form asp-controller="Perfil" asp-action="UpdateProfile" method="post">
+                    <form asp-controller="Perfil" asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
                             @Html.AntiForgeryToken()
+                            <div class="mb-3 text-center">
+                                <img src="@(string.IsNullOrWhiteSpace(User.FindFirst("FotoPerfil")?.Value) ? "/img/avatar-default.svg" : User.FindFirst("FotoPerfil")!.Value)" alt="Avatar" class="rounded-circle" style="width: 96px; height: 96px; object-fit: cover;" />
+                            </div>
                             <div class="mb-3">
                                 <label for="Username" class="form-label">Nombre de usuario</label>
                                 <input name="Username" id="Username" class="form-control" value="@User.Identity?.Name" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="FotoPerfil" class="form-label">Foto de perfil</label>
+                                <input type="file" name="FotoPerfil" id="FotoPerfil" class="form-control" accept="image/*" />
+                                <small class="text-muted">JPG/PNG/WebP, hasta 2MB</small>
                             </div>
                             <div class="mb-3">
                                 <label for="CurrentPassword" class="form-label">Contraseña actual</label>
