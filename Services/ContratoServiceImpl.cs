@@ -48,5 +48,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return contratoRepository.ObtenerPorInmuebleId(inmuebleId);
         }
+
+        public IList<Contrato> ObtenerTodos(int? inquilinoId = null)
+        {
+            return contratoRepository.ObtenerTodos(inquilinoId);
+        }
     }
 }

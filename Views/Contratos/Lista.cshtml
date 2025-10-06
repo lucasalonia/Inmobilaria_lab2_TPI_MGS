@@ -65,13 +65,20 @@
                                         <td>@item.FechaInicio.ToShortDateString()</td>
                                         <td>@item.FechaFin.ToShortDateString()</td>
                                         <td class="text-center">
+                                            @{
+                                                bool esActivo = item.Estado == "VIGENTE" && item.FechaFin >= DateTime.Now;
+                                            }
                                             @if (string.IsNullOrEmpty(item.Estado))
                                             {
                                                 <span class="badge bg-secondary">SIN ESTADO</span>
                                             }
+                                            else if (esActivo)
+                                            {
+                                                <span class="badge bg-success">ACTIVO</span>
+                                            }
                                             else if (item.Estado == "VIGENTE")
                                             {
-                                                <span class="badge bg-success">VIGENTE</span>
+                                                <span class="badge bg-warning">VENCIDO</span>
                                             }
                                             else
                                             {
@@ -160,18 +167,18 @@
                     <nav aria-label="Navegación de páginas">
                         <ul class="pagination justify-content-center">
                             <li class="page-item @(Pagina <= 1 ? "disabled" : "")">
-                                <a class="page-link" href="~/Contratos/Index?pagina=@(Pagina - 1)">
+                                <a class="page-link" href="~/Contratos/Lista?pagina=@(Pagina - 1)">
                                     <i class="fas fa-angle-left"></i> Anterior
                                 </a>
                             </li>
                             @for (int i = 1; i <= TotalPaginas; i++)
                             {
                                 <li class="page-item @(i == Pagina ? "active" : "")">
-                                    <a class="page-link" href="~/Contratos/Index?pagina=@i">@i</a>
+                                    <a class="page-link" href="~/Contratos/Lista?pagina=@i">@i</a>
                                 </li>
                             }
                             <li class="page-item @(Pagina >= TotalPaginas ? "disabled" : "")">
-                                <a class="page-link" href="~/Contratos/Index?pagina=@(Pagina + 1)">
+                                <a class="page-link" href="~/Contratos/Lista?pagina=@(Pagina + 1)">
                                     Siguiente <i class="fas fa-angle-right"></i>
                                 </a>
                             </li>

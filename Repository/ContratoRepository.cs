@@ -178,8 +178,12 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     string query = @"
                                     SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones
                                     FROM contrato
-                                    WHERE estado = 'VIGENTE' AND fecha_fin >= CURDATE()
-                                    ORDER BY fecha_inicio DESC
+                                    ORDER BY 
+                                        CASE 
+                                            WHEN estado = 'VIGENTE' AND fecha_fin >= CURDATE() THEN 1
+                                            ELSE 2
+                                        END,
+                                        fecha_inicio DESC
                                     LIMIT @TamPagina OFFSET @Offset";
 
                     using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -213,7 +217,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Error al obtener contratos vigentes: {e.Message}");
+                    Console.WriteLine($"Error al obtener contratos: {e.Message}");
                     throw;
                 }
                 finally
@@ -223,8 +227,6 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             }
 
             return contratos;
-
-
         }
         public Contrato ObtenerPorId(int contratoId)
         {

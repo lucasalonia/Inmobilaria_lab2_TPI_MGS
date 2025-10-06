@@ -14,6 +14,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         public Contrato ObtenerPorId(int contratoId);
          public Contrato? ObtenerContratoVigentePorInmuebleId(int inmuebleId);
         IList<Contrato> ObtenerPorInmuebleId(int inmuebleId);
+        IList<Contrato> ObtenerTodos(int? inquilinoId = null);
         
     }
 }
