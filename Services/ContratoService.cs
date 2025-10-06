@@ -9,6 +9,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         bool Baja(int id, int? idUsuario);
         Contrato ObtenerContratoVigente(int inquilinoId);
         IList<Inmueble> ListarInmueblesDisponibles(int paginaNro = 1, int tamPagina = 10);
+        IList<Inmueble> ListarInmueblesDisponiblesEnRangoFechas(DateTime fechaInicio, DateTime fechaFin, int paginaNro = 1, int tamPagina = 10);
         public IList<Contrato> ListaContratosVigentes(int paginaNro = 1, int tamPagina = 10);
 
         public Contrato ObtenerPorId(int contratoId);

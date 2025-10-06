@@ -601,6 +601,69 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
 
             return inmuebles;
         }
+
+        public List<Inmueble> ListarInmueblesDisponiblesEnRangoFechas(DateTime fechaInicio, DateTime fechaFin, int paginaNro = 1, int tamPagina = 10)
+        {
+            var inmuebles = new List<Inmueble>();
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    string query = @"
+                SELECT i.id, i.direccion, i.estado, i.superficie_m2, i.ambientes, i.banos, i.cochera
+                FROM inmueble i
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM contrato c
+                    WHERE c.inmueble_id = i.id
+                      AND c.estado = 'VIGENTE'
+                      AND (
+                        (c.fecha_inicio <= @FechaFin AND c.fecha_fin >= @FechaInicio)
+                        OR 
+                        (@FechaInicio <= c.fecha_fin AND @FechaFin >= c.fecha_inicio)
+                      )
+                    )
+                LIMIT @TamPagina OFFSET @Offset";
+
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        int offset = (paginaNro - 1) * tamPagina;
+                        command.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                        command.Parameters.AddWithValue("@FechaFin", fechaFin);
+                        command.Parameters.AddWithValue("@TamPagina", tamPagina);
+                        command.Parameters.AddWithValue("@Offset", offset);
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                inmuebles.Add(new Inmueble
+                                {
+                                    Id = reader.GetInt32("id"),
+                                    Direccion = reader.GetString("direccion"),
+                                    Estado = reader.GetString("estado"),
+                                    SuperficieM2 = reader.GetInt32("superficie_m2"),
+                                    Ambientes = reader.GetInt32("ambientes"),
+                                    Banos = reader.GetInt32("banos"),
+                                    Cochera = reader.GetInt32("cochera")
+                                });
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error al obtener inmuebles disponibles en rango de fechas: {e.Message}");
+                    throw;
+                }
+            }
+
+            return inmuebles;
+        }
+
         public Contrato? ObtenerContratoVigentePorInmuebleId(int inmuebleId)
         {
             Contrato? contrato = null;

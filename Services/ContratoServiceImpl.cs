@@ -29,7 +29,12 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         }
         public IList<Inmueble> ListarInmueblesDisponibles(int paginaNro = 1, int tamPagina = 10)
         {
-            return contratoRepository.ListarInmueblesDisponibles();
+            return contratoRepository.ListarInmueblesDisponibles(paginaNro, tamPagina);
+        }
+
+        public IList<Inmueble> ListarInmueblesDisponiblesEnRangoFechas(DateTime fechaInicio, DateTime fechaFin, int paginaNro = 1, int tamPagina = 10)
+        {
+            return contratoRepository.ListarInmueblesDisponiblesEnRangoFechas(fechaInicio, fechaFin, paginaNro, tamPagina);
         }
 
         public IList<Contrato> ListaContratosVigentes(int paginaNro = 1, int tamPagina = 10)

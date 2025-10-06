@@ -13,7 +13,7 @@
 		<div class="card">
 			<div class="card-header d-flex justify-content-between align-items-center">
 				<h3 class="card-title mb-0">
-					<i class="fas fa-users me-2"></i>Inquilinos Sin Contrato
+					<i class="fas fa-users me-2"></i>Seleccionar Inquilino para Nuevo Contrato
 				</h3>
 			</div>
 			<div class="card-body">
@@ -54,7 +54,14 @@
 											<td>@(item.Persona.Telefono ?? "-")</td>
 											<td>@(item.Persona.Email ?? "-")</td>
 											<td class="text-center">
-												<span class="badge bg-secondary">SIN CONTRATO</span>
+												@if (item.Estado == "ACTIVO")
+												{
+													<span class="badge bg-success">ACTIVO</span>
+												}
+												else
+												{
+													<span class="badge bg-secondary">@item.Estado</span>
+												}
 											</td>
 											<td class="text-center">
 												<button type="button" class="btn btn-sm btn-outline-primary btn-abrir-inmuebles"
@@ -70,7 +77,7 @@
 								{
 									<tr>
 										<td colspan="8" class="text-center text-muted py-4">
-											<i class="fas fa-info-circle me-2"></i>No se registran inquilinos sin contrato
+											<i class="fas fa-info-circle me-2"></i>No se registran inquilinos activos
 										</td>
 									</tr>
 								}
@@ -121,7 +128,28 @@
 					<h5 class="modal-title">Seleccionar Inmueble</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 				</div>
-				<div class="modal-body" id="contenedorInmuebles">
+				<div class="modal-body">
+					<!-- Filtros de fecha -->
+					<div class="row mb-3">
+						<div class="col-md-6">
+							<label for="fechaInicio" class="form-label">Fecha de Inicio del Contrato</label>
+							<input type="date" id="fechaInicio" class="form-control" required>
+						</div>
+						<div class="col-md-6">
+							<label for="fechaFin" class="form-label">Fecha de Fin del Contrato</label>
+							<input type="date" id="fechaFin" class="form-control" required>
+						</div>
+					</div>
+					<div class="row mb-3">
+						<div class="col-12">
+							<button type="button" id="btnFiltrarInmuebles" class="btn btn-primary">
+								<i class="fas fa-search me-1"></i>Buscar Inmuebles Disponibles
+							</button>
+						</div>
+					</div>
+					<div id="contenedorInmuebles">
+						<p class="text-muted">Seleccione las fechas del contrato para ver los inmuebles disponibles.</p>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -249,22 +277,47 @@
 		</script>
 		<script>
 
-				// Función para cargar propietarios en el modal. 
-				function cargarInmueble(pagina) {
-					$.get('/Inmueble/ListarParaSeleccionInmuebles?pagina=' + pagina, function (data) {
+				// Función para cargar inmuebles en el modal. 
+				function cargarInmueble(pagina, fechaInicio = null, fechaFin = null) {
+					let url = '/Inmueble/ListarParaSeleccionInmuebles?pagina=' + pagina;
+					if (fechaInicio && fechaFin) {
+						url += '&fechaInicio=' + fechaInicio + '&fechaFin=' + fechaFin;
+					}
+					
+					$.get(url, function (data) {
 						$('#contenedorInmuebles').html(data);
 					});
 				}
 
-			// Cuando se abre el modal, cargamos la primera página
+			// Cuando se abre el modal, no cargamos inmuebles hasta que se seleccionen fechas
 			$('#modalInmuebles').on('shown.bs.modal', function () {
-				cargarInmueble(1);
+				$('#contenedorInmuebles').html('<p class="text-muted">Seleccione las fechas del contrato para ver los inmuebles disponibles.</p>');
+			});
+
+			// Evento para el botón de filtrar inmuebles
+			$('#btnFiltrarInmuebles').on('click', function () {
+				let fechaInicio = $('#fechaInicio').val();
+				let fechaFin = $('#fechaFin').val();
+				
+				if (!fechaInicio || !fechaFin) {
+					alert('Por favor seleccione ambas fechas del contrato.');
+					return;
+				}
+				
+				if (new Date(fechaFin) <= new Date(fechaInicio)) {
+					alert('La fecha de fin debe ser posterior a la fecha de inicio.');
+					return;
+				}
+				
+				cargarInmueble(1, fechaInicio, fechaFin);
 			});
 
 			// Delegamos el click en la paginación
 			$(document).on('click', '.cargar-pagina', function () {
 				let pagina = $(this).data('pagina');
-				cargarInmueble(pagina);
+				let fechaInicio = $('#fechaInicio').val();
+				let fechaFin = $('#fechaFin').val();
+				cargarInmueble(pagina, fechaInicio, fechaFin);
 			});
 
 			// Delegamos el click en "Seleccionar"
@@ -275,9 +328,16 @@
 				//El id de inquilino lo obtenemos del data set del boton que abre el modal
 				let inquilinoId = $('.btn-abrir-inmuebles').data('inquilino-id');
 
-				$('#InmuebleId').val(inmuebleId);
+				// Obtener las fechas del modal de inmuebles
+				let fechaInicio = $('#fechaInicio').val();
+				let fechaFin = $('#fechaFin').val();
 
+				$('#InmuebleId').val(inmuebleId);
 				$('#InquilinoId').val(inquilinoId);
+				
+				// Copiar las fechas al formulario del contrato
+				$('#FechaInicio').val(fechaInicio);
+				$('#FechaFin').val(fechaFin);
 
 				// Cerrar modal de inmuebles
 				$('#modalInmuebles').modal('hide');
