@@ -8,11 +8,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
     {
         private readonly UsuarioRepository usuarioRepository;
         private readonly PersonService personService;
+        private readonly UsuarioRolService usuarioRolService;
 
-        public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PersonService personService)
+        public UsuarioServiceImpl(UsuarioRepository usuarioRepository, PersonService personService, UsuarioRolService usuarioRolService)
         {
             this.usuarioRepository = usuarioRepository;
             this.personService = personService;
+            this.usuarioRolService = usuarioRolService;
         }
         
         public IList<Usuario> ObtenerTodos()
@@ -72,6 +74,17 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         public bool DeshabilitarUsuario(int id)
         {
             return usuarioRepository.DeshabilitarUsuario(id);
+        }
+
+        public IList<Rol> ObtenerRolesActivosPorUsuarioId(int usuarioId)
+        {
+            // Obtener el rol activo actual (siguiendo el mismo patrón que en AuthServiceImpl)
+            var rolActivo = usuarioRolService.ObtenerActivoPorUsuarioId(usuarioId);
+            if (rolActivo != null)
+            {
+                return new List<Rol> { rolActivo.Rol };
+            }
+            return new List<Rol>();
         }
     }
 }

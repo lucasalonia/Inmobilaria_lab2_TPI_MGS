@@ -12,5 +12,6 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         Usuario? ObtenerPorId(int id);
         bool ActualizarUsuario(Usuario usuario);
         bool DeshabilitarUsuario(int id);
+        IList<Rol> ObtenerRolesActivosPorUsuarioId(int usuarioId);
     }
 }

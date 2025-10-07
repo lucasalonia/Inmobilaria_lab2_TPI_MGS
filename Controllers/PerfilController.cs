@@ -152,9 +152,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     claims.Add(new Claim("FotoPerfil", usuario.FotoPerfil));
                 }
 
-                if (usuario.RolActual != null)
+                // Cargar todos los roles activos del usuario
+                var rolesActivos = usuarioService.ObtenerRolesActivosPorUsuarioId(usuario.Id);
+                foreach (var rol in rolesActivos)
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, usuario.RolActual.Codigo));
+                    claims.Add(new Claim(ClaimTypes.Role, rol.Codigo));
                 }
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
