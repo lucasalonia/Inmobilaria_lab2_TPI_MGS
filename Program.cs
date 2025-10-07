@@ -63,6 +63,9 @@ builder.Services.AddScoped<ContratoService, ContratoServiceImpl>();
 // Auth Service
 builder.Services.AddScoped<AuthService, AuthServiceImpl>();
 
+// Dashboard Service
+builder.Services.AddScoped<DashboardService, DashboardServiceImpl>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

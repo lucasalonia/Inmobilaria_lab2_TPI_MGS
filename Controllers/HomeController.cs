@@ -2,22 +2,27 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Inmobilaria_lab2_TPI_MGS.Models;
+using Inmobilaria_lab2_TPI_MGS.Services;
+using Inmobilaria_lab2_TPI_MGS.Models.ViewModels;
 
 namespace Inmobilaria_lab2_TPI_MGS.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly DashboardService _dashboardService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, DashboardService dashboardService)
     {
         _logger = logger;
+        _dashboardService = dashboardService;
     }
 
-    [AllowAnonymous]
+    [Authorize]
     public IActionResult Index()
     {
-        return View();
+        var dashboardData = _dashboardService.ObtenerDatosDashboard();
+        return View(dashboardData);
     }
 
     [Authorize]

@@ -1,8 +1,348 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Inmobilaria_lab2_TPI_MGS.Models.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid">
+    <!-- Header del Dashboard -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-6 text-primary">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard Inmobiliaria
+            </h1>
+            <p class="text-muted">Resumen ejecutivo de tu gestión inmobiliaria</p>
+        </div>
+    </div>
+
+    <!-- Métricas principales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Propietarios Activos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalPropietarios</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Inquilinos Activos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalInquilinos</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Inmuebles Disponibles
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalInmuebles</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-home fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Contratos Vigentes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalContratosVigentes</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-contract fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ingresos -->
+    <div class="row mb-4">
+        <div class="col-xl-6 col-lg-6">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Ingresos del Mes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$@Model.IngresosMensuales.ToString("N2")</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Ingresos del Año
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$@Model.IngresosAnuales.ToString("N2")</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Ingresos Mensuales</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="ingresosChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Inmuebles por Tipo</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="inmueblesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos directos -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Accesos Directos</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach (var acceso in Model.AccesosDirectos)
+                        {
+                            <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+                                <a asp-controller="@acceso.Controlador" asp-action="@acceso.Accion" class="btn btn-outline-@acceso.Color btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
+                                    <i class="@acceso.Icono fa-2x mb-2"></i>
+                                    <span class="fw-bold">@acceso.Titulo</span>
+                                    <small class="text-muted">@acceso.Descripcion</small>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas importantes -->
+    <div class="row">
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-warning">Contratos Próximos a Vencer</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.ContratosProximosVencer.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Inmueble</th>
+                                        <th>Inquilino</th>
+                                        <th>Días</th>
+                                        <th>Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var contrato in Model.ContratosProximosVencer)
+                                    {
+                                        <tr class="@(contrato.DiasRestantes <= 7 ? "table-warning" : "")">
+                                            <td>@contrato.Inmueble</td>
+                                            <td>@contrato.Inquilino</td>
+                                            <td>
+                                                <span class="badge @(contrato.DiasRestantes <= 7 ? "bg-danger" : "bg-warning")">
+                                                    @contrato.DiasRestantes días
+                                                </span>
+                                            </td>
+                                            <td>$@contrato.MontoMensual.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No hay contratos próximos a vencer.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-danger">Pagos Pendientes</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.PagosPendientes.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Inquilino</th>
+                                        <th>Inmueble</th>
+                                        <th>Mes/Año</th>
+                                        <th>Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var pago in Model.PagosPendientes.Take(5))
+                                    {
+                                        <tr class="@(pago.DiasVencido > 30 ? "table-danger" : "table-warning")">
+                                            <td>@pago.Inquilino</td>
+                                            <td>@pago.Inmueble</td>
+                                            <td>@pago.Mes/@pago.Año</td>
+                                            <td>$@pago.Monto.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            @if (Model.PagosPendientes.Count > 5)
+                            {
+                                <small class="text-muted">Y @(Model.PagosPendientes.Count - 5) más...</small>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-success">¡Excelente! No hay pagos pendientes.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Gráfico de ingresos mensuales
+        const ingresosData = @Html.Raw(Json.Serialize(Model.IngresosPorMes));
+        const ingresosLabels = ingresosData.map(item => item.mes);
+        const ingresosValues = ingresosData.map(item => item.monto);
+
+        const ingresosCtx = document.getElementById('ingresosChart').getContext('2d');
+        new Chart(ingresosCtx, {
+            type: 'line',
+            data: {
+                labels: ingresosLabels,
+                datasets: [{
+                    label: 'Ingresos ($)',
+                    data: ingresosValues,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de inmuebles por tipo
+        const inmueblesData = @Html.Raw(Json.Serialize(Model.InmueblesPorTipo));
+        const inmueblesLabels = inmueblesData.map(item => item.tipo);
+        const inmueblesValues = inmueblesData.map(item => item.cantidad);
+
+        const inmueblesCtx = document.getElementById('inmueblesChart').getContext('2d');
+        new Chart(inmueblesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: inmueblesLabels,
+                datasets: [{
+                    data: inmueblesValues,
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+}
