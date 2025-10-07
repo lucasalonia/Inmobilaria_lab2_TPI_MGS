@@ -6,6 +6,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
     {
         IList<Inmueble> ObtenerTodos(int paginaNro = 1, int tamPagina = 10);
         public IList<Inmueble> ObtenerTodosParaContratos(int paginaNro = 1, int tamPagina = 5);
+        IList<Inmueble> ObtenerDisponiblesEnRangoFechas(DateTime fechaInicio, DateTime fechaFin, int paginaNro = 1, int tamPagina = 5);
 
         int Modificar(Inmueble inmueble, int? modificadoPor = null);
 

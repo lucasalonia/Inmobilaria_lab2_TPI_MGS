@@ -60,6 +60,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         {
             return inmuebleRepository.ObtenerTodosParaContratos(paginaNro, tamPagina);
         }
+
+        public IList<Inmueble> ObtenerDisponiblesEnRangoFechas(DateTime fechaInicio, DateTime fechaFin, int paginaNro = 1, int tamPagina = 5)
+        {
+            return contratoRepository.ListarInmueblesDisponiblesEnRangoFechas(fechaInicio, fechaFin, paginaNro, tamPagina);
+        }
         public int ObtenerCantidadInmuebles()
         {
             return inmuebleRepository.ObtenerCantidadInmuebles();

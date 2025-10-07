@@ -34,10 +34,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
             try
             {
                 int tamPagina = 10;
-                var totalRegistros = inquilinoService.ContarInquilinosActivosSinContrato();
+                var totalRegistros = inquilinoService.ContarInquilinosActivos();
                 var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
 
-                var listaInquilinos = inquilinoService.ListarInquilinosSinContrato(pagina, tamPagina);
+                var listaInquilinos = inquilinoService.ObtenerTodos(pagina, tamPagina);
 
 
                 ViewBag.ListaInquilinos = listaInquilinos;
@@ -56,7 +56,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         public ActionResult Lista(int pagina = 1)
         {
             int tamPagina = 10;
-            var totalRegistros = contratoService.ListaContratosVigentes().Count;
+            var totalRegistros = contratoService.ObtenerTodos().Count;
             var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
             var listaContratos = contratoService.ListaContratosVigentes(pagina, tamPagina);
 

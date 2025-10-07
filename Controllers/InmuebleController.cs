@@ -208,21 +208,34 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         }
 
 
-        public IActionResult ListarParaSeleccionInmuebles(int pagina = 1)
+        public IActionResult ListarParaSeleccionInmuebles(int pagina = 1, DateTime? fechaInicio = null, DateTime? fechaFin = null)
         {
             try
             {
                 int tamPagina = 5;
-                var totalRegistros = InmuebleService.ObtenerCantidadInmueblesActivos();
-                var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
+                
+                // Si no se proporcionan fechas, usar el método original
+                if (fechaInicio == null || fechaFin == null)
+                {
+                    var totalRegistros = InmuebleService.ObtenerCantidadInmueblesActivos();
+                    var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamPagina);
+                    var lista = InmuebleService.ObtenerTodosParaContratos(pagina, tamPagina);
 
+                    ViewBag.Pagina = pagina;
+                    ViewBag.TotalPaginas = totalPaginas;
 
-                var lista = InmuebleService.ObtenerTodosParaContratos(pagina, tamPagina);
+                    return PartialView("_ListaInmueblesSeleccion", lista);
+                }
+                else
+                {
+                    // Usar el nuevo método que filtra por fechas
+                    var lista = InmuebleService.ObtenerDisponiblesEnRangoFechas(fechaInicio.Value, fechaFin.Value, pagina, tamPagina);
+                    
+                    ViewBag.Pagina = pagina;
+                    ViewBag.TotalPaginas = 1; // Por simplicidad, no calculamos el total para el filtro por fechas
 
-                ViewBag.Pagina = pagina;
-                ViewBag.TotalPaginas = totalPaginas;
-
-                return PartialView("_ListaInmueblesSeleccion", lista);
+                    return PartialView("_ListaInmueblesSeleccion", lista);
+                }
             }
             catch (Exception ex)
             {
