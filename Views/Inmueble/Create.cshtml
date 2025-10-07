@@ -20,8 +20,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="Tipo">Tipo *</label>
-                                    <input type="text" asp-for="Tipo" class="form-control" as id="Tipo" name="Tipo" value="@Model?.Tipo" />
+                                    <label for="TipoInmuebleId" class="form-label">Tipo de Inmueble *</label>
+                                    <select asp-for="TipoInmuebleId" class="form-control" asp-items="ViewBag.TiposInmueble">
+                                        <option value="">Seleccione un tipo</option>
+                                    </select>
+                                    <span asp-validation-for="TipoInmuebleId" class="text-danger"></span>  
                                 </div>
                             </div>
                             <div class="col-md-6">

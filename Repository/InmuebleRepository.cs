@@ -16,9 +16,14 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             using (var connection = new MySqlConnection(connectionString))
             {
                 int offset = (paginaNro - 1) * tamPagina;
-                string sql = @"SELECT id, tipo, estado, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
-                               FROM inmueble
-                               LIMIT @tamPagina OFFSET @offset";
+                string sql = @"
+                        SELECT 
+                        i.id, i.tipo_inmueble_id, t.nombre AS tipo_inmueble_nombre,
+                        i.estado, i.superficie_m2, i.ambientes, i.banos, i.cochera,
+                        i.direccion, i.descripcion, i.fecha_creacion, i.fecha_modificacion
+                    FROM inmueble i
+                    LEFT JOIN tipo_inmueble t ON i.tipo_inmueble_id = t.id
+                    LIMIT @tamPagina OFFSET @offset;";
                 using (MySqlCommand command = new MySqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@tamPagina", tamPagina);
@@ -33,7 +38,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                         {
                             Id = reader.GetInt32("id"),
                             Estado = reader.GetString("estado"),
-                            Tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? null : reader.GetString("tipo"),
+                            TipoInmuebleId = reader["tipo_inmueble_id"] == DBNull.Value ? null : (int?)reader.GetInt32("tipo_inmueble_id"),
+                            TipoInmuebleNombre = reader["tipo_inmueble_nombre"] == DBNull.Value ? null : reader.GetString("tipo_inmueble_nombre"),
                             SuperficieM2 = reader.IsDBNull(reader.GetOrdinal("superficie_m2")) ? (int?)null : reader.GetInt32("superficie_m2"),
                             Ambientes = reader.IsDBNull(reader.GetOrdinal("ambientes")) ? null : reader.GetInt32("ambientes"),
                             Banos = reader.IsDBNull(reader.GetOrdinal("banos")) ? null : reader.GetInt32("banos"),
@@ -58,10 +64,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"
-                    SELECT id, propietario_id, tipo, estado, superficie_m2, ambientes, banos,
-                        cochera, direccion, descripcion, fecha_creacion, fecha_modificacion
-                    FROM inmueble
-                    WHERE estado = 'ACTIVO';";
+                    SELECT 
+                        i.id, i.propietario_id, i.tipo_inmueble_id, t.nombre AS tipo_inmueble_nombre,
+                        i.estado, i.superficie_m2, i.ambientes, i.banos, i.cochera,
+                        i.direccion, i.descripcion, i.fecha_creacion, i.fecha_modificacion
+                    FROM inmueble i
+                    LEFT JOIN tipo_inmueble t ON i.tipo_inmueble_id = t.id
+                    WHERE i.estado = 'ACTIVO';";
 
                 using (var command = new MySqlCommand(sql, connection))
                 {
@@ -75,7 +84,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                 Id = reader.GetInt32("id"),
                                 PropietarioId = reader.GetInt32("propietario_id"),
                                 Estado = reader.GetString("estado"),
-                                Tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? null : reader.GetString("tipo"),
+                                TipoInmuebleId = reader["tipo_inmueble_id"] == DBNull.Value ? null : (int?)reader.GetInt32("tipo_inmueble_id"),
+                                TipoInmuebleNombre = reader["tipo_inmueble_nombre"] == DBNull.Value ? null : reader.GetString("tipo_inmueble_nombre"),
                                 SuperficieM2 = reader.IsDBNull(reader.GetOrdinal("superficie_m2")) ? (int?)null : reader.GetInt32("superficie_m2"),
                                 Ambientes = reader.IsDBNull(reader.GetOrdinal("ambientes")) ? null : reader.GetInt32("ambientes"),
                                 Direccion = reader.IsDBNull(reader.GetOrdinal("direccion")) ? null : reader.GetString("direccion"),
@@ -100,15 +110,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
 
             int InmuebleId = 0;
             string sql = @"INSERT INTO inmueble 
-            (propietario_id, estado, tipo, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion, creado_por, modificado_por)
-            VALUES (@propietario_id, @estado, @tipo, @superficie_m2, @ambientes, @banos, @cochera, @direccion, @descripcion, NOW(), NOW(), 1, 1);
-            SELECT LAST_INSERT_ID();";
+                (propietario_id, estado, tipo_inmueble_id, superficie_m2, ambientes, banos, cochera, direccion, descripcion, fecha_creacion, fecha_modificacion, creado_por, modificado_por)
+                VALUES (@propietario_id, @estado, @tipo_inmueble_id, @superficie_m2, @ambientes, @banos, @cochera, @direccion, @descripcion, NOW(), NOW(), @creado_por, @modificado_por);
+                SELECT LAST_INSERT_ID();";
 
             using (var cmdInm = new MySqlCommand(sql, connection))
             {
                 cmdInm.Parameters.AddWithValue("@propietario_id", inmueble.PropietarioId);
                 cmdInm.Parameters.AddWithValue("@estado", inmueble.Estado ?? "ACTIVO");
-                cmdInm.Parameters.AddWithValue("@tipo", (object?)inmueble.Tipo ?? DBNull.Value);
+                cmdInm.Parameters.AddWithValue("@tipo_inmueble_id", (object?)inmueble.TipoInmuebleId ?? DBNull.Value);
                 cmdInm.Parameters.AddWithValue("@superficie_m2", (object?)inmueble.SuperficieM2 ?? DBNull.Value);
                 cmdInm.Parameters.AddWithValue("@ambientes", (object?)inmueble.Ambientes ?? DBNull.Value);
                 cmdInm.Parameters.AddWithValue("@banos", (object?)inmueble.Banos ?? DBNull.Value);
@@ -132,18 +142,19 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             {
                 string sql = @"
                 SELECT 
-                    i.id, i.propietario_id, i.tipo, i.estado, i.superficie_m2, 
-                    i.ambientes, i.banos, i.cochera, i.direccion, i.descripcion, 
-                    i.fecha_creacion, i.fecha_modificacion, i.portada,
-                    per.nombre AS propietario_nombre, per.apellido AS propietario_apellido,
-                    uc.username AS creado_por_username,
-                    um.username AS modificado_por_username
-                FROM inmueble i
-                LEFT JOIN propietario p ON i.propietario_id = p.id
-                LEFT JOIN persona per ON p.persona_id = per.id
-                LEFT JOIN usuario uc ON i.creado_por = uc.id
-                LEFT JOIN usuario um ON i.modificado_por = um.id
-                WHERE i.id = @id;";
+                        i.id, i.propietario_id, i.tipo_inmueble_id, t.nombre AS tipo_inmueble_nombre,
+                        i.estado, i.superficie_m2, i.ambientes, i.banos, i.cochera,
+                        i.direccion, i.descripcion, i.fecha_creacion, i.fecha_modificacion, i.portada,
+                        per.nombre AS propietario_nombre, per.apellido AS propietario_apellido,
+                        uc.username AS creado_por_username,
+                        um.username AS modificado_por_username
+                    FROM inmueble i
+                    LEFT JOIN tipo_inmueble t ON i.tipo_inmueble_id = t.id
+                    LEFT JOIN propietario p ON i.propietario_id = p.id
+                    LEFT JOIN persona per ON p.persona_id = per.id
+                    LEFT JOIN usuario uc ON i.creado_por = uc.id
+                    LEFT JOIN usuario um ON i.modificado_por = um.id
+                    WHERE i.id = @id;";
 
                 using (var command = new MySqlCommand(sql, connection))
                 {
@@ -158,7 +169,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                 Id = reader.GetInt32("id"),
                                 PropietarioId = reader.IsDBNull(reader.GetOrdinal("propietario_id")) ? 0 : reader.GetInt32("propietario_id"),
                                 Estado = reader.GetString("estado"),
-                                Tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? null : reader.GetString("tipo"),
+                                TipoInmuebleId = reader["tipo_inmueble_id"] == DBNull.Value ? null : (int?)reader.GetInt32("tipo_inmueble_id"),
+                                TipoInmuebleNombre = reader["tipo_inmueble_nombre"] == DBNull.Value ? null : reader.GetString("tipo_inmueble_nombre"),
                                 SuperficieM2 = reader.IsDBNull(reader.GetOrdinal("superficie_m2")) ? (int?)null : reader.GetInt32("superficie_m2"),
                                 Ambientes = reader.IsDBNull(reader.GetOrdinal("ambientes")) ? null : reader.GetInt32("ambientes"),
                                 Banos = reader.IsDBNull(reader.GetOrdinal("banos")) ? null : reader.GetInt32("banos"),
@@ -196,10 +208,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             {
                 string sql = @"
                     SELECT 
-                        i.id, i.propietario_id, i.tipo, i.estado, i.superficie_m2, 
-                        i.ambientes, i.banos, i.cochera, i.direccion, i.descripcion, 
+                        i.id, i.propietario_id, i.tipo_inmueble_id, t.nombre AS tipo_inmueble_nombre,
+                        i.estado, i.superficie_m2, i.ambientes, i.banos, i.cochera, i.direccion, i.descripcion, 
                         i.fecha_creacion, i.fecha_modificacion
                     FROM inmueble i
+                    LEFT JOIN tipo_inmueble t ON i.tipo_inmueble_id = t.id
                     WHERE i.propietario_id = @idPropietario;";
 
                 using (var command = new MySqlCommand(sql, connection))
@@ -216,7 +229,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                 Id = reader.GetInt32("id"),
                                 PropietarioId = reader.GetInt32("propietario_id"),
                                 Estado = reader.GetString("estado"),
-                                Tipo = reader.IsDBNull("tipo") ? null : reader.GetString("tipo"),
+                                TipoInmuebleId = reader["tipo_inmueble_id"] == DBNull.Value ? null : (int?)reader.GetInt32("tipo_inmueble_id"),
+                                TipoInmuebleNombre = reader["tipo_inmueble_nombre"] == DBNull.Value ? null : reader.GetString("tipo_inmueble_nombre"),
                                 SuperficieM2 = reader.IsDBNull("superficie_m2") ? (int?)null : reader.GetInt32("superficie_m2"),
                                 Ambientes = reader.IsDBNull("ambientes") ? null : reader.GetInt32("ambientes"),
                                 Direccion = reader.IsDBNull("direccion") ? null : reader.GetString("direccion"),
@@ -246,7 +260,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 string sqlPersona = @"
                     UPDATE inmueble SET 
                         propietario_id=@propietario_id, estado=@estado,
-                        tipo=@tipo, superficie_m2=@superficie_m2, ambientes=@ambientes,
+                        tipo_inmueble_id = @tipo_inmueble_id, superficie_m2=@superficie_m2, ambientes=@ambientes,
                         banos=@banos, cochera=@cochera, direccion=@direccion, descripcion=@descripcion,
                         modificado_por=@modificadoPor, fecha_modificacion=NOW()
                     WHERE id=@id;";
@@ -255,7 +269,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     command.Parameters.AddWithValue("@id", inmueble.Id);
                     command.Parameters.AddWithValue("@propietario_id", inmueble.PropietarioId);
                     command.Parameters.AddWithValue("@estado", inmueble.Estado ?? "ACTIVO");
-                    command.Parameters.AddWithValue("@tipo", (object?)inmueble.Tipo ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@tipo_inmueble_id", (object?)inmueble.TipoInmuebleId ?? DBNull.Value);
                     command.Parameters.AddWithValue("@superficie_m2", (object?)inmueble.SuperficieM2 ?? DBNull.Value);
                     command.Parameters.AddWithValue("@ambientes", (object?)inmueble.Ambientes ?? DBNull.Value);
                     command.Parameters.AddWithValue("@banos", (object?)inmueble.Banos ?? DBNull.Value);
@@ -338,9 +352,10 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
             using (var connection = new MySqlConnection(connectionString))
             {
                 string sql = @"
-            SELECT i.id, i.tipo, i.estado, i.superficie_m2, i.ambientes, i.banos, i.cochera,
+            SELECT i.id, i.tipo_inmueble_id, i.estado, i.superficie_m2, i.ambientes, i.banos, i.cochera,
                    i.direccion, i.descripcion, i.fecha_creacion, i.fecha_modificacion
             FROM inmueble i
+            LEFT JOIN tipo_inmueble t ON i.tipo_inmueble_id = t.id
             LEFT JOIN contrato c
                 ON i.id = c.inmueble_id
                 AND c.estado = 'VIGENTE'
@@ -364,7 +379,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                             {
                                 Id = reader.GetInt32("id"),
                                 Estado = reader.GetString("estado"),
-                                Tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? null : reader.GetString("tipo"),
+                                TipoInmuebleId = reader["tipo_inmueble_id"] == DBNull.Value ? null : (int?)Convert.ToInt32(reader["tipo_inmueble_id"]),
+                                TipoInmuebleNombre = reader["tipo_inmueble_nombre"] == DBNull.Value ? null : reader.GetString("tipo_inmueble_nombre"),
                                 SuperficieM2 = reader.IsDBNull(reader.GetOrdinal("superficie_m2")) ? (int?)null : reader.GetInt32("superficie_m2"),
                                 Ambientes = reader.IsDBNull(reader.GetOrdinal("ambientes")) ? null : reader.GetInt32("ambientes"),
                                 Banos = reader.IsDBNull(reader.GetOrdinal("banos")) ? null : reader.GetInt32("banos"),

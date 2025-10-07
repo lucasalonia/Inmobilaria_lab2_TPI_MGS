@@ -561,8 +561,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     connection.Open();
 
                     string query = @$"
-                SELECT i.id, i.direccion, i.tipo, i.estado, i.superficie_m2, i.ambientes, i.banos, i.cochera
+                SELECT i.id, i.direccion, i.tipo_inmueble_id, i.estado, i.superficie_m2, i.ambientes, i.banos, i.cochera
                 FROM inmueble i
+                LEFT JOIN tipo_inmueble t ON i.tipo_inmueble_id = t.id
                 WHERE NOT EXISTS (
                     SELECT 1
                     FROM contrato c
@@ -580,7 +581,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                             {
                                 Id = reader.GetInt32("id"),
                                 Direccion = reader.GetString("direccion"),
-                                Tipo = reader.GetString("tipo"),
+                                TipoInmuebleId = reader["tipo_inmueble_id"] == DBNull.Value ? null : (int?)Convert.ToInt32(reader["tipo_inmueble_id"]),
+                                TipoInmuebleNombre = reader["tipo_inmueble_nombre"] == DBNull.Value ? null : reader.GetString("tipo_inmueble_nombre"),
                                 Estado = reader.GetString("estado"),
                                 SuperficieM2 = reader.GetInt32("superficie_m2"),
                                 Ambientes = reader.GetInt32("ambientes"),

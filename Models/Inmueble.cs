@@ -6,7 +6,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
         public int Id { get; set; }
         public int PropietarioId { get; set; }
         public string Estado { get; set; }
-        public string? Tipo { get; set; }
+        public int? TipoInmuebleId { get; set; }
         public int? SuperficieM2 { get; set; }
         public int? Ambientes { get; set; }
         public int? Banos { get; set; }
@@ -21,7 +21,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Models
         public string? PropietarioNombre { get; set; }
         public string? CreadoPorNombre { get; set; }
         public string? ModificadoPorNombre { get; set; }
-
+        public string? TipoInmuebleNombre { get; set; }
         public string? Portada { get; set; }
         [NotMapped]
         public IFormFile? PortadaFile { get; set; }

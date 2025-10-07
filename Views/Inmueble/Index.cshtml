@@ -78,7 +78,7 @@
                                @foreach (var item in Model)
                                 {
                                     <tr>
-                                        <td>@(item.Tipo?? "-")</td>
+                                        <td>@(item.TipoInmuebleNombre ?? "-")</td>
                                         <td>@(item.SuperficieM2?.ToString() ?? "-")</td>
                                         <td>@(item.Ambientes?.ToString() ?? "-")</td>
                                         <td>@item.Direccion</td>
@@ -127,7 +127,7 @@
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#eliminarModal"
                                                             data-id="@item.Id"
-                                                            data-tipo="@item.Tipo"
+                                                            data-tipo="@(item.TipoInmuebleNombre ?? "-")"
                                                             data-ambientes="@item.Ambientes"
                                                             data-direccion="@item.Direccion"
                                                             title="Deshabilitar">

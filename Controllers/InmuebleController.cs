@@ -2,6 +2,7 @@ using Inmobilaria_lab2_TPI_MGS.Models;
 using Inmobilaria_lab2_TPI_MGS.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Inmobilaria_lab2_TPI_MGS.Controllers
 {
@@ -12,11 +13,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         private readonly InmuebleService InmuebleService;
         private readonly PropietarioService propietarioService;
         private readonly ImagenService imagenService;
-        public InmuebleController(InmuebleService InmuebleService, PropietarioService propietarioService, ImagenService imagenService)
+        private readonly TipoInmuebleService tipoInmuebleService;
+        public InmuebleController(InmuebleService inmuebleService, PropietarioService propietarioService, ImagenService imagenService, TipoInmuebleService tipoInmuebleService)
         {
-            this.InmuebleService = InmuebleService;
+            this.InmuebleService = inmuebleService;
             this.propietarioService = propietarioService;
             this.imagenService = imagenService;
+            this.tipoInmuebleService = tipoInmuebleService;
         }
 
         public IActionResult Index(int pagina = 1)
@@ -59,6 +62,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.TiposInmueble = new SelectList(
+                tipoInmuebleService.ObtenerTodos(),
+                "Id",
+                "Nombre"
+            );
             return View();
         }
 
@@ -119,8 +127,14 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     propietarioNombre = propietario.Persona.Nombre + " " + propietario.Persona.Apellido + " (DNI: " + propietario.Persona.Dni + ")";
                 }
             }
-
             ViewBag.PropietarioNombre = propietarioNombre;
+
+            ViewBag.TiposInmueble = new SelectList(
+                tipoInmuebleService.ObtenerTodos(),
+                "Id",
+                "Nombre",
+                inmueble.TipoInmuebleId 
+            );
             return View(inmueble);
         }
 
@@ -148,7 +162,12 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Manejo de errores si algo falla en el update
+                     ViewBag.TiposInmueble = new SelectList(
+                        tipoInmuebleService.ObtenerTodos(),
+                        "Id",
+                        "Nombre",
+                        i.TipoInmuebleId 
+                    );
                     ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
                 }
             }
