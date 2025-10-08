@@ -37,6 +37,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
             return pagoRepository.ListarPorContrato(contratoId);
         }
 
-
+        public bool ActualizarEstado(ulong id, string nuevoEstado)
+        {
+            return pagoRepository.ActualizarEstado(id, nuevoEstado);
+        }
     }
 }

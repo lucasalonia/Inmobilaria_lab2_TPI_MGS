@@ -13,9 +13,11 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         public IList<Contrato> ListaContratosVigentes(int paginaNro = 1, int tamPagina = 10);
 
         public Contrato ObtenerPorId(int contratoId);
-         public Contrato? ObtenerContratoVigentePorInmuebleId(int inmuebleId);
+        public Contrato? ObtenerContratoVigentePorInmuebleId(int inmuebleId);
         IList<Contrato> ObtenerPorInmuebleId(int inmuebleId);
         IList<Contrato> ObtenerTodos(int? inquilinoId = null);
+        Task<bool> BajaAsync(int contratoId, int? idUsuario);
+        Task<bool> AltaAsync(Contrato contrato, int? idUsuario);
         
     }
 }

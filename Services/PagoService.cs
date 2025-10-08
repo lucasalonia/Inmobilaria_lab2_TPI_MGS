@@ -9,6 +9,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         bool Baja(int id, int? idUsuario);
         Pago ObtenerPorId(ulong id);
         IList<Pago> ListarPorContrato(int contratoId);
+        bool ActualizarEstado(ulong id, string nuevoEstado);
 
     }
 }

@@ -295,5 +295,44 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
 
             return pagos;
         }
+
+        public bool ActualizarEstado(ulong pagoId, string nuevoEstado)
+        {
+            bool exito = false;
+
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    string query = @"
+                        UPDATE pago
+                        SET estado = @NuevoEstado,
+                            fecha_modificacion = NOW()
+                        WHERE id = @Id;";
+
+                    using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", pagoId);
+                        command.Parameters.AddWithValue("@NuevoEstado", nuevoEstado);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+                        exito = rowsAffected > 0;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error al actualizar estado del pago: {e.Message}");
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+
+            return exito;
+        }
     }
 }

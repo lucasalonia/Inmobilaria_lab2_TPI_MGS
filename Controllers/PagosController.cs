@@ -73,6 +73,14 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 }
 
                 var listaPagos = pagoService.ListarPorContrato(id);
+                foreach (var pago in listaPagos)
+                {
+                    if (pago.Estado == "PENDIENTE" && pago.FechaVencimiento < DateTime.Today && pago.ImportePagado == null)
+                    {
+                        pago.Estado = "VENCIDO";
+                        pagoService.ActualizarEstado(pago.Id, "VENCIDO");
+                    }
+                }
                 ViewBag.IdContrato = id;
                 ViewBag.Moneda = contrato.Moneda;
 

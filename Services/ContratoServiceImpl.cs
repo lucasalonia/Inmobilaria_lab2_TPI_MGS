@@ -46,7 +46,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
             return contratoRepository.ObtenerPorId(contratoId);
         }
         public Contrato? ObtenerContratoVigentePorInmuebleId(int inmuebleId)
-        { 
+        {
             return contratoRepository.ObtenerContratoVigentePorInmuebleId(inmuebleId);
         }
         public IList<Contrato> ObtenerPorInmuebleId(int inmuebleId)
@@ -57,6 +57,14 @@ namespace Inmobilaria_lab2_TPI_MGS.Services
         public IList<Contrato> ObtenerTodos(int? inquilinoId = null)
         {
             return contratoRepository.ObtenerTodos(inquilinoId);
+        }
+        public async Task<bool> BajaAsync(int contratoId, int? idUsuario)
+        {
+            return await contratoRepository.BajaAsync(contratoId, idUsuario);
+        }
+        public async Task<bool> AltaAsync(Contrato contrato, int? idUsuario)
+        {
+            return await contratoRepository.AltaAsync(contrato, idUsuario);
         }
     }
 }

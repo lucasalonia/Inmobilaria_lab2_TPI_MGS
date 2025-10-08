@@ -1,0 +1,210 @@
+@model Inmobilaria_lab2_TPI_MGS.Models.Contrato
+
+@{
+    ViewData["Title"] = "Renovar Contrato";
+    var Persona = ViewBag.Persona;
+    var Inmueble = ViewBag.Inmueble;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-contract me-2"></i>Renovar Contrato
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="RenovarContrato" method="post" id="formContrato">
+                        <div class="row g-3">
+
+
+                            <div class="col-md-6">
+                                <label for="InmuebleId" class="form-label">Inmueble</label>
+                                <div class="input-group">
+                                    <input asp-for="InmuebleId" type="hidden" />
+
+                                    <input id="InmuebleDireccion" class="form-control" readonly
+                                        value="@ViewBag.Inmueble.Direccion" 
+                                        placeholder="Seleccione un inquilino" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="InquilinoId" class="form-label">Inquilino</label>
+                                <div class="input-group">  
+
+                                    @* Se envia este input *@
+                                    <input asp-for="InquilinoId" type="hidden" value="@Model?.InquilinoId" />   
+
+                                    <input id="InquilinoNombre" class="form-control" readonly
+                                        value="@ViewBag.Persona.Nombre @ViewBag.Persona.Apellido"
+                                        placeholder="Seleccione un inquilino" />
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label for="FechaInicio" class="form-label">Fecha Inicio</label>
+                                <input type="date" id="FechaInicio" name="FechaInicio" class="form-control" required>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label for="FechaFin" class="form-label">Fecha Fin</label>
+                                <input type="date" id="FechaFin" name="FechaFin" class="form-control" required>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label for="FechaVencimiento" class="form-label">Vencimiento de pagos</label>
+                                <select id="FechaVencimiento" name="FechaVencimiento" class="form-select" required>
+                                    <option value="">-- Selección --</option>
+                                    <option value="5">Día 5 de cada mes</option>
+                                    <option value="10">Día 10 de cada mes</option>
+                                    <option value="15">Día 15 de cada mes</option>
+                                    <option value="20">Día 20 de cada mes</option>
+                                </select>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label for="Moneda" class="form-label">Moneda</label>
+                                <select id="Moneda" name="Moneda" class="form-select" asp-items="ViewBag.Monedas"
+                                    required>
+                                    <option value="">-- Selección --</option>
+                                </select>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label asp-for="MontoMensual" class="form-label">Monto Mensual *</label>
+                                <input asp-for="MontoMensual" class="form-control" type="number" required />
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label asp-for="Deposito" class="form-label">Depósito *</label>
+                                <input asp-for="Deposito" class="form-control" type="number" required />
+                            </div>
+
+
+                            <div class="col-12">
+                                <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                                <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Cancelar
+                    </a>
+                    <button type="button" class="btn btn-primary" form="formContrato" id="guardarContrato">
+                        <i class="fas fa-save me-1"></i>Guardar Contrato
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Confirmación -->
+<div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Envío de Contrato</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="confirmBody">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmarContrato">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        @if (!ViewData.ModelState.IsValid)
+            {
+                  foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <text>
+                        toastr.options = {
+                            "positionClass": "toast-top-center",
+                        "timeOut": "5000"
+                                                                                                  };
+                        toastr.error("@error.ErrorMessage");
+                    </text>
+            }
+            }
+
+
+
+
+            document.getElementById("guardarContrato").addEventListener("click", () => {
+                const form = document.getElementById("formContrato");
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                const fechaInicio = new Date(document.getElementById("FechaInicio").value);
+                const fechaFin = new Date(document.getElementById("FechaFin").value);
+                const fechaMinima = new Date(fechaInicio);
+                fechaMinima.setMonth(fechaMinima.getMonth() + 6);
+
+                if (fechaMinima.getDate() !== fechaInicio.getDate()) {
+                    fechaMinima.setDate(0);
+                }
+
+                if (fechaFin < fechaMinima) {
+                    toastr.options = { "positionClass": "toast-top-center" };
+                    toastr.error("La Fecha Fin debe ser al menos 6 meses después de la Fecha Inicio.");
+                    return;
+                }
+
+                const confirmModal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
+                const body = document.getElementById("confirmBody");
+                body.innerHTML = `
+                                <p><strong>Inmueble ID:</strong> ${document.getElementById("InmuebleId").value}</p>
+                                <p><strong>Inquilino ID:</strong> ${document.getElementById("InquilinoId").value}</p>
+                                <p><strong>Fecha Inicio:</strong> ${document.getElementById("FechaInicio").value}</p>
+                                <p><strong>Fecha Fin:</strong> ${document.getElementById("FechaFin").value}</p>
+                                <p><strong>Moneda:</strong> ${document.getElementById("Moneda").value}</p>
+                                <p><strong>Monto Mensual:</strong> ${document.getElementById("MontoMensual").value}</p>
+                                <p><strong>Depósito:</strong> ${document.getElementById("Deposito").value}</p>
+                                <p><strong>Observaciones:</strong> ${document.getElementById("Observaciones").value}</p>
+                            `;
+
+                // LÍNEA ELIMINADA: bootstrap.Modal.getInstance(document.getElementById('modalContrato')).hide();
+                confirmModal.show();
+                document.getElementById("confirmarContrato").addEventListener("click", () => {
+                    const form = document.getElementById("formContrato");
+
+                    // Ocultamos el modal de forma segura
+                    const confirmModalEl = document.getElementById('modalConfirmacion');
+                    const confirmModal = bootstrap.Modal.getInstance(confirmModalEl) || new bootstrap.Modal(confirmModalEl);
+                    confirmModal.hide();
+
+                    // Esperamos un instante para asegurarnos de que el modal se cierre
+                    setTimeout(() => {
+                        form.submit();
+                    }, 200);
+                });
+
+
+
+            });
+
+    </script>
+}

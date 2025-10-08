@@ -645,12 +645,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                 inmuebles.Add(new Inmueble
                                 {
                                     Id = reader.GetInt32("id"),
-                                    Direccion = reader.GetString("direccion"),
+                                    Direccion = reader.IsDBNull(reader.GetOrdinal("direccion")) ? "" : reader.GetString("direccion"),
+                                    Banos = reader.IsDBNull(reader.GetOrdinal("banos")) ? 0 : reader.GetInt32("banos"),
+                                    Cochera = reader.IsDBNull(reader.GetOrdinal("cochera")) ? 0 : reader.GetInt32("cochera"),
                                     Estado = reader.GetString("estado"),
                                     SuperficieM2 = reader.GetInt32("superficie_m2"),
                                     Ambientes = reader.GetInt32("ambientes"),
-                                    Banos = reader.GetInt32("banos"),
-                                    Cochera = reader.GetInt32("cochera")
+
                                 });
                             }
                         }
@@ -705,6 +706,88 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 }
             }
             return contrato;
+        }
+        public async Task<bool> AltaAsync(Contrato contrato, int? idUsuario)
+        {
+            bool exito = false;
+            await using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    await connection.OpenAsync();
+
+                    string query = @"
+                INSERT INTO contrato 
+                    (inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, 
+                     observaciones, fecha_creacion, fecha_modificacion, creado_por)
+                VALUES 
+                    (@InmuebleId, @InquilinoId, @FechaInicio, @FechaFin, @Estado, @MontoMensual, @Moneda, @Deposito, 
+                     @Observaciones, NOW(), NOW(), @CreadoPor)";
+
+                    await using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@InmuebleId", contrato.InmuebleId);
+                        command.Parameters.AddWithValue("@InquilinoId", contrato.InquilinoId);
+                        command.Parameters.AddWithValue("@FechaInicio", contrato.FechaInicio);
+                        command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
+                        command.Parameters.AddWithValue("@Estado", contrato.Estado);
+                        command.Parameters.AddWithValue("@MontoMensual", (object)contrato.MontoMensual ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Moneda", (object)contrato.Moneda ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Deposito", (object)contrato.Deposito ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Observaciones", (object)contrato.Observaciones ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@CreadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value);
+
+                        int rowsAffected = await command.ExecuteNonQueryAsync();
+                        exito = rowsAffected > 0;
+
+                        if (exito)
+                        {
+                            contrato.Id = (int)command.LastInsertedId;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error al insertar contrato: {e.Message}");
+                    throw;
+                }
+            }
+            return exito;
+        }
+
+
+        public async Task<bool> BajaAsync(int contratoId, int? idUsuario)
+        {
+            bool exito = false;
+            await using (var connection = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    await connection.OpenAsync();
+
+                    string query = @"
+                UPDATE contrato
+                SET estado = 'NO VIGENTE',
+                    fecha_modificacion = NOW(),
+                    modificado_por = @ModificadoPor
+                WHERE id = @Id";
+
+                    await using (var command = new MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", contratoId);
+                        command.Parameters.AddWithValue("@ModificadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value);
+
+                        int rowsAffected = await command.ExecuteNonQueryAsync();
+                        exito = rowsAffected > 0;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error al eliminar contrato: {e.Message}");
+                    throw;
+                }
+            }
+            return exito;
         }
 
     }
