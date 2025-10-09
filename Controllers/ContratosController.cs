@@ -409,9 +409,21 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
 
                 if (contrato.FechaInicio.AddMonths(6).Date <= DateTime.Now.Date)
                 {
-                    Console.WriteLine("Puede rescindir el contrato.");  
-                    var inquilino = inquilinoService.ObtenerPorId(contrato.InquilinoId);
+
+                    Inquilino inquilino = inquilinoService.ObtenerPorId(contrato.InquilinoId);
                     Inmueble inmueble = inmuebleService.ObtenerPorId(contrato.InmuebleId);
+
+                    if (contrato.FechaInicio.AddMonths(12).Date >= DateTime.Now.Date)
+                    {
+
+                        ViewBag.Multa = (contrato.MontoMensual ?? 0) * 1.5m;
+                    }
+                    else
+                    {
+
+                        ViewBag.Multa = contrato.MontoMensual;
+
+                    }
 
                     ViewBag.Persona = inquilino.Persona;
                     ViewBag.Inmueble = inmueble;
@@ -425,6 +437,21 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     return View(contrato);
                 }
 
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult RescindirContrato(int ContratoId)
+        {
+            try
+            {
+                int? idUsuario = int.Parse(User.FindFirstValue("UserId"));
+                contratoService.Baja(ContratoId, idUsuario);
+                return RedirectToAction("Lista");
             }
             catch (Exception ex)
             {

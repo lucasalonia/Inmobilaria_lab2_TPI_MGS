@@ -15,7 +15,7 @@
             </div>
 
             <div class="card-body p-4">
-                <form asp-action="RescindirConfirmado" method="post">
+                <form asp-action="RescindirContrato" method="post">
                     <input type="hidden" name="ContratoId" value="@Model.Id" />
 
                     <div class="mb-4">
@@ -78,7 +78,7 @@
                             <h5 class="mb-0 fw-bold">Multa</h5>
                         </div>
                         <hr class="mt-2 mb-3" />
-                        <p>Ejemplo: $50.000</p>
+                        <p>@ViewBag.Multa</p>
                     </div>
 
                     <div class="d-flex justify-content-end mt-4">

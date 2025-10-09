@@ -102,33 +102,13 @@
                                         <td class="text-center">
                                             @if (!string.IsNullOrEmpty(item.Observaciones))
                                             {
-                                                <button type="button" class="btn btn-sm btn-outline-secondary"
-                                                    data-bs-toggle="modal" data-bs-target="#observacionesModal_@item.Id">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary btn-observaciones"
+                                                        data-id="@item.Id"
+                                                        data-observaciones="@item.Observaciones">
                                                     ...
                                                 </button>
 
-                                                <!-- Modal -->
-                                                <div class="modal fade" id="observacionesModal_@item.Id" tabindex="-1"
-                                                    aria-labelledby="observacionesLabel_@item.Id" aria-hidden="true">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="observacionesLabel_@item.Id">
-                                                                    Observaciones del Contrato #@item.Id
-                                                                </h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                    aria-label="Cerrar"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <p>@item.Observaciones</p>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary"
-                                                                    data-bs-dismiss="modal">Cerrar</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                                                
                                             }
                                             else
                                             {
@@ -226,6 +206,24 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="observacionesModal" tabindex="-1" aria-labelledby="observacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="observacionesLabel">Observaciones del Contrato</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p id="contenidoObservaciones"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div
+
 <!-- Modal Editar Contrato -->
 <div class="modal fade" id="editarModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -305,6 +303,17 @@
 
 @section Scripts {
     <script>
+          document.querySelectorAll('.btn-observaciones').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const texto = this.dataset.observaciones;
+
+                document.getElementById('contenidoObservaciones').textContent = texto;
+                document.getElementById('observacionesLabel').textContent = `Observaciones del Contrato #${id}`;
+
+                new bootstrap.Modal(document.getElementById('observacionesModal')).show();
+            });
+        });
           document.querySelectorAll('.btn-editar').forEach(btn => {
         btn.addEventListener('click', function () {
             const fechaInicio = this.dataset.fechainicio;
