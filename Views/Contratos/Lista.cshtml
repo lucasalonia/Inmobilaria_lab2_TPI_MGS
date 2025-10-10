@@ -34,40 +34,40 @@
 </style>
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title mb-0">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h3 class="card-title mb-0 fw-bold text-primary">
                     <i class="fas fa-file-contract me-2"></i>Contratos
                 </h3>
                 <a class="btn btn-primary" asp-action="Index" title="Nuevo Contrato" data-bs-toggle="tooltip">
                     <i class="fas fa-plus me-1"></i>Crear Contrato
                 </a>
-
             </div>
 
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-12">
                         <p class="text-muted mb-0">
-                            Mostrando @((Pagina - 1) * tamPagina + 1) a
-                            @Math.Min(Pagina * tamPagina, TotalRegistros) de
-                            @TotalRegistros contratos
+                            <i class="fas fa-info-circle me-1"></i>
+                            Mostrando <strong>@((Pagina - 1) * tamPagina + 1)</strong> a
+                            <strong>@Math.Min(Pagina * tamPagina, TotalRegistros)</strong> de
+                            <strong>@TotalRegistros</strong> contratos
                         </p>
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
+                    <table class="table table-modern">
+                        <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Fecha Inicio</th>
-                                <th>Fecha Fin</th>
-                                <th>Estado</th>
-                                <th>Moneda</th>
-                                <th>Monto Mensual</th>
-                                <th>Depósito</th>
-                                <th>Observaciones</th>
-                                <th>Acciones</th>
+                                <th><i class="fas fa-hashtag me-1"></i>ID</th>
+                                <th><i class="fas fa-calendar-check me-1"></i>F. Inicio</th>
+                                <th><i class="fas fa-calendar-times me-1"></i>F. Fin</th>
+                                <th class="text-center"><i class="fas fa-toggle-on me-1"></i>Estado</th>
+                                <th><i class="fas fa-coins me-1"></i>Moneda</th>
+                                <th><i class="fas fa-money-bill me-1"></i>Monto Mensual</th>
+                                <th><i class="fas fa-piggy-bank me-1"></i>Depósito</th>
+                                <th class="text-center"><i class="fas fa-comment me-1"></i>Obs.</th>
+                                <th class="text-center"><i class="fas fa-cogs me-1"></i>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -76,29 +76,39 @@
                                 foreach (var item in Model)
                                 {
                                     <tr>
-                                        <td>@item.Id</td>
-                                        <td>@item.FechaInicio.ToShortDateString()</td>
-                                        <td>@item.FechaFin.ToShortDateString()</td>
+                                        <td><span class="badge bg-info">@item.Id</span></td>
+                                        <td><small class="text-muted"><i class="fas fa-calendar me-1"></i>@item.FechaInicio.ToShortDateString()</small></td>
+                                        <td><small class="text-muted"><i class="fas fa-calendar me-1"></i>@item.FechaFin.ToShortDateString()</small></td>
                                         <td class="text-center">
                                             @{
                                                 bool esActivo = item.Estado == "VIGENTE" && item.FechaFin.Date >= DateTime.Now.Date;
                                             }
                                             @if (string.IsNullOrEmpty(item.Estado))
                                             {
-                                                <span class="badge bg-secondary">SIN ESTADO</span>
+                                                <span class="status-badge status-pending">SIN ESTADO</span>
                                             }
                                             else if (esActivo)
                                             {
-                                                <span class="badge bg-success">ACTIVO</span>
+                                                <span class="status-badge status-active">
+                                                    <i class="fas fa-check-circle me-1"></i>ACTIVO
+                                                </span>
+                                            }
+                                            else if (item.Estado == "VIGENTE")
+                                            {
+                                                <span class="status-badge status-pending">
+                                                    <i class="fas fa-exclamation-circle me-1"></i>VENCIDO
+                                                </span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-danger">@item.Estado</span>
+                                                <span class="status-badge status-inactive">
+                                                    <i class="fas fa-times-circle me-1"></i>@item.Estado
+                                                </span>
                                             }
                                         </td>
-                                        <td>@item.Moneda</td>
-                                        <td>@item.MontoMensual</td>
-                                        <td>@item.Deposito</td>
+                                        <td><span class="badge bg-success">@item.Moneda</span></td>
+                                        <td><strong class="text-success">$@(item.MontoMensual?.ToString("N2") ?? "0.00")</strong></td>
+                                        <td><span class="text-muted">$@(item.Deposito?.ToString("N2") ?? "0.00")</span></td>
                                         <td class="text-center">
                                             @if (!string.IsNullOrEmpty(item.Observaciones))
                                             {

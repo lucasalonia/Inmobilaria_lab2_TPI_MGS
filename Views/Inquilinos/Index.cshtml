@@ -19,9 +19,9 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title mb-0">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h3 class="card-title mb-0 fw-bold text-primary">
                     <i class="fas fa-users me-2"></i>Historial de Inquilinos
                 </h3>
                 <a class="btn btn-primary" asp-action="Agregar" title="Nuevo Inquilino" data-bs-toggle="tooltip">
@@ -32,24 +32,24 @@
                 <div class="row mb-3">
                     <div class="col-12">
                         <p class="text-muted mb-0">
-                            Mostrando @((Pagina - 1) * tamPagina + 1) a
-                            @Math.Min(Pagina * tamPagina, TotalRegistros) de
-                            @TotalRegistros inquilinos
+                            <i class="fas fa-info-circle me-1"></i>
+                            Mostrando <strong>@((Pagina - 1) * tamPagina + 1)</strong> a
+                            <strong>@Math.Min(Pagina * tamPagina, TotalRegistros)</strong> de
+                            <strong>@TotalRegistros</strong> inquilinos
                         </p>
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
+                    <table class="table table-modern">
+                        <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>DNI</th>
-                                <th>Teléfono</th>
-                                <th>Email</th>
-                                <th>Estado Contrato</th>
-                                <th>Acciones</th>
+                                <th><i class="fas fa-hashtag me-1"></i>ID</th>
+                                <th><i class="fas fa-user me-1"></i>Inquilino</th>
+                                <th><i class="fas fa-id-card me-1"></i>DNI</th>
+                                <th><i class="fas fa-phone me-1"></i>Teléfono</th>
+                                <th><i class="fas fa-envelope me-1"></i>Email</th>
+                                <th class="text-center"><i class="fas fa-file-contract me-1"></i>Estado Contrato</th>
+                                <th class="text-center"><i class="fas fa-cogs me-1"></i>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -58,28 +58,42 @@
                                 foreach (var item in Model)
                                 {
                                     <tr>
-                                        <td>@item.Inquilino.Id</td>
-                                        <td>@item.Persona.Nombre</td>
-                                        <td>@item.Persona.Apellido</td>
-                                        <td>@item.Persona.Dni</td>
+                                        <td><span class="badge bg-info">@item.Inquilino.Id</span></td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="fw-semibold">@item.Persona.Nombre @item.Persona.Apellido</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-secondary">@item.Persona.Dni</span></td>
                                         <td>@(item.Persona.Telefono ?? "-")</td>
                                         <td>@(item.Persona.Email ?? "-")</td>
                                         <td class="text-center">
                                             @if (item.Contrato == null)
                                             {
-                                                <span class="badge bg-secondary">SIN CONTRATO</span>
+                                                <span class="status-badge status-pending">
+                                                    <i class="fas fa-exclamation-circle me-1"></i>SIN CONTRATO
+                                                </span>
                                             }
                                             else if (item.Contrato.Estado == "VIGENTE")
                                             {
-                                                <span class="badge bg-success">VIGENTE</span>
+                                                <span class="status-badge status-active">
+                                                    <i class="fas fa-check-circle me-1"></i>VIGENTE
+                                                </span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-danger">@item.Contrato.Estado</span>
+                                                <span class="status-badge status-inactive">
+                                                    <i class="fas fa-times-circle me-1"></i>@item.Contrato.Estado
+                                                </span>
                                             }
                                         </td>
-                                        <td class="text-center">
-                                            <div class="btn-group" role="group">
+                                        <td>
+                                            <div class="table-actions">
                                                 <a class="btn btn-sm btn-outline-primary btn-editar" href="javascript:void(0);"
                                                     data-id="@item.Persona.Id" data-nombre="@item.Persona.Nombre"
                                                     data-apellido="@item.Persona.Apellido" data-dni="@item.Persona.Dni"
