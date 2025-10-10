@@ -20,13 +20,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         private readonly ContratoService contratoService;
         private readonly InmuebleService inmuebleService;
         private readonly PagoService pagoService;
+        private readonly UsuarioService usuarioService;
 
-        public ContratosController(InquilinoService inquilinoService, ContratoService contratoService, InmuebleService inmuebleService, PagoService pagoService)
+        public ContratosController(InquilinoService inquilinoService, ContratoService contratoService, InmuebleService inmuebleService, PagoService pagoService, UsuarioService usuarioService)
         {
             this.inquilinoService = inquilinoService;
             this.contratoService = contratoService;
             this.inmuebleService = inmuebleService;
             this.pagoService = pagoService;
+            this.usuarioService = usuarioService;
         }
 
         // GET: ContratosController
@@ -354,6 +356,26 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
 
                 ViewBag.Inquilino = inquilino;
                 ViewBag.Inmueble = inmueble;
+
+                if (contrato.CreadoPor.HasValue)
+                {
+                    var usuarioCreador = usuarioService.ObtenerPorId((int)contrato.CreadoPor.Value);
+                    ViewBag.UsuarioCreador = usuarioCreador;
+                }
+                else
+                {
+                    ViewBag.UsuarioCreador = null;
+                }
+
+                if (contrato.TerminadoPor.HasValue)
+                {
+                    var usuarioTerminador = usuarioService.ObtenerPorId(contrato.TerminadoPor.Value);
+                    ViewBag.UsuarioTerminador = usuarioTerminador;
+                }
+                else
+                {
+                    ViewBag.UsuarioTerminador = null;
+                }
 
                 return View(contrato);
             }

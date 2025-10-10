@@ -142,12 +142,14 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     string query = @"UPDATE contrato
                                      SET estado = 'NO VIGENTE',
                                          fecha_modificacion = NOW(),
-                                         modificado_por = @ModificadoPor
+                                         modificado_por = @ModificadoPor,
+                                         terminado_por = @TerminadoPor
                                      WHERE id = @Id";
                     using (var command = new MySqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", contratoId);
                         command.Parameters.AddWithValue("@ModificadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@TerminadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value);
                         int rowsAffected = command.ExecuteNonQuery();
                         exito = rowsAffected > 0;
                     }
@@ -239,7 +241,7 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     connection.Open();
 
                     string query = @"
-                                SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones, fecha_creacion, fecha_modificacion, creado_por
+                                SELECT id, inmueble_id, inquilino_id, fecha_inicio, fecha_fin, estado, monto_mensual, moneda, deposito, observaciones, fecha_creacion, fecha_modificacion, creado_por, modificado_por, terminado_por
                                 FROM contrato
                                 WHERE id = @ContratoId
                                 LIMIT 1";
@@ -268,7 +270,13 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                                     FechaModificacion = reader.GetDateTime("fecha_modificacion"),
                                     CreadoPor = reader.IsDBNull(reader.GetOrdinal("creado_por"))
                                         ? (ulong?)null
-                                        : (ulong)reader.GetInt32("creado_por")
+                                        : (ulong)reader.GetInt32("creado_por"),
+                                    ModificadoPor = reader.IsDBNull(reader.GetOrdinal("modificado_por"))
+                                        ? (ulong?)null
+                                        : (ulong)reader.GetInt32("modificado_por"),
+                                    TerminadoPor = reader.IsDBNull(reader.GetOrdinal("terminado_por"))
+                                        ? (int?)null
+                                        : reader.GetInt32("terminado_por")
                                 };
                             }
                         }
@@ -769,13 +777,15 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                 UPDATE contrato
                 SET estado = 'NO VIGENTE',
                     fecha_modificacion = NOW(),
-                    modificado_por = @ModificadoPor
+                    modificado_por = @ModificadoPor,
+                    terminado_por = @TerminadoPor
                 WHERE id = @Id";
 
                     await using (var command = new MySqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", contratoId);
                         command.Parameters.AddWithValue("@ModificadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@TerminadoPor", idUsuario.HasValue ? idUsuario.Value : (object)DBNull.Value);
 
                         int rowsAffected = await command.ExecuteNonQueryAsync();
                         exito = rowsAffected > 0;

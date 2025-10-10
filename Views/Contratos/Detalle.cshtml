@@ -48,14 +48,44 @@
         <div class="col-md-12">
             <div class="card border-secondary shadow-sm">
                 <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0"> <i class="bi bi-receipt me-2"></i> Datos del Inmueble</h5>
+                    <h5 class="mb-0"> <i class="bi bi-receipt me-2"></i> Datos del Contrato</h5>
                 </div>
                 <div class="card-body">
                     <p><strong>ID Contrato:</strong> @Model.Id</p>
                     <p><strong>Fecha de Inicio:</strong> @Model.FechaInicio.ToShortDateString()</p>
                     <p><strong>Fecha de Fin:</strong> @Model.FechaFin.ToShortDateString()</p>
                     <p><strong>Monto:</strong> $@Model.MontoMensual</p>
-                    <p><strong>Estado:</strong> @Model.Estado</p>
+                    <p><strong>Estado:</strong> 
+                        @if (Model.Estado == "VIGENTE")
+                        {
+                            <span class="badge bg-success">@Model.Estado</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">@Model.Estado</span>
+                        }
+                    </p>
+                    
+                    <hr class="my-3" />
+                    
+                    @if (ViewBag.UsuarioCreador != null)
+                    {
+                        <p><strong><i class="fas fa-user-plus me-1"></i> Creado por:</strong> @ViewBag.UsuarioCreador.Persona.Nombre @ViewBag.UsuarioCreador.Persona.Apellido (@ViewBag.UsuarioCreador.UserName)</p>
+                        <p class="text-muted"><small><i class="fas fa-calendar me-1"></i>Fecha de creación: @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</small></p>
+                    }
+                    else
+                    {
+                        <p class="text-muted"><small><i class="fas fa-calendar me-1"></i>Creado: @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</small></p>
+                    }
+
+                    @if (Model.Estado == "NO VIGENTE" && ViewBag.UsuarioTerminador != null)
+                    {
+                        <hr class="my-3" />
+                        <p><strong><i class="fas fa-user-times me-1 text-danger"></i> Terminado por:</strong> @ViewBag.UsuarioTerminador.Persona.Nombre @ViewBag.UsuarioTerminador.Persona.Apellido (@ViewBag.UsuarioTerminador.UserName)</p>
+                        <p class="text-muted"><small><i class="fas fa-calendar-times me-1"></i>Fecha de terminación: @Model.FechaModificacion.ToString("dd/MM/yyyy HH:mm")</small></p>
+                    }
+                    
+                    <hr class="my-3" />
                     <a asp-controller="Pagos" asp-action="Lista" asp-route-id="@Model.Id"
                                                     class="btn btn-primary btn-sm" title="Registrar Pago">
                                                     <i class="fas fa-file-contract"></i> Lista de Pagos
