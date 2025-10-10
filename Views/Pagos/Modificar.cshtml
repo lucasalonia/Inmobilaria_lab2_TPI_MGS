@@ -58,12 +58,11 @@
                                         <label class="form-label">Recargo</label>
                                         @if (ViewBag.Estado == "PENDIENTE")
                                         {
-                                            <input type="number" step="0.01" class="form-control" asp-for="Recargo"
-                                                disabled />
+                                            <input type="number" step="0.01" class="form-control" asp-for="Recargo" value="0.00" disabled />
                                         }
                                         else
                                         {
-                                            <input type="number" step="0.01" class="form-control" asp-for="Recargo" />
+                                            <input type="number" step="0.01" class="form-control" asp-for="Recargo" value="0.00" min="0" />
                                         }
                                         <span asp-validation-for="Recargo" class="text-danger"></span>
                                     </div>
@@ -71,8 +70,8 @@
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label"> Descuento </label>
-                                        <input type="number" step="0.01" class="form-control" asp-for="Descuento" />
+                                        <label class="form-label">Descuento</label>
+                                        <input type="number" step="0.01" class="form-control" asp-for="Descuento" value="0.00" min="0" />
                                         <span asp-validation-for="Descuento" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -120,6 +119,17 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             const form = document.querySelector("form");
+            
+            const recargoField = document.querySelector("[name='Recargo']");
+            const descuentoField = document.querySelector("[name='Descuento']");
+            
+            if (recargoField && !recargoField.value) {
+                recargoField.value = "0.00";
+            }
+            if (descuentoField && !descuentoField.value) {
+                descuentoField.value = "0.00";
+            }
+            
             form.addEventListener("submit", (e) => {
                 const importePagado = parseFloat(document.querySelector("[name='ImportePagado']").value);
                 const medioPago = document.querySelector("[name='MedioPago']").value;
@@ -136,6 +146,13 @@
 
                 if (!medioPago) {
                     errores.push("Debe seleccionar un medio de pago.");
+                }
+
+                if (!recargoField.value || recargoField.value === "") {
+                    recargoField.value = "0.00";
+                }
+                if (!descuentoField.value || descuentoField.value === "") {
+                    descuentoField.value = "0.00";
                 }
 
                 if (errores.length > 0) {

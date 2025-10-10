@@ -76,11 +76,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                     var updates = new List<string>();
                     var parameters = new List<MySqlParameter>();
 
-                    if (!string.IsNullOrWhiteSpace(pago.Estado))
-                    {
-                        updates.Add("estado = @Estado");
-                        parameters.Add(new MySqlParameter("@Estado", pago.Estado));
-                    }
+                    updates.Add("estado = @Estado");
+                    parameters.Add(new MySqlParameter("@Estado", pago.Estado ?? "PENDIENTE"));
 
                     if (pago.ImportePagado.HasValue)
                     {
@@ -105,6 +102,12 @@ namespace Inmobilaria_lab2_TPI_MGS.Repository
                         updates.Add("observaciones = @Observaciones");
                         parameters.Add(new MySqlParameter("@Observaciones", pago.Observaciones));
                     }
+
+                    updates.Add("recargo = @Recargo");
+                    parameters.Add(new MySqlParameter("@Recargo", pago.Recargo));
+                    updates.Add("descuento = @Descuento");
+                    parameters.Add(new MySqlParameter("@Descuento", pago.Descuento));
+
                     updates.Add("importe = @Importe");
                     parameters.Add(new MySqlParameter("@Importe", pago.Importe));
 

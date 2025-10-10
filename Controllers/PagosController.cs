@@ -110,7 +110,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     return NotFound();
                 }
 
-                ViewBag.PeriodoMes = DateTimeFormatInfo.CurrentInfo.GetMonthName(pago.PeriodoMes);
+                ViewBag.PeriodoMes = pago.PeriodoMes > 0 && pago.PeriodoMes <= 12 
+                    ? DateTimeFormatInfo.CurrentInfo.GetMonthName(pago.PeriodoMes) 
+                    : string.Empty;
                 ViewBag.PeriodoAnio = pago.PeriodoAnio;
                 ViewBag.Estado = pago.Estado;
                 ViewBag.Importe = pago.Importe;
@@ -130,6 +132,18 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
         {
             try
             {
+                if (pago.Recargo == 0 && string.IsNullOrEmpty(Request.Form["Recargo"]))
+                {
+                    pago.Recargo = 0;
+                }
+                if (pago.Descuento == 0 && string.IsNullOrEmpty(Request.Form["Descuento"]))
+                {
+                    pago.Descuento = 0;
+                }
+                if (string.IsNullOrWhiteSpace(pago.Observaciones))
+                {
+                    pago.Observaciones = null;
+                }
                
                 if (ModelState.IsValid)
                 {
@@ -137,21 +151,23 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                     pago.FechaPago = DateTime.Now;
                     Pago pagoAux = pagoService.ObtenerPorId(pago.Id);
 
-                    decimal resta =  (decimal)pagoAux.Importe - (decimal)pago.ImportePagado;
+                    pago.Importe = pagoAux.Importe;
 
-                    if (resta == 0)
+                    decimal saldoRestante = (decimal)pagoAux.Importe - (decimal)pago.ImportePagado;
+
+                    if (saldoRestante <= 0)
                     {
                         pago.Estado = "PAGADO";
-                        pago.Importe = resta;
-                    }
-                    else if (resta > 0)
-                    {
-                        pago.Estado = "PENDIENTE";
-                        pago.Importe = resta;
+                        if (saldoRestante < 0)
+                        {
+                            pago.ImportePagado = pagoAux.Importe;
+                        }
+                        Console.WriteLine($"Pago {pago.Id} marcado como PAGADO. Importe: {pagoAux.Importe}, Pagado: {pago.ImportePagado}");
                     }
                     else
                     {
-                        throw new Exception("El importe pagado no puede ser mayor al importe del pago.");
+                        pago.Estado = "PENDIENTE";
+                        Console.WriteLine($"Pago {pago.Id} mantiene estado PENDIENTE. Saldo restante: {saldoRestante}");
                     }
 
                     pagoService.Modificar(pago, idUsuario);
@@ -160,7 +176,9 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
                 else
                 {
                     // Si el modelo no es válido, vuelve a la vista con los errores de validación
-                    ViewBag.PeriodoMes = DateTimeFormatInfo.CurrentInfo.GetMonthName(pago.PeriodoMes);
+                    ViewBag.PeriodoMes = pago.PeriodoMes > 0 && pago.PeriodoMes <= 12 
+                        ? DateTimeFormatInfo.CurrentInfo.GetMonthName(pago.PeriodoMes) 
+                        : string.Empty;
                     ViewBag.PeriodoAnio = pago.PeriodoAnio;
                     ViewBag.Estado = pago.Estado;
                     ViewBag.FechaVencimiento = pago.FechaVencimiento;
