@@ -3,15 +3,34 @@ document.addEventListener('DOMContentLoaded', function () {
     var form = document.querySelector('#profileModal form');
     if (!form) return;
 
-    // Previsualizar al seleccionar archivo
     var fileInput = form.querySelector('#FotoPerfil');
     var imgEl = document.querySelector('#profileModal img');
+    var removeCheckbox = form.querySelector('#RemoveFotoPerfil');
+    var defaultAvatar = '/img/avatar-default.svg';
+    var originalPhoto = imgEl ? imgEl.src : defaultAvatar;
+
     if (fileInput && imgEl) {
         fileInput.addEventListener('change', function () {
             var f = fileInput.files && fileInput.files[0];
             if (!f) return;
             var url = URL.createObjectURL(f);
             imgEl.src = url;
+            if (removeCheckbox && removeCheckbox.checked) {
+                removeCheckbox.checked = false;
+            }
+        });
+    }
+
+    if (removeCheckbox && fileInput && imgEl) {
+        removeCheckbox.addEventListener('change', function () {
+            if (removeCheckbox.checked) {
+                fileInput.disabled = true;
+                fileInput.value = '';
+                imgEl.src = defaultAvatar;
+            } else {
+                fileInput.disabled = false;
+                imgEl.src = originalPhoto;
+            }
         });
     }
     form.addEventListener('submit', async function (e) {
@@ -28,26 +47,32 @@ document.addEventListener('DOMContentLoaded', function () {
             var data = await resp.json();
             if (data && data.success) {
                 if (window.toastr) toastr.success(data.message || 'Perfil actualizado');
-                // Actualizar imagen del modal y cache-busting
-                if (imgEl && data.photoUrl) {
-                    var bust = (data.photoUrl.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
-                    imgEl.src = data.photoUrl + bust;
+                var photoUrl = data.photoUrl || defaultAvatar;
+                if (imgEl) {
+                    if (photoUrl === defaultAvatar) {
+                        imgEl.src = defaultAvatar;
+                    } else {
+                        var bust = (photoUrl.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
+                        imgEl.src = photoUrl + bust;
+                    }
                 }
-                // Actualizar avatar del navbar si existe
                 var navImg = document.getElementById('navbarAvatar');
-                if (navImg && data.photoUrl) {
-                    var bust2 = (data.photoUrl.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
-                    navImg.src = data.photoUrl + bust2;
+                if (navImg) {
+                    if (photoUrl === defaultAvatar) {
+                        navImg.src = defaultAvatar;
+                    } else {
+                        var bust2 = (photoUrl.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
+                        navImg.src = photoUrl + bust2;
+                    }
                 }
                 var modalEl = document.getElementById('profileModal');
                 if (modalEl) {
                     var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
                     modal.hide();
                 }
-                // Limpiar passwords
-                var cur = form.querySelector('#CurrentPassword'); if (cur) cur.value = '';
-                var np = form.querySelector('#NewPassword'); if (np) np.value = '';
-                var cp = form.querySelector('#ConfirmPassword'); if (cp) cp.value = '';
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
             } else {
                 var msg = (data && data.message) ? data.message : 'No se pudo actualizar el perfil';
                 if (window.toastr) toastr.error(msg); else alert(msg);

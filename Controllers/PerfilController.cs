@@ -98,8 +98,28 @@ namespace Inmobilaria_lab2_TPI_MGS.Controllers
 
                 usuario.UserName = model.Username?.Trim() ?? usuario.UserName;
 
+                if (model.RemoveFotoPerfil)
+                {
+                    if (!string.IsNullOrWhiteSpace(usuario.FotoPerfil))
+                    {
+                        try
+                        {
+                            var baseDir = Path.Combine("C:\\inmobiliaria\\perfil", usuario.Id.ToString());
+                            var filePath = usuario.FotoPerfil.Replace("/perfil/", "C:\\inmobiliaria\\perfil\\").Replace("/", "\\");
+                            if (System.IO.File.Exists(filePath))
+                            {
+                                System.IO.File.Delete(filePath);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error al eliminar archivo de foto: {ex.Message}");
+                        }
+                    }
+                    usuario.FotoPerfil = null;
+                }
                 // Guardar foto si fue enviada
-                if (FotoPerfil != null && FotoPerfil.Length > 0)
+                else if (FotoPerfil != null && FotoPerfil.Length > 0)
                 {
                     if (FotoPerfil.Length > 2 * 1024 * 1024)
                     {

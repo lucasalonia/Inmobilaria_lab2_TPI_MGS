@@ -20,6 +20,8 @@ namespace Inmobilaria_lab2_TPI_MGS.Models.ViewModels
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Debe confirmar la contraseña")]
         [Compare("NewPassword", ErrorMessage = "Las contraseñas no coinciden")]
         public string? ConfirmPassword { get; set; }
+
+        public bool RemoveFotoPerfil { get; set; } = false;
     }
 }
 
